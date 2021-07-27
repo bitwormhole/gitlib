@@ -3,4 +3,5 @@
 
 
 #### 项目内各个包的依赖关系：
-    [commands] -> [instructions] -> [local] -> [remote] -> [network] -> [repository] -> [util]
+    [gitlib] -> [commands] -> [instructions] -> [local] -> [remote] -
+    -> [network] -> [repository] -> [git] -> [util]
