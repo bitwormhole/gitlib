@@ -2,7 +2,7 @@ package repository
 
 import "github.com/bitwormhole/gitlib/util"
 
-type GitWorktree interface {
+// GitWorkspace aka WorkingDirectory
+type GitWorkspace interface {
 	util.LocalDirectory
-	GitContextClient
 }

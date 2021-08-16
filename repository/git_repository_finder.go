@@ -2,6 +2,7 @@ package repository
 
 import "github.com/bitwormhole/starter/io/fs"
 
-type GitRepositoryFinder interface {
+// Finder 是仓库的搜索器
+type Finder interface {
 	Find(path fs.Path) []fs.Path
 }

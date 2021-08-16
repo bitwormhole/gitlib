@@ -1,7 +1,8 @@
 package repository
 
-import "github.com/bitwormhole/starter/io/fs"
+// Factory 是仓库的工厂
+type Factory interface {
 
-type GitRepositoryFactory interface {
-	Open(path fs.Path) (GitRepositoryViewport, error)
+	// Open 打开位于 location 的仓库
+	Open(location *Location) (Viewport, error)
 }

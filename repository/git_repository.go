@@ -2,8 +2,8 @@ package repository
 
 import "github.com/bitwormhole/gitlib/util"
 
-// ref to the [.git] directory, or not if bare.
-type GitRepository interface {
+// Core 是仓库的核心目录 ref to the [.git] directory, or not if bare.
+type Core interface {
 	util.LocalDirectory
 
 	Config() GitConfig
