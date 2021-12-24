@@ -1,5 +1,0 @@
-package gitlib
-
-func Init() {
-
-}

@@ -11,7 +11,7 @@
             "mode": "auto",
             "program": "${workspaceFolder}/src/test/golang",
             "args": [
-                "--test.repo.path=E:\\home\\dev\\test\\example_git_repos\\repo1_normal\\temp\\xyz"
+                "--test.repo.path=E:\\home\\dev\\test\\example_git_repos\\outside_worktrees\\tree1\\xyz\\dir"
             ],
             "env": {
                 "test.1.repo": "E:\\home\\dev\\test\\example_git_repos\\repo1_normal\\temp\\xyz\\666",
