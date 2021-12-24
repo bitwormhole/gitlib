@@ -46,5 +46,5 @@ func (inst *LocalRepoDriver) Open(uri lang.URI) (repository.View, error) {
 		return nil, err
 	}
 
-	return repo.Facade.View, nil
+	return repo.View, nil
 }

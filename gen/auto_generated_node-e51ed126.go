@@ -8,12 +8,27 @@ import (
 	repository0x5aaf5a "github.com/bitwormhole/gitlib/git/repository"
 	support0x074feb "github.com/bitwormhole/gitlib/git/support"
 	localfilesys0x6be3ff "github.com/bitwormhole/gitlib/git/support/localfilesys"
+	config0x71b4a2 "github.com/bitwormhole/gitlib/git/support/localfilesys/config"
+	objects0x11508a "github.com/bitwormhole/gitlib/git/support/localfilesys/objects"
+	refs0x4e5472 "github.com/bitwormhole/gitlib/git/support/localfilesys/refs"
 	markup0x23084a "github.com/bitwormhole/starter/markup"
 )
 
 type pComLocalGitConfigFactory struct {
-	instance *localfilesys0x6be3ff.LocalGitConfigFactory
-	 markup0x23084a.Component `class:""`
+	instance *config0x71b4a2.LocalGitConfigFactory
+	 markup0x23084a.Component `class:"git-local-element-factory"`
+}
+
+
+type pComLocalGitObjectsFactory struct {
+	instance *objects0x11508a.LocalGitObjectsFactory
+	 markup0x23084a.Component `class:"git-local-element-factory"`
+}
+
+
+type pComLocalGitRefsFactory struct {
+	instance *refs0x4e5472.LocalGitRefsFactory
+	 markup0x23084a.Component `class:"git-local-element-factory"`
 }
 
 

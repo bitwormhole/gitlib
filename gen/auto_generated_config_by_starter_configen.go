@@ -9,6 +9,9 @@ import (
 	repository0x5aaf5a "github.com/bitwormhole/gitlib/git/repository"
 	support0x074feb "github.com/bitwormhole/gitlib/git/support"
 	localfilesys0x6be3ff "github.com/bitwormhole/gitlib/git/support/localfilesys"
+	config0x71b4a2 "github.com/bitwormhole/gitlib/git/support/localfilesys/config"
+	objects0x11508a "github.com/bitwormhole/gitlib/git/support/localfilesys/objects"
+	refs0x4e5472 "github.com/bitwormhole/gitlib/git/support/localfilesys/refs"
 	application "github.com/bitwormhole/starter/application"
 	config "github.com/bitwormhole/starter/application/config"
 	lang "github.com/bitwormhole/starter/lang"
@@ -29,18 +32,36 @@ func autoGenConfig(cb application.ConfigBuilder) error {
 	cominfobuilder := config.ComInfo()
 	nop(err,cominfobuilder)
 
-	// component: com0-localfilesys0x6be3ff.LocalGitConfigFactory
+	// component: com0-config0x71b4a2.LocalGitConfigFactory
 	cominfobuilder.Next()
-	cominfobuilder.ID("com0-localfilesys0x6be3ff.LocalGitConfigFactory").Class("").Aliases("").Scope("")
+	cominfobuilder.ID("com0-config0x71b4a2.LocalGitConfigFactory").Class("git-local-element-factory").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComLocalGitConfigFactory{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com1-localfilesys0x6be3ff.LocalRepoDriver
+	// component: com1-objects0x11508a.LocalGitObjectsFactory
 	cominfobuilder.Next()
-	cominfobuilder.ID("com1-localfilesys0x6be3ff.LocalRepoDriver").Class("git-repository-driver").Aliases("").Scope("")
+	cominfobuilder.ID("com1-objects0x11508a.LocalGitObjectsFactory").Class("git-local-element-factory").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComLocalGitObjectsFactory{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com2-refs0x4e5472.LocalGitRefsFactory
+	cominfobuilder.Next()
+	cominfobuilder.ID("com2-refs0x4e5472.LocalGitRefsFactory").Class("git-local-element-factory").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComLocalGitRefsFactory{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com3-localfilesys0x6be3ff.LocalRepoDriver
+	cominfobuilder.Next()
+	cominfobuilder.ID("com3-localfilesys0x6be3ff.LocalRepoDriver").Class("git-repository-driver").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComLocalRepoDriver{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
@@ -90,10 +111,10 @@ func autoGenConfig(cb application.ConfigBuilder) error {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComLocalGitConfigFactory : the factory of component: com0-localfilesys0x6be3ff.LocalGitConfigFactory
+// comFactory4pComLocalGitConfigFactory : the factory of component: com0-config0x71b4a2.LocalGitConfigFactory
 type comFactory4pComLocalGitConfigFactory struct {
 
-    mPrototype * localfilesys0x6be3ff.LocalGitConfigFactory
+    mPrototype * config0x71b4a2.LocalGitConfigFactory
 
 	
 
@@ -108,12 +129,12 @@ func (inst * comFactory4pComLocalGitConfigFactory) init() application.ComponentF
     return inst
 }
 
-func (inst * comFactory4pComLocalGitConfigFactory) newObject() * localfilesys0x6be3ff.LocalGitConfigFactory {
-	return & localfilesys0x6be3ff.LocalGitConfigFactory {}
+func (inst * comFactory4pComLocalGitConfigFactory) newObject() * config0x71b4a2.LocalGitConfigFactory {
+	return & config0x71b4a2.LocalGitConfigFactory {}
 }
 
-func (inst * comFactory4pComLocalGitConfigFactory) castObject(instance application.ComponentInstance) * localfilesys0x6be3ff.LocalGitConfigFactory {
-	return instance.Get().(*localfilesys0x6be3ff.LocalGitConfigFactory)
+func (inst * comFactory4pComLocalGitConfigFactory) castObject(instance application.ComponentInstance) * config0x71b4a2.LocalGitConfigFactory {
+	return instance.Get().(*config0x71b4a2.LocalGitConfigFactory)
 }
 
 func (inst * comFactory4pComLocalGitConfigFactory) GetPrototype() lang.Object {
@@ -144,7 +165,115 @@ func (inst * comFactory4pComLocalGitConfigFactory) Inject(instance application.C
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComLocalRepoDriver : the factory of component: com1-localfilesys0x6be3ff.LocalRepoDriver
+// comFactory4pComLocalGitObjectsFactory : the factory of component: com1-objects0x11508a.LocalGitObjectsFactory
+type comFactory4pComLocalGitObjectsFactory struct {
+
+    mPrototype * objects0x11508a.LocalGitObjectsFactory
+
+	
+
+}
+
+func (inst * comFactory4pComLocalGitObjectsFactory) init() application.ComponentFactory {
+
+	
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComLocalGitObjectsFactory) newObject() * objects0x11508a.LocalGitObjectsFactory {
+	return & objects0x11508a.LocalGitObjectsFactory {}
+}
+
+func (inst * comFactory4pComLocalGitObjectsFactory) castObject(instance application.ComponentInstance) * objects0x11508a.LocalGitObjectsFactory {
+	return instance.Get().(*objects0x11508a.LocalGitObjectsFactory)
+}
+
+func (inst * comFactory4pComLocalGitObjectsFactory) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComLocalGitObjectsFactory) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComLocalGitObjectsFactory) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComLocalGitObjectsFactory) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComLocalGitObjectsFactory) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComLocalGitObjectsFactory) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	return nil
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComLocalGitRefsFactory : the factory of component: com2-refs0x4e5472.LocalGitRefsFactory
+type comFactory4pComLocalGitRefsFactory struct {
+
+    mPrototype * refs0x4e5472.LocalGitRefsFactory
+
+	
+
+}
+
+func (inst * comFactory4pComLocalGitRefsFactory) init() application.ComponentFactory {
+
+	
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComLocalGitRefsFactory) newObject() * refs0x4e5472.LocalGitRefsFactory {
+	return & refs0x4e5472.LocalGitRefsFactory {}
+}
+
+func (inst * comFactory4pComLocalGitRefsFactory) castObject(instance application.ComponentInstance) * refs0x4e5472.LocalGitRefsFactory {
+	return instance.Get().(*refs0x4e5472.LocalGitRefsFactory)
+}
+
+func (inst * comFactory4pComLocalGitRefsFactory) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComLocalGitRefsFactory) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComLocalGitRefsFactory) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComLocalGitRefsFactory) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComLocalGitRefsFactory) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComLocalGitRefsFactory) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	return nil
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComLocalRepoDriver : the factory of component: com3-localfilesys0x6be3ff.LocalRepoDriver
 type comFactory4pComLocalRepoDriver struct {
 
     mPrototype * localfilesys0x6be3ff.LocalRepoDriver
@@ -213,7 +342,7 @@ func (inst * comFactory4pComLocalRepoDriver) getterForFieldLayoutSelector (conte
 	if !ok {
 		eb := &util.ErrorBuilder{}
 		eb.Message("bad cast")
-		eb.Set("com", "com1-localfilesys0x6be3ff.LocalRepoDriver")
+		eb.Set("com", "com3-localfilesys0x6be3ff.LocalRepoDriver")
 		eb.Set("field", "Layout")
 		eb.Set("type1", "?")
 		eb.Set("type2", "files0x00707a.Layout")
@@ -231,7 +360,7 @@ func (inst * comFactory4pComLocalRepoDriver) getterForFieldLocatorSelector (cont
 	if !ok {
 		eb := &util.ErrorBuilder{}
 		eb.Message("bad cast")
-		eb.Set("com", "com1-localfilesys0x6be3ff.LocalRepoDriver")
+		eb.Set("com", "com3-localfilesys0x6be3ff.LocalRepoDriver")
 		eb.Set("field", "Locator")
 		eb.Set("type1", "?")
 		eb.Set("type2", "files0x00707a.RepositoryLocator")
@@ -249,7 +378,7 @@ func (inst * comFactory4pComLocalRepoDriver) getterForFieldFactorySelector (cont
 	if !ok {
 		eb := &util.ErrorBuilder{}
 		eb.Message("bad cast")
-		eb.Set("com", "com1-localfilesys0x6be3ff.LocalRepoDriver")
+		eb.Set("com", "com3-localfilesys0x6be3ff.LocalRepoDriver")
 		eb.Set("field", "Factory")
 		eb.Set("type1", "?")
 		eb.Set("type2", "localfilesys0x6be3ff.RepoFactory")

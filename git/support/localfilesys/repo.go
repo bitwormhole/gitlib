@@ -2,31 +2,30 @@ package localfilesys
 
 import (
 	"github.com/bitwormhole/gitlib/git/repository"
+	"github.com/bitwormhole/gitlib/git/repository/objects"
+	"github.com/bitwormhole/gitlib/git/repository/refs"
 	"github.com/bitwormhole/starter/lang"
 )
 
-type Core struct {
-}
+type Repo struct {
+	Factory  RepoFactory
+	Elements []lang.Object
 
-type Shell struct {
-}
+	// detail
+	Objects objects.Directory
+	Refs    refs.Directory
+	Config  repository.Config
 
-type Working struct {
-}
+	Head  repository.HEAD
+	Index repository.Index
 
-type Facade struct {
+	// facade
 	View    repository.View
 	Shell   repository.Shell
 	Core    repository.Core
 	Working repository.WorkingDirectory
 }
 
-type Repo struct {
-	Factory  RepoFactory
-	Elements []lang.Object
-
-	Core    Core
-	Shell   Shell
-	Working Working
-	Facade  Facade
+func (inst *Repo) AddElement(o lang.Object) {
+	inst.Elements = append(inst.Elements, o)
 }
