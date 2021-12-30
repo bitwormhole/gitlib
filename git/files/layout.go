@@ -8,6 +8,8 @@ type CoreDirectory struct {
 	Config    fs.Path // the 'config' as file
 	Objects   fs.Path // the 'objects' as dir
 	Refs      fs.Path // the 'refs' as dir
+	Modules   fs.Path // the 'modules' as dir
+	Worktrees fs.Path // the 'worktrees' as dir
 }
 
 // ShellDirectory 壳子布局

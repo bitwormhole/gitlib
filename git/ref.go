@@ -11,6 +11,8 @@ type ReferenceName interface {
 type Ref interface {
 	Name() ReferenceName
 
+	Exists() bool
+
 	GetValue() (ObjectID, error)
 
 	SetValue(id ObjectID) error

@@ -1,7 +1,9 @@
 package refs
 
 import (
+	"github.com/bitwormhole/gitlib/git"
 	"github.com/bitwormhole/gitlib/git/files"
+	"github.com/bitwormhole/gitlib/git/repository/refs"
 	"github.com/bitwormhole/gitlib/git/support/localfilesys"
 	"github.com/bitwormhole/starter/io/fs"
 	"github.com/bitwormhole/starter/markup"
@@ -24,9 +26,8 @@ func (inst *LocalGitRefsFactory) CreateElement(r *localfilesys.Repo, v *files.Re
 	el := &localGitRefs{}
 	el.dir = v.Core.Refs
 
-	r.AddElement(el)
 	r.Refs = el
-
+	r.AddElement(el)
 	return nil
 }
 
@@ -34,6 +35,14 @@ func (inst *LocalGitRefsFactory) CreateElement(r *localfilesys.Repo, v *files.Re
 
 type localGitRefs struct {
 	dir fs.Path
+}
+
+func (inst *localGitRefs) _Impl() refs.Directory {
+	return inst
+}
+
+func (inst *localGitRefs) GetRef(name git.ReferenceName) git.Ref {
+	return nil
 }
 
 ////////////////////////////////////////////////////////////////////////////////

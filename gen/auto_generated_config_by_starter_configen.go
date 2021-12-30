@@ -10,8 +10,13 @@ import (
 	support0x074feb "github.com/bitwormhole/gitlib/git/support"
 	localfilesys0x6be3ff "github.com/bitwormhole/gitlib/git/support/localfilesys"
 	config0x71b4a2 "github.com/bitwormhole/gitlib/git/support/localfilesys/config"
+	head0xb6393b "github.com/bitwormhole/gitlib/git/support/localfilesys/head"
+	index0x3eb559 "github.com/bitwormhole/gitlib/git/support/localfilesys/index"
+	modules0xe8c0dc "github.com/bitwormhole/gitlib/git/support/localfilesys/modules"
 	objects0x11508a "github.com/bitwormhole/gitlib/git/support/localfilesys/objects"
 	refs0x4e5472 "github.com/bitwormhole/gitlib/git/support/localfilesys/refs"
+	views0x7d154b "github.com/bitwormhole/gitlib/git/support/localfilesys/views"
+	worktrees0xa9c0a9 "github.com/bitwormhole/gitlib/git/support/localfilesys/worktrees"
 	application "github.com/bitwormhole/starter/application"
 	config "github.com/bitwormhole/starter/application/config"
 	lang "github.com/bitwormhole/starter/lang"
@@ -41,27 +46,54 @@ func autoGenConfig(cb application.ConfigBuilder) error {
 		return err
 	}
 
-	// component: com1-objects0x11508a.LocalGitObjectsFactory
+	// component: com1-head0xb6393b.GitHeadFileFactory
 	cominfobuilder.Next()
-	cominfobuilder.ID("com1-objects0x11508a.LocalGitObjectsFactory").Class("git-local-element-factory").Aliases("").Scope("")
+	cominfobuilder.ID("com1-head0xb6393b.GitHeadFileFactory").Class("git-local-element-factory").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComGitHeadFileFactory{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com2-index0x3eb559.GitIndexFileFactory
+	cominfobuilder.Next()
+	cominfobuilder.ID("com2-index0x3eb559.GitIndexFileFactory").Class("git-local-element-factory").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComGitIndexFileFactory{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com3-modules0xe8c0dc.GitModulesDirFactory
+	cominfobuilder.Next()
+	cominfobuilder.ID("com3-modules0xe8c0dc.GitModulesDirFactory").Class("git-local-element-factory").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComGitModulesDirFactory{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com4-objects0x11508a.LocalGitObjectsFactory
+	cominfobuilder.Next()
+	cominfobuilder.ID("com4-objects0x11508a.LocalGitObjectsFactory").Class("git-local-element-factory").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComLocalGitObjectsFactory{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com2-refs0x4e5472.LocalGitRefsFactory
+	// component: com5-refs0x4e5472.LocalGitRefsFactory
 	cominfobuilder.Next()
-	cominfobuilder.ID("com2-refs0x4e5472.LocalGitRefsFactory").Class("git-local-element-factory").Aliases("").Scope("")
+	cominfobuilder.ID("com5-refs0x4e5472.LocalGitRefsFactory").Class("git-local-element-factory").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComLocalGitRefsFactory{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com3-localfilesys0x6be3ff.LocalRepoDriver
+	// component: com6-localfilesys0x6be3ff.LocalRepoDriver
 	cominfobuilder.Next()
-	cominfobuilder.ID("com3-localfilesys0x6be3ff.LocalRepoDriver").Class("git-repository-driver").Aliases("").Scope("")
+	cominfobuilder.ID("com6-localfilesys0x6be3ff.LocalRepoDriver").Class("git-repository-driver").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComLocalRepoDriver{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
@@ -90,6 +122,51 @@ func autoGenConfig(cb application.ConfigBuilder) error {
 	cominfobuilder.Next()
 	cominfobuilder.ID("git-local-repository-locator").Class("").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComLocalRepoLocator{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com10-views0x7d154b.CoreDirFactory
+	cominfobuilder.Next()
+	cominfobuilder.ID("com10-views0x7d154b.CoreDirFactory").Class("git-local-element-factory").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComCoreDirFactory{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com11-views0x7d154b.ShellDirFactory
+	cominfobuilder.Next()
+	cominfobuilder.ID("com11-views0x7d154b.ShellDirFactory").Class("git-local-element-factory").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComShellDirFactory{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com12-views0x7d154b.RepoViewFactory
+	cominfobuilder.Next()
+	cominfobuilder.ID("com12-views0x7d154b.RepoViewFactory").Class("git-local-element-factory").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComRepoViewFactory{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com13-views0x7d154b.WorkingDirFactory
+	cominfobuilder.Next()
+	cominfobuilder.ID("com13-views0x7d154b.WorkingDirFactory").Class("git-local-element-factory").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComWorkingDirFactory{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com14-worktrees0xa9c0a9.GitWorktreesDirFactory
+	cominfobuilder.Next()
+	cominfobuilder.ID("com14-worktrees0xa9c0a9.GitWorktreesDirFactory").Class("git-local-element-factory").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComGitWorktreesDirFactory{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
@@ -165,7 +242,169 @@ func (inst * comFactory4pComLocalGitConfigFactory) Inject(instance application.C
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComLocalGitObjectsFactory : the factory of component: com1-objects0x11508a.LocalGitObjectsFactory
+// comFactory4pComGitHeadFileFactory : the factory of component: com1-head0xb6393b.GitHeadFileFactory
+type comFactory4pComGitHeadFileFactory struct {
+
+    mPrototype * head0xb6393b.GitHeadFileFactory
+
+	
+
+}
+
+func (inst * comFactory4pComGitHeadFileFactory) init() application.ComponentFactory {
+
+	
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComGitHeadFileFactory) newObject() * head0xb6393b.GitHeadFileFactory {
+	return & head0xb6393b.GitHeadFileFactory {}
+}
+
+func (inst * comFactory4pComGitHeadFileFactory) castObject(instance application.ComponentInstance) * head0xb6393b.GitHeadFileFactory {
+	return instance.Get().(*head0xb6393b.GitHeadFileFactory)
+}
+
+func (inst * comFactory4pComGitHeadFileFactory) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComGitHeadFileFactory) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComGitHeadFileFactory) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComGitHeadFileFactory) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComGitHeadFileFactory) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComGitHeadFileFactory) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	return nil
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComGitIndexFileFactory : the factory of component: com2-index0x3eb559.GitIndexFileFactory
+type comFactory4pComGitIndexFileFactory struct {
+
+    mPrototype * index0x3eb559.GitIndexFileFactory
+
+	
+
+}
+
+func (inst * comFactory4pComGitIndexFileFactory) init() application.ComponentFactory {
+
+	
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComGitIndexFileFactory) newObject() * index0x3eb559.GitIndexFileFactory {
+	return & index0x3eb559.GitIndexFileFactory {}
+}
+
+func (inst * comFactory4pComGitIndexFileFactory) castObject(instance application.ComponentInstance) * index0x3eb559.GitIndexFileFactory {
+	return instance.Get().(*index0x3eb559.GitIndexFileFactory)
+}
+
+func (inst * comFactory4pComGitIndexFileFactory) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComGitIndexFileFactory) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComGitIndexFileFactory) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComGitIndexFileFactory) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComGitIndexFileFactory) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComGitIndexFileFactory) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	return nil
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComGitModulesDirFactory : the factory of component: com3-modules0xe8c0dc.GitModulesDirFactory
+type comFactory4pComGitModulesDirFactory struct {
+
+    mPrototype * modules0xe8c0dc.GitModulesDirFactory
+
+	
+
+}
+
+func (inst * comFactory4pComGitModulesDirFactory) init() application.ComponentFactory {
+
+	
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComGitModulesDirFactory) newObject() * modules0xe8c0dc.GitModulesDirFactory {
+	return & modules0xe8c0dc.GitModulesDirFactory {}
+}
+
+func (inst * comFactory4pComGitModulesDirFactory) castObject(instance application.ComponentInstance) * modules0xe8c0dc.GitModulesDirFactory {
+	return instance.Get().(*modules0xe8c0dc.GitModulesDirFactory)
+}
+
+func (inst * comFactory4pComGitModulesDirFactory) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComGitModulesDirFactory) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComGitModulesDirFactory) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComGitModulesDirFactory) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComGitModulesDirFactory) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComGitModulesDirFactory) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	return nil
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComLocalGitObjectsFactory : the factory of component: com4-objects0x11508a.LocalGitObjectsFactory
 type comFactory4pComLocalGitObjectsFactory struct {
 
     mPrototype * objects0x11508a.LocalGitObjectsFactory
@@ -219,7 +458,7 @@ func (inst * comFactory4pComLocalGitObjectsFactory) Inject(instance application.
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComLocalGitRefsFactory : the factory of component: com2-refs0x4e5472.LocalGitRefsFactory
+// comFactory4pComLocalGitRefsFactory : the factory of component: com5-refs0x4e5472.LocalGitRefsFactory
 type comFactory4pComLocalGitRefsFactory struct {
 
     mPrototype * refs0x4e5472.LocalGitRefsFactory
@@ -273,7 +512,7 @@ func (inst * comFactory4pComLocalGitRefsFactory) Inject(instance application.Com
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComLocalRepoDriver : the factory of component: com3-localfilesys0x6be3ff.LocalRepoDriver
+// comFactory4pComLocalRepoDriver : the factory of component: com6-localfilesys0x6be3ff.LocalRepoDriver
 type comFactory4pComLocalRepoDriver struct {
 
     mPrototype * localfilesys0x6be3ff.LocalRepoDriver
@@ -342,7 +581,7 @@ func (inst * comFactory4pComLocalRepoDriver) getterForFieldLayoutSelector (conte
 	if !ok {
 		eb := &util.ErrorBuilder{}
 		eb.Message("bad cast")
-		eb.Set("com", "com3-localfilesys0x6be3ff.LocalRepoDriver")
+		eb.Set("com", "com6-localfilesys0x6be3ff.LocalRepoDriver")
 		eb.Set("field", "Layout")
 		eb.Set("type1", "?")
 		eb.Set("type2", "files0x00707a.Layout")
@@ -360,7 +599,7 @@ func (inst * comFactory4pComLocalRepoDriver) getterForFieldLocatorSelector (cont
 	if !ok {
 		eb := &util.ErrorBuilder{}
 		eb.Message("bad cast")
-		eb.Set("com", "com3-localfilesys0x6be3ff.LocalRepoDriver")
+		eb.Set("com", "com6-localfilesys0x6be3ff.LocalRepoDriver")
 		eb.Set("field", "Locator")
 		eb.Set("type1", "?")
 		eb.Set("type2", "files0x00707a.RepositoryLocator")
@@ -378,7 +617,7 @@ func (inst * comFactory4pComLocalRepoDriver) getterForFieldFactorySelector (cont
 	if !ok {
 		eb := &util.ErrorBuilder{}
 		eb.Message("bad cast")
-		eb.Set("com", "com3-localfilesys0x6be3ff.LocalRepoDriver")
+		eb.Set("com", "com6-localfilesys0x6be3ff.LocalRepoDriver")
 		eb.Set("field", "Factory")
 		eb.Set("type1", "?")
 		eb.Set("type2", "localfilesys0x6be3ff.RepoFactory")
@@ -565,6 +804,276 @@ func (inst * comFactory4pComLocalRepoLocator) Destroy(instance application.Compo
 }
 
 func (inst * comFactory4pComLocalRepoLocator) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	return nil
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComCoreDirFactory : the factory of component: com10-views0x7d154b.CoreDirFactory
+type comFactory4pComCoreDirFactory struct {
+
+    mPrototype * views0x7d154b.CoreDirFactory
+
+	
+
+}
+
+func (inst * comFactory4pComCoreDirFactory) init() application.ComponentFactory {
+
+	
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComCoreDirFactory) newObject() * views0x7d154b.CoreDirFactory {
+	return & views0x7d154b.CoreDirFactory {}
+}
+
+func (inst * comFactory4pComCoreDirFactory) castObject(instance application.ComponentInstance) * views0x7d154b.CoreDirFactory {
+	return instance.Get().(*views0x7d154b.CoreDirFactory)
+}
+
+func (inst * comFactory4pComCoreDirFactory) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComCoreDirFactory) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComCoreDirFactory) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComCoreDirFactory) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComCoreDirFactory) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComCoreDirFactory) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	return nil
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComShellDirFactory : the factory of component: com11-views0x7d154b.ShellDirFactory
+type comFactory4pComShellDirFactory struct {
+
+    mPrototype * views0x7d154b.ShellDirFactory
+
+	
+
+}
+
+func (inst * comFactory4pComShellDirFactory) init() application.ComponentFactory {
+
+	
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComShellDirFactory) newObject() * views0x7d154b.ShellDirFactory {
+	return & views0x7d154b.ShellDirFactory {}
+}
+
+func (inst * comFactory4pComShellDirFactory) castObject(instance application.ComponentInstance) * views0x7d154b.ShellDirFactory {
+	return instance.Get().(*views0x7d154b.ShellDirFactory)
+}
+
+func (inst * comFactory4pComShellDirFactory) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComShellDirFactory) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComShellDirFactory) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComShellDirFactory) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComShellDirFactory) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComShellDirFactory) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	return nil
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComRepoViewFactory : the factory of component: com12-views0x7d154b.RepoViewFactory
+type comFactory4pComRepoViewFactory struct {
+
+    mPrototype * views0x7d154b.RepoViewFactory
+
+	
+
+}
+
+func (inst * comFactory4pComRepoViewFactory) init() application.ComponentFactory {
+
+	
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComRepoViewFactory) newObject() * views0x7d154b.RepoViewFactory {
+	return & views0x7d154b.RepoViewFactory {}
+}
+
+func (inst * comFactory4pComRepoViewFactory) castObject(instance application.ComponentInstance) * views0x7d154b.RepoViewFactory {
+	return instance.Get().(*views0x7d154b.RepoViewFactory)
+}
+
+func (inst * comFactory4pComRepoViewFactory) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComRepoViewFactory) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComRepoViewFactory) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComRepoViewFactory) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComRepoViewFactory) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComRepoViewFactory) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	return nil
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComWorkingDirFactory : the factory of component: com13-views0x7d154b.WorkingDirFactory
+type comFactory4pComWorkingDirFactory struct {
+
+    mPrototype * views0x7d154b.WorkingDirFactory
+
+	
+
+}
+
+func (inst * comFactory4pComWorkingDirFactory) init() application.ComponentFactory {
+
+	
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComWorkingDirFactory) newObject() * views0x7d154b.WorkingDirFactory {
+	return & views0x7d154b.WorkingDirFactory {}
+}
+
+func (inst * comFactory4pComWorkingDirFactory) castObject(instance application.ComponentInstance) * views0x7d154b.WorkingDirFactory {
+	return instance.Get().(*views0x7d154b.WorkingDirFactory)
+}
+
+func (inst * comFactory4pComWorkingDirFactory) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComWorkingDirFactory) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComWorkingDirFactory) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComWorkingDirFactory) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComWorkingDirFactory) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComWorkingDirFactory) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	return nil
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComGitWorktreesDirFactory : the factory of component: com14-worktrees0xa9c0a9.GitWorktreesDirFactory
+type comFactory4pComGitWorktreesDirFactory struct {
+
+    mPrototype * worktrees0xa9c0a9.GitWorktreesDirFactory
+
+	
+
+}
+
+func (inst * comFactory4pComGitWorktreesDirFactory) init() application.ComponentFactory {
+
+	
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComGitWorktreesDirFactory) newObject() * worktrees0xa9c0a9.GitWorktreesDirFactory {
+	return & worktrees0xa9c0a9.GitWorktreesDirFactory {}
+}
+
+func (inst * comFactory4pComGitWorktreesDirFactory) castObject(instance application.ComponentInstance) * worktrees0xa9c0a9.GitWorktreesDirFactory {
+	return instance.Get().(*worktrees0xa9c0a9.GitWorktreesDirFactory)
+}
+
+func (inst * comFactory4pComGitWorktreesDirFactory) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComGitWorktreesDirFactory) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComGitWorktreesDirFactory) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComGitWorktreesDirFactory) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComGitWorktreesDirFactory) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComGitWorktreesDirFactory) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
 	return nil
 }
 

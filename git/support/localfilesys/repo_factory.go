@@ -49,7 +49,7 @@ func (inst *LocalRepoFactory) initElements(repo *Repo) error {
 	for _, o := range elist {
 		el, ok := o.(Element)
 		if ok {
-			err := el.InitElement()
+			err := el.InitElement(repo)
 			if err != nil {
 				return err
 			}

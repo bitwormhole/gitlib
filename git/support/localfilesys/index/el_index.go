@@ -1,4 +1,4 @@
-package config
+package index
 
 import (
 	"github.com/bitwormhole/gitlib/git/files"
@@ -10,44 +10,41 @@ import (
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// LocalGitConfigFactory ...
-type LocalGitConfigFactory struct {
+// GitIndexFileFactory ...
+type GitIndexFileFactory struct {
 	markup.Component `class:"git-local-element-factory"`
 }
 
-func (inst *LocalGitConfigFactory) _Impl() localfilesys.ElementFactory {
+func (inst *GitIndexFileFactory) _Impl() localfilesys.ElementFactory {
 	return inst
 }
 
 // CreateElement ...
-func (inst *LocalGitConfigFactory) CreateElement(r *localfilesys.Repo, v *files.RepositoryView) error {
-
-	file := v.Core.Config
-
-	el := &localGitConfig{}
+func (inst *GitIndexFileFactory) CreateElement(r *localfilesys.Repo, v *files.RepositoryView) error {
+	file := v.Shell.Index
+	el := &gitIndexFile{}
 	el._file = file
-
-	r.Config = el
+	r.Index = el
 	r.AddElement(el)
-
 	return nil
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-type localGitConfig struct {
+type gitIndexFile struct {
 	_file fs.Path
 }
 
-func (inst *localGitConfig) _Impl() (repository.Config, localfilesys.Element) {
+func (inst *gitIndexFile) _Impl() (repository.Index, localfilesys.Element) {
 	return inst, inst
 }
 
-func (inst *localGitConfig) InitElement(r *localfilesys.Repo) error {
+func (inst *gitIndexFile) InitElement(r *localfilesys.Repo) error {
+
 	return nil
 }
 
-func (inst *localGitConfig) Demo() int {
+func (inst *gitIndexFile) Demo() int {
 	return 0
 }
 

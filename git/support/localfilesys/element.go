@@ -4,7 +4,7 @@ import "github.com/bitwormhole/gitlib/git/files"
 
 // Element  仓库元素，这个接口是可选的，有些元素可能不提供此接口
 type Element interface {
-	InitElement() error
+	InitElement(r *Repo) error
 }
 
 // ElementFactory 仓库元素工厂

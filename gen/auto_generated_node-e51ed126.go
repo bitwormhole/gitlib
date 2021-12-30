@@ -9,13 +9,36 @@ import (
 	support0x074feb "github.com/bitwormhole/gitlib/git/support"
 	localfilesys0x6be3ff "github.com/bitwormhole/gitlib/git/support/localfilesys"
 	config0x71b4a2 "github.com/bitwormhole/gitlib/git/support/localfilesys/config"
+	head0xb6393b "github.com/bitwormhole/gitlib/git/support/localfilesys/head"
+	index0x3eb559 "github.com/bitwormhole/gitlib/git/support/localfilesys/index"
+	modules0xe8c0dc "github.com/bitwormhole/gitlib/git/support/localfilesys/modules"
 	objects0x11508a "github.com/bitwormhole/gitlib/git/support/localfilesys/objects"
 	refs0x4e5472 "github.com/bitwormhole/gitlib/git/support/localfilesys/refs"
+	views0x7d154b "github.com/bitwormhole/gitlib/git/support/localfilesys/views"
+	worktrees0xa9c0a9 "github.com/bitwormhole/gitlib/git/support/localfilesys/worktrees"
 	markup0x23084a "github.com/bitwormhole/starter/markup"
 )
 
 type pComLocalGitConfigFactory struct {
 	instance *config0x71b4a2.LocalGitConfigFactory
+	 markup0x23084a.Component `class:"git-local-element-factory"`
+}
+
+
+type pComGitHeadFileFactory struct {
+	instance *head0xb6393b.GitHeadFileFactory
+	 markup0x23084a.Component `class:"git-local-element-factory"`
+}
+
+
+type pComGitIndexFileFactory struct {
+	instance *index0x3eb559.GitIndexFileFactory
+	 markup0x23084a.Component `class:"git-local-element-factory"`
+}
+
+
+type pComGitModulesDirFactory struct {
+	instance *modules0xe8c0dc.GitModulesDirFactory
 	 markup0x23084a.Component `class:"git-local-element-factory"`
 }
 
@@ -57,6 +80,36 @@ type pComLocalRepoLayout struct {
 type pComLocalRepoLocator struct {
 	instance *localfilesys0x6be3ff.LocalRepoLocator
 	 markup0x23084a.Component `id:"git-local-repository-locator"`
+}
+
+
+type pComCoreDirFactory struct {
+	instance *views0x7d154b.CoreDirFactory
+	 markup0x23084a.Component `class:"git-local-element-factory"`
+}
+
+
+type pComShellDirFactory struct {
+	instance *views0x7d154b.ShellDirFactory
+	 markup0x23084a.Component `class:"git-local-element-factory"`
+}
+
+
+type pComRepoViewFactory struct {
+	instance *views0x7d154b.RepoViewFactory
+	 markup0x23084a.Component `class:"git-local-element-factory"`
+}
+
+
+type pComWorkingDirFactory struct {
+	instance *views0x7d154b.WorkingDirFactory
+	 markup0x23084a.Component `class:"git-local-element-factory"`
+}
+
+
+type pComGitWorktreesDirFactory struct {
+	instance *worktrees0xa9c0a9.GitWorktreesDirFactory
+	 markup0x23084a.Component `class:"git-local-element-factory"`
 }
 
 
