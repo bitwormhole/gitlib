@@ -1,33 +1,27 @@
 package git
 
 // ID 表示git的一个 hash 值
-type ID interface {
-	Bytes() []byte
+type ID string
 
-	GetBytes(buffer []byte) []byte
-
-	GetFactory() IdentityFactory
-
-	String() string
+func (id ID) String() string {
+	return string(id)
 }
+
+// Bytes ...
+func (id ID) Bytes() []byte {
+	return nil
+}
+
+// Size ...
+func (id ID) Size() int {
+	cb := len(id)
+	return cb * 4
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 // ObjectID 表示git的对象ID
-type ObjectID interface {
-	ID
-}
+type ObjectID ID
 
 // PackID 表示git的包ID
-type PackID interface {
-	ID
-}
-
-// IdentityFactory 表示一个创建git-ID的工厂
-type IdentityFactory interface {
-	Algorithm() string
-
-	// Size in bits
-	Size() int
-
-	Parse(s string) (ID, error)
-	Create(b []byte) (ID, error)
-}
+type PackID ID

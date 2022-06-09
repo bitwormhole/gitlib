@@ -11,3 +11,7 @@ type Object interface {
 	GetID() ObjectID
 	Read() (io.ReadCloser, error)
 }
+
+// Objects 接口是对一个git对象的抽象
+type Objects interface {
+}

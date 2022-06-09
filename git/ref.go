@@ -1,11 +1,17 @@
 package git
 
 // ReferenceName is the name for .git/refs/*
-type ReferenceName interface {
-	String() string
+type ReferenceName string
 
-	Normalize() ReferenceName
+func (v ReferenceName) String() string {
+	return string(v)
 }
+
+func (v ReferenceName) Normalize() ReferenceName {
+	return "todo..."
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 // Ref  is the key-value for .git/refs/*
 type Ref interface {
@@ -16,4 +22,9 @@ type Ref interface {
 	GetValue() (ObjectID, error)
 
 	SetValue(id ObjectID) error
+}
+
+// Ref  is the key-value for .git/refs/*
+type Refs interface {
+	GetRef(name ReferenceName) Ref
 }
