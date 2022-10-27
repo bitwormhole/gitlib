@@ -1,4 +1,6 @@
-package git
+package store
+
+import "bitwormhole.com/starter/afs"
 
 // ReferenceName is the name for .git/refs/*
 type ReferenceName string
@@ -7,6 +9,7 @@ func (v ReferenceName) String() string {
 	return string(v)
 }
 
+// Normalize ...
 func (v ReferenceName) Normalize() ReferenceName {
 	return "todo..."
 }
@@ -15,16 +18,16 @@ func (v ReferenceName) Normalize() ReferenceName {
 
 // Ref  is the key-value for .git/refs/*
 type Ref interface {
+	Path() afs.Path
+
 	Name() ReferenceName
 
 	Exists() bool
-
-	GetValue() (ObjectID, error)
-
-	SetValue(id ObjectID) error
 }
 
-// Ref  is the key-value for .git/refs/*
+// Refs  is the key-value for .git/refs/*
 type Refs interface {
+	Path() afs.Path
+
 	GetRef(name ReferenceName) Ref
 }
