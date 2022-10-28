@@ -25,6 +25,12 @@ type Core struct {
 	Repository RepositoryProfile
 
 	Workspace Workspace
+
+	SessionFactory SessionFactory
+
+	Digest      Digest      // default="SHA-1"
+	Compression Compression // default="DEFLATE"
+	PathMapping PathMapping // default="xx/xxxx"
 }
 
 // CoreConfigurer 是用来配置 repository.Core 的组件

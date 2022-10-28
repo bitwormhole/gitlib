@@ -18,6 +18,7 @@ func (inst *Configurer) Configure(c *store.Context) error {
 	list = append(list, &GitCommitService{})
 	list = append(list, &GitInitService{})
 	list = append(list, &GitPushService{})
+	list = append(list, &GitStatusService{})
 
 	c.Services = list
 	return nil

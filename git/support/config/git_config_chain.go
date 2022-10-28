@@ -16,13 +16,14 @@ func (inst *ChainFactory) _Impl() store.ConfigChainFactory {
 }
 
 // Create ...
-func (inst *ChainFactory) Create(file afs.Path, parent store.ConfigChain, scope store.ConfigScope) store.ConfigChain {
+func (inst *ChainFactory) Create(file afs.Path, parent store.ConfigChain, scope store.ConfigScope, required bool) store.ConfigChain {
 	config := &simpleConfig{}
 	config.init(file)
 	return &configChainNode{
-		scope:  scope,
-		parent: parent,
-		config: config,
+		scope:    scope,
+		parent:   parent,
+		config:   config,
+		required: required,
 	}
 }
 
@@ -31,16 +32,18 @@ func (inst *ChainFactory) Root() store.ConfigChain {
 	file1 := inst.getSystemConfigFile()
 	file2 := inst.getUserConfigFile()
 	builder := configChainBuilder{factory: inst}
-	builder.add(file1, store.ConfigScopeSystem)
-	builder.add(file2, store.ConfigScopeUser)
+	builder.add(file1, store.ConfigScopeSystem, false)
+	builder.add(file2, store.ConfigScopeUser, false)
 	return builder.create()
 }
 
 func (inst *ChainFactory) getUserConfigFile() afs.Path {
+	// todo ...
 	return nil
 }
 
 func (inst *ChainFactory) getSystemConfigFile() afs.Path {
+	// todo ...
 	return nil
 }
 
@@ -51,9 +54,9 @@ type configChainBuilder struct {
 	factory store.ConfigChainFactory
 }
 
-func (inst *configChainBuilder) add(file afs.Path, scope store.ConfigScope) {
+func (inst *configChainBuilder) add(file afs.Path, scope store.ConfigScope, required bool) {
 	parent := inst.chain
-	child := inst.factory.Create(file, parent, scope)
+	child := inst.factory.Create(file, parent, scope, required)
 	inst.chain = child
 }
 
@@ -64,9 +67,10 @@ func (inst *configChainBuilder) create() store.ConfigChain {
 ////////////////////////////////////////////////////////////////////////////////
 
 type configChainNode struct {
-	config store.Config
-	scope  store.ConfigScope
-	parent store.ConfigChain
+	config   store.Config
+	scope    store.ConfigScope
+	parent   store.ConfigChain
+	required bool
 }
 
 func (inst *configChainNode) _Impl() store.ConfigChain {
@@ -110,15 +114,26 @@ func (inst *configChainNode) Mix() store.ConfigChain {
 	}
 }
 
-func (inst *configChainNode) Load(se store.Session) error {
-	p := inst._Impl()
-	for ; p != nil; p = p.Parent() {
-		cfg := p.Config()
-		err := cfg.Load(se)
+func (inst *configChainNode) Load() error {
+
+	// parent
+	parent := inst.parent
+	if parent != nil {
+		err := inst.parent.Load()
 		if err != nil {
 			return err
 		}
 	}
+
+	// this
+	cfg := inst.Config()
+	err := cfg.Load()
+	if err != nil {
+		if inst.required {
+			return err
+		}
+	}
+
 	return nil
 }
 

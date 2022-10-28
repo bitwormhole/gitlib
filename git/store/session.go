@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"bitwormhole.com/starter/afs"
+	"github.com/bitwormhole/gitlib/git/data/dxo"
 )
 
 // Session ...
@@ -23,10 +24,16 @@ type Session interface {
 	GetLayout() RepositoryLayout
 
 	// config
+	// SaveConfig(cfg Config) error
+	// LoadConfig(cfg Config) error
 
-	SaveConfig(cfg Config) error
+	// objects
+	LoadCommit(id dxo.ObjectID) (*dxo.Commit, error)
+	LoadTag(id dxo.ObjectID) (*dxo.Tag, error)
+	LoadTree(id dxo.ObjectID) (*dxo.Tree, error)
 
-	LoadConfig(cfg Config) error
+	// HEAD
+	LoadHEAD(head HEAD) (dxo.ReferenceName, error)
 }
 
 // SessionFactory ...

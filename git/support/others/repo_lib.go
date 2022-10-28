@@ -30,6 +30,11 @@ func (inst *LibImpl) RepositoryLocator() store.RepositoryLocator {
 	return inst.Context.Locator
 }
 
+// RepositoryLoader ...
+func (inst *LibImpl) RepositoryLoader() store.RepositoryLoader {
+	return inst.Context.RepositoryLoader
+}
+
 // ServiceManager ...
 func (inst *LibImpl) ServiceManager() services.ServiceManager {
 	return inst.Context.ServiceManager

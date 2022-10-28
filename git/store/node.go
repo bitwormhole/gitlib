@@ -12,6 +12,7 @@ const (
 	NodeDotGit    NodeType = ".git"
 	NodeWorkspace NodeType = ".git/.."
 	NodeIndex     NodeType = ".git/index"
+	NodeHEAD      NodeType = ".git/HEAD"
 )
 
 // Node 表示 git 中的一个 dir 或者 file

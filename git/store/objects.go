@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"bitwormhole.com/starter/afs"
+	"github.com/bitwormhole/gitlib/git/data/dxo"
 )
 
 // Entity ...
@@ -13,7 +14,7 @@ type Entity interface {
 
 // Object 表示一个git对象
 type Object struct {
-	ID     ObjectID
+	ID     dxo.ObjectID
 	Type   string
 	Length int64
 	Entity Entity
@@ -21,7 +22,7 @@ type Object struct {
 
 // Pack 代表 {.git}/objects/pack
 type Pack interface {
-	GetID() PackID
+	GetID() dxo.PackID
 
 	GetIndexFile() afs.Path
 
@@ -34,7 +35,7 @@ type Pack interface {
 type SparseObject interface {
 	Path() afs.Path
 
-	GetID() ObjectID
+	GetID() dxo.ObjectID
 
 	Exists() bool
 }
@@ -48,9 +49,9 @@ type InfoFolder interface {
 type Objects interface {
 	Path() afs.Path
 
-	GetObject(oid ObjectID) SparseObject
+	GetObject(oid dxo.ObjectID) SparseObject
 
-	GetPack(pid PackID) Pack
+	GetPack(pid dxo.PackID) Pack
 
 	Info() InfoFolder
 }

@@ -24,14 +24,21 @@ type RepositoryLayout interface {
 
 // LayoutBuilder 仓库布局对象创建器
 type LayoutBuilder struct {
-	Config     afs.Path
-	DotGit     afs.Path
-	HEAD       afs.Path
-	Index      afs.Path
-	Objects    afs.Path
-	Refs       afs.Path
-	Repository afs.Path
+	WD     afs.Path
+	DotGit afs.Path
+
+	Repository afs.Path // the repository core dir
 	Workspace  afs.Path
+
+	SubmodulePoint afs.Path
+	WorktreePoint  afs.Path
+	CorePoint      afs.Path
+
+	Config  afs.Path
+	HEAD    afs.Path
+	Index   afs.Path
+	Objects afs.Path
+	Refs    afs.Path
 }
 
 // Create 创建仓库布局对象
@@ -47,6 +54,7 @@ func (inst *LayoutBuilder) Create() RepositoryLayout {
 	res.refs = inst.Refs
 	res.repo = inst.Repository
 	res.workspace = inst.Workspace
+	res.wd = inst.WD
 
 	return res
 }
@@ -54,7 +62,7 @@ func (inst *LayoutBuilder) Create() RepositoryLayout {
 ////////////////////////////////////////////////////////////////////////////////
 
 type innerLayout struct {
-	pwd       afs.Path
+	wd        afs.Path
 	repo      afs.Path
 	workspace afs.Path
 	dotgit    afs.Path
@@ -102,5 +110,5 @@ func (inst *innerLayout) DotGit() afs.Path {
 }
 
 func (inst *innerLayout) WD() afs.Path {
-	return inst.pwd
+	return inst.wd
 }

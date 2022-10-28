@@ -7,9 +7,9 @@ import (
 
 // Lib ...
 type Lib interface {
-	// Context() context.Context
-
 	FS() afs.FS
+
+	RepositoryLoader() RepositoryLoader
 
 	RepositoryFinder() RepositoryFinder
 

@@ -1,4 +1,4 @@
-package store
+package dxo
 
 // HexID 表示git的一个 hash 值
 type HexID string

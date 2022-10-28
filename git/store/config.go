@@ -14,8 +14,8 @@ const (
 	ConfigScopeMix        ConfigScope = 4
 )
 
-// RepositoryConfiguration 表示基本的配置文件
-type RepositoryConfiguration interface {
+// RepositoryConfig  表示基本的配置文件
+type RepositoryConfig interface {
 	Import(src map[string]string)
 	Export() map[string]string
 	GetProperty(name string) string
@@ -26,9 +26,9 @@ type RepositoryConfiguration interface {
 // Config 统一的抽象配置接口
 type Config interface {
 	NodeLocation
-	RepositoryConfiguration
-	Save(se Session) error
-	Load(se Session) error
+	RepositoryConfig
+	Save() error
+	Load() error
 }
 
 // ConfigChain ... 表示配置对象构成的责任链
@@ -43,12 +43,12 @@ type ConfigChain interface {
 
 	FindByScope(scope ConfigScope) ConfigChain
 
-	Load(se Session) error
+	Load() error
 }
 
 // ConfigChainFactory ...
 type ConfigChainFactory interface {
-	Create(file afs.Path, parent ConfigChain, scope ConfigScope) ConfigChain
+	Create(file afs.Path, parent ConfigChain, scope ConfigScope, required bool) ConfigChain
 
 	Root() ConfigChain
 }

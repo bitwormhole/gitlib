@@ -31,6 +31,11 @@ func Init(ctx context.Context, cfg *store.ContextConfiguration) context.Context 
 	return ctx
 }
 
+// GetLib 取 Lib 对象
+func GetLib(c context.Context) store.Lib {
+	return store.GetLib(c)
+}
+
 func makeDefaultConfig() *store.ContextConfiguration {
 
 	cfg := &store.ContextConfiguration{}
@@ -39,6 +44,8 @@ func makeDefaultConfig() *store.ContextConfiguration {
 
 	c4ctx = append(c4ctx, &support.BaseContextConfigurer{})
 	c4ctx = append(c4ctx, &services.Configurer{})
+
+	c4core = append(c4core, &support.BaseCoreConfigurer{})
 
 	cfg.ContextConfigurers = c4ctx
 	cfg.CoreConfigurers = c4core

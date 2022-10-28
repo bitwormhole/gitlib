@@ -27,11 +27,13 @@ func (inst *BaseContextConfigurer) Configure(c *store.Context) error {
 
 	c.ConfigChainFactory = &config.ChainFactory{}
 
-	c.ProfileFactory = &others.RepositoryProfileFactoryImpl{}
+	c.RepositoryLoader = &others.RepositoryLoaderImpl{Context: c}
 
 	c.Lib = &others.LibImpl{Context: c}
 
 	c.ServiceManager = &others.CommandServiceManagerImpl{Context: c}
+
+	c.CoreConfigurers = nil
 
 	return nil
 }

@@ -7,13 +7,13 @@ import (
 
 // Context 表示仓库对象的周边环境
 type Context struct {
-	// Context context.Context
+	Lib Lib
 
 	Services []services.ServiceRegistry
 
-	FS afs.FS
+	CoreConfigurers []CoreConfigurer
 
-	Lib Lib
+	FS afs.FS
 
 	Locator RepositoryLocator
 
@@ -21,7 +21,7 @@ type Context struct {
 
 	ServiceManager services.ServiceManager
 
-	ProfileFactory RepositoryProfileFactory
+	RepositoryLoader RepositoryLoader
 
 	ConfigChainFactory ConfigChainFactory
 }

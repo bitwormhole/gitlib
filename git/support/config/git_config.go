@@ -2,6 +2,8 @@ package config
 
 import (
 	"bitwormhole.com/starter/afs"
+	"github.com/bitwormhole/gitlib/git/data/dxo"
+	"github.com/bitwormhole/gitlib/git/data/gdio"
 	"github.com/bitwormhole/gitlib/git/store"
 )
 
@@ -10,7 +12,7 @@ type simpleConfig struct {
 	properties map[string]string
 }
 
-func (inst *simpleConfig) _Impl() (store.Config, store.RepositoryConfiguration) {
+func (inst *simpleConfig) _Impl() (store.Config, store.RepositoryConfig) {
 	return inst, inst
 }
 
@@ -59,10 +61,35 @@ func (inst *simpleConfig) Clear() {
 	inst.properties = make(map[string]string)
 }
 
-func (inst *simpleConfig) Save(se store.Session) error {
-	return se.SaveConfig(inst)
+func (inst *simpleConfig) Save() error {
+	file := inst.path
+	if file == nil {
+		return nil
+	}
+	props := &dxo.Properties{}
+	props.Import(inst.properties)
+	text := gdio.FormatPropertiesWithSegment(props)
+	opt := &afs.Options{Create: true, Mkdirs: true}
+	err := file.GetIO().WriteText(text, opt)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (inst *simpleConfig) Load(se store.Session) error {
-	return se.LoadConfig(inst)
+func (inst *simpleConfig) Load() error {
+	file := inst.path
+	if file == nil {
+		return nil
+	}
+	text, err := file.GetIO().ReadText(nil)
+	if err != nil {
+		return err
+	}
+	src, err := gdio.ParseProperties(text, nil)
+	if err != nil {
+		return err
+	}
+	inst.properties = src.Export(nil)
+	return nil
 }

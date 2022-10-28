@@ -1,18 +1,9 @@
 package store
 
-import "bitwormhole.com/starter/afs"
-
-// ReferenceName is the name for .git/refs/*
-type ReferenceName string
-
-func (v ReferenceName) String() string {
-	return string(v)
-}
-
-// Normalize ...
-func (v ReferenceName) Normalize() ReferenceName {
-	return "todo..."
-}
+import (
+	"bitwormhole.com/starter/afs"
+	"github.com/bitwormhole/gitlib/git/data/dxo"
+)
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -20,14 +11,16 @@ func (v ReferenceName) Normalize() ReferenceName {
 type Ref interface {
 	Path() afs.Path
 
-	Name() ReferenceName
+	Name() dxo.ReferenceName
 
 	Exists() bool
+
+	GetValue(s Session) (dxo.ObjectID, error)
 }
 
 // Refs  is the key-value for .git/refs/*
 type Refs interface {
 	Path() afs.Path
 
-	GetRef(name ReferenceName) Ref
+	GetRef(name dxo.ReferenceName) Ref
 }

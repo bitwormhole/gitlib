@@ -4,7 +4,7 @@ package store
 type RepositoryProfile interface {
 	Layout() RepositoryLayout
 
-	Config() Config
+	Config() ConfigChain
 
 	HEAD() HEAD
 
@@ -13,9 +13,16 @@ type RepositoryProfile interface {
 	Refs() Refs
 
 	Objects() Objects
+
+	OpenSession() (Session, error)
 }
 
-// RepositoryProfileFactory ...
-type RepositoryProfileFactory interface {
-	Create(l RepositoryLayout) (RepositoryProfile, error)
+// Repository  ...
+type Repository interface {
+	RepositoryProfile
+}
+
+// RepositoryLoader ...
+type RepositoryLoader interface {
+	Load(l RepositoryLayout) (Repository, error)
 }
