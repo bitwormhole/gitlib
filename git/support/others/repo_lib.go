@@ -1,8 +1,11 @@
 package others
 
 import (
+	"context"
+
 	"bitwormhole.com/starter/afs"
-	"github.com/bitwormhole/gitlib/git/services"
+	"bitwormhole.com/starter/cli"
+	"github.com/bitwormhole/gitlib/git/instructions"
 	"github.com/bitwormhole/gitlib/git/store"
 )
 
@@ -35,7 +38,30 @@ func (inst *LibImpl) RepositoryLoader() store.RepositoryLoader {
 	return inst.Context.RepositoryLoader
 }
 
-// ServiceManager ...
-func (inst *LibImpl) ServiceManager() services.ServiceManager {
+// InstructionServiceManager ...
+func (inst *LibImpl) InstructionServiceManager() instructions.ServiceManager {
 	return inst.Context.ServiceManager
+}
+
+// Bind ...
+func (inst *LibImpl) Bind(cc context.Context) context.Context {
+	cc = store.Bind(cc)
+	b, err := store.GetBinding(cc)
+	if err != nil {
+		panic(err)
+	}
+	err = b.SetLib(inst)
+	if err != nil {
+		panic(err)
+	}
+	return cc
+}
+
+// GetCLI ...
+func (inst *LibImpl) GetCLI(required bool) cli.CLI {
+	o := inst.Context.CLI
+	if o == nil && required {
+		panic("no cli in this lib config")
+	}
+	return o
 }

@@ -50,7 +50,14 @@ func (inst *BaseCoreConfigurer) loadConfig(c *store.Core) (store.ConfigChain, er
 	configFile := layout.Config()
 
 	rootConfig := factory.Root()
-	repoConfig := factory.Create(configFile, rootConfig, store.ConfigScopeRepository, true)
+	params := &store.ConfigChainParams{
+		File:       configFile,
+		Parent:     rootConfig,
+		Scope:      store.ConfigScopeRepository,
+		Required:   true,
+		IgnoreCase: true,
+	}
+	repoConfig := factory.Create(params)
 
 	err := repoConfig.Load()
 	if err != nil {

@@ -3,12 +3,12 @@ package git
 import (
 	"context"
 
-	"github.com/bitwormhole/gitlib/git/services"
+	"github.com/bitwormhole/gitlib/git/instructions"
 )
 
 // Add 表示一条git命令
 type Add struct {
-	services.Command
+	instructions.Meta
 
 	Service AddService
 
@@ -20,9 +20,9 @@ func (inst *Add) Run() error {
 	return inst.Service.Run(inst)
 }
 
-// GetCommand ...
-func (inst *Add) GetCommand() *services.Command {
-	return &inst.Command
+// GetMeta ...
+func (inst *Add) GetMeta() *instructions.Meta {
+	return &inst.Meta
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ type AddService interface {
 func NewAdd(c context.Context) *Add {
 	cmd := &Add{}
 	cmd.Context = c
-	cmd.Name = services.GitAdd
-	cmd.Service = findServiceForCommand(&cmd.Command).(AddService)
+	cmd.Name = instructions.GitAdd
+	cmd.Service = findService(&cmd.Meta).(AddService)
 	return cmd
 }

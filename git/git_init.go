@@ -3,17 +3,24 @@ package git
 import (
 	"context"
 
-	"github.com/bitwormhole/gitlib/git/services"
+	"github.com/bitwormhole/gitlib/git/instructions"
 )
 
 // Init 表示一条git命令
 type Init struct {
-	services.Command
+	instructions.Meta
 
 	Service InitService
 
-	Directory string
-	Bare      bool
+	Quiet             bool
+	Bare              bool
+	TemplateDirectory string
+	SeparateGitDir    string
+	ObjectFormat      string
+	BranchName        string
+	Shared            bool
+	Permissions       string
+	Directory         string
 }
 
 // Run ...
@@ -21,9 +28,9 @@ func (inst *Init) Run() error {
 	return inst.Service.Run(inst)
 }
 
-// GetCommand ...
-func (inst *Init) GetCommand() *services.Command {
-	return &inst.Command
+// GetMeta ...
+func (inst *Init) GetMeta() *instructions.Meta {
+	return &inst.Meta
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -39,7 +46,7 @@ type InitService interface {
 func NewInit(c context.Context) *Init {
 	cmd := &Init{}
 	cmd.Context = c
-	cmd.Name = services.GitInit
-	cmd.Service = findServiceForCommand(&cmd.Command).(InitService)
+	cmd.Name = instructions.GitInit
+	cmd.Service = findService(&cmd.Meta).(InitService)
 	return cmd
 }

@@ -3,12 +3,12 @@ package git
 import (
 	"context"
 
-	"github.com/bitwormhole/gitlib/git/services"
+	"github.com/bitwormhole/gitlib/git/instructions"
 )
 
 // Example 表示一条git命令
 type Example struct {
-	services.Command
+	instructions.Meta
 
 	Service ExampleService
 
@@ -20,9 +20,9 @@ func (inst *Example) Run() error {
 	return inst.Service.Run(inst)
 }
 
-// GetCommand ...
-func (inst *Example) GetCommand() *services.Command {
-	return &inst.Command
+// GetMeta ...
+func (inst *Example) GetMeta() *instructions.Meta {
+	return &inst.Meta
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ type ExampleService interface {
 func NewExample(c context.Context) *Example {
 	cmd := &Example{}
 	cmd.Context = c
-	cmd.Name = services.GitExample
-	cmd.Service = findServiceForCommand(&cmd.Command).(ExampleService)
+	cmd.Name = instructions.GitExample
+	cmd.Service = findService(&cmd.Meta).(ExampleService)
 	return cmd
 }

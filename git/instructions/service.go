@@ -1,4 +1,4 @@
-package services
+package instructions
 
 // Service is the Runner for Command
 type Service interface {

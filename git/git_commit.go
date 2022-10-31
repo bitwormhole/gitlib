@@ -3,12 +3,12 @@ package git
 import (
 	"context"
 
-	"github.com/bitwormhole/gitlib/git/services"
+	"github.com/bitwormhole/gitlib/git/instructions"
 )
 
 // Commit 表示一条git命令
 type Commit struct {
-	services.Command
+	instructions.Meta
 
 	Service CommitService
 
@@ -20,9 +20,9 @@ func (inst *Commit) Run() error {
 	return inst.Service.Run(inst)
 }
 
-// GetCommand ...
-func (inst *Commit) GetCommand() *services.Command {
-	return &inst.Command
+// GetMeta ...
+func (inst *Commit) GetMeta() *instructions.Meta {
+	return &inst.Meta
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ type CommitService interface {
 func NewCommit(c context.Context) *Commit {
 	cmd := &Commit{}
 	cmd.Context = c
-	cmd.Name = services.GitCommit
-	cmd.Service = findServiceForCommand(&cmd.Command).(CommitService)
+	cmd.Name = instructions.GitCommit
+	cmd.Service = findService(&cmd.Meta).(CommitService)
 	return cmd
 }

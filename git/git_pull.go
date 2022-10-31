@@ -3,12 +3,12 @@ package git
 import (
 	"context"
 
-	"github.com/bitwormhole/gitlib/git/services"
+	"github.com/bitwormhole/gitlib/git/instructions"
 )
 
 // Pull 表示一条git命令
 type Pull struct {
-	services.Command
+	instructions.Meta
 
 	Service PullService
 
@@ -20,9 +20,9 @@ func (inst *Pull) Run() error {
 	return inst.Service.Run(inst)
 }
 
-// GetCommand ...
-func (inst *Pull) GetCommand() *services.Command {
-	return &inst.Command
+// GetMeta ...
+func (inst *Pull) GetMeta() *instructions.Meta {
+	return &inst.Meta
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ type PullService interface {
 func NewPull(c context.Context) *Pull {
 	cmd := &Pull{}
 	cmd.Context = c
-	cmd.Name = services.GitPull
-	cmd.Service = findServiceForCommand(&cmd.Command).(PullService)
+	cmd.Name = instructions.GitPull
+	cmd.Service = findService(&cmd.Meta).(PullService)
 	return cmd
 }

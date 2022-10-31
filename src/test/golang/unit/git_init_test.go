@@ -3,29 +3,27 @@ package unit
 import (
 	"testing"
 
-	"github.com/bitwormhole/gitlib"
-	"github.com/bitwormhole/gitlib/git"
-	"github.com/bitwormhole/gitlib/git/store"
+	"bitwormhole.com/starter/cli"
 )
 
 func TestGitInit(t *testing.T) {
 
-	ctx := gitlib.Init(nil, nil)
-	lib := store.GetLib(ctx)
-	files := lib.FS()
+	unit := initUnit(t)
 
-	tmp := files.NewPath(t.TempDir())
+	tmp := unit.tmp
 	wd := tmp.GetChild("test_git_init")
 	wd.Mkdirs(nil)
 
+	ctx := unit.context
+
 	////////////////////////////////
 
-	task := git.NewInit(ctx)
-	task.Bare = false
-	task.Directory = "demo"
-	task.WD = wd
-
-	err := task.Run()
+	task := &cli.Task{
+		Context: ctx,
+		Command: "git init foo",
+		WD:      wd.GetPath(),
+	}
+	err := unit.cli.GetClient().Run(task)
 	if err != nil {
 		t.Error(err)
 	}

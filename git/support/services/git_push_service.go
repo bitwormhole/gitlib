@@ -4,30 +4,30 @@ import (
 	"errors"
 
 	"github.com/bitwormhole/gitlib/git"
-	"github.com/bitwormhole/gitlib/git/services"
+	"github.com/bitwormhole/gitlib/git/instructions"
 )
 
 // GitPushService ...
 type GitPushService struct {
 }
 
-func (inst *GitPushService) _Impl() (services.ServiceRegistry, git.PushService) {
+func (inst *GitPushService) _Impl() (instructions.ServiceRegistry, git.PushService) {
 	return inst, inst
 }
 
 // ListRegistrations ...
-func (inst *GitPushService) ListRegistrations() []*services.ServiceRegistration {
+func (inst *GitPushService) ListRegistrations() []*instructions.ServiceRegistration {
 	name := inst.Name()
-	reg := &services.ServiceRegistration{
+	reg := &instructions.ServiceRegistration{
 		Name:    name,
 		Service: inst,
 	}
-	return []*services.ServiceRegistration{reg}
+	return []*instructions.ServiceRegistration{reg}
 }
 
 // Name ...
 func (inst *GitPushService) Name() string {
-	return services.GitPush
+	return instructions.GitPush
 }
 
 // Run ...

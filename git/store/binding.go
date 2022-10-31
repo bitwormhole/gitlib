@@ -2,90 +2,76 @@ package store
 
 import (
 	"context"
+	"errors"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// SetupBinding ...
-func SetupBinding(c context.Context) context.Context {
-	if c == nil {
-		c = context.Background()
+// contextValueKey 用来表示上下文中键值对的 key 类型
+type tagBindingKey string
+
+const theBindingKey tagBindingKey = "github.com/bitwormhole/gitlib/git/repository/Binding#binding"
+
+// Binding ...
+type Binding interface {
+	SetLib(lib Lib) error
+	GetLib() (Lib, error)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// Bind ...
+func Bind(cc context.Context) context.Context {
+	if cc == nil {
+		cc = context.Background()
 	}
-	const key contextValueKey = keyBindingBinding
-	o1 := c.Value(key)
-	if o1 != nil {
-		holder, ok := o1.(*Binding)
-		if ok && holder != nil {
-			return c
-		}
+	const key = theBindingKey
+	o1, ok := cc.Value(key).(*binding)
+	if ok && o1 != nil {
+		return cc
 	}
-	binding := &Binding{}
-	return context.WithValue(c, key, binding)
+	o1 = &binding{}
+	return context.WithValue(cc, key, o1)
 }
 
 // GetBinding ...
-func GetBinding(c context.Context) *Binding {
-	if c == nil {
-		panic("context is nil")
+func GetBinding(cc context.Context) (Binding, error) {
+	if cc == nil {
+		cc = context.Background()
 	}
-	const key contextValueKey = keyBindingBinding
-	o1 := c.Value(key)
-	if o1 != nil {
-		holder, ok := o1.(*Binding)
-		if ok && holder != nil {
-			return holder
-		}
+	const key = theBindingKey
+	o1, ok := cc.Value(key).(*binding)
+	if ok && o1 != nil {
+		return o1, nil
 	}
-	panic("need store.SetupBinding() first")
-}
-
-// GetLib ...
-func GetLib(ctx context.Context) Lib {
-	binding := GetBinding(ctx)
-	return binding.GetLib()
+	return nil, errors.New("")
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// contextValueKey 用来表示上下文中键值对的 key 类型
-type contextValueKey string
-
-const keyBindingBinding contextValueKey = "github.com/bitwormhole/gitlib/git/repository/Binding#binding"
-
-////////////////////////////////////////////////////////////////////////////////
-
-// Binding ...
-type Binding struct {
-	context *Context
-	factory ContextFactory
-	config  *ContextConfiguration
+// binding ...
+type binding struct {
+	lib Lib
 }
 
-// Config ...
-func (inst *Binding) Config(cfg *ContextConfiguration) {
-	inst.factory = cfg.Factory
-	inst.config = cfg
+func (inst *binding) _Impl() Binding {
+	return inst
 }
 
-// GetLib ...
-func (inst *Binding) GetLib() Lib {
-	l := inst.getContext().Lib
-	l.FS() // panic if nil
-	return l
-}
-
-func (inst *Binding) getContext() *Context {
-	ctx := inst.context
-	if ctx != nil {
-		return ctx
+func (inst *binding) SetLib(l Lib) error {
+	if l == nil {
+		return errors.New("the param 'Lib' is nil")
 	}
-	factory := inst.factory
-	if factory == nil {
-		panic("no store.ContextFactory, call (store.Binding).SetContextFactory first")
+	inst.lib = l
+	return nil
+}
+
+func (inst *binding) GetLib() (Lib, error) {
+	l := inst.lib
+	if l == nil {
+		return nil, errors.New("no Lib in this binding")
 	}
-	ctx = factory.Create(inst.config)
-	inst.context = ctx
-	return ctx
+	return l, nil
 }
 
 ////////////////////////////////////////////////////////////////////////////////

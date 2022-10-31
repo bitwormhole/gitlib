@@ -3,43 +3,45 @@ package unit
 import (
 	"testing"
 
-	"github.com/bitwormhole/gitlib"
-	"github.com/bitwormhole/gitlib/git"
-	"github.com/bitwormhole/gitlib/git/store"
+	"bitwormhole.com/starter/cli"
 )
 
 func TestGitStatus(t *testing.T) {
 
 	const name = "test_git_status"
 
-	ctx := gitlib.Init(nil, nil)
-	lib := store.GetLib(ctx)
-	files := lib.FS()
+	unit := initUnit(t)
 
-	tmp := files.NewPath(t.TempDir())
-	wd1 := tmp
+	wd1 := unit.tmp
 	wd2 := wd1.GetChild(name)
+
+	ctx := unit.context
 
 	////////////////////////////////
 	// git init
 
-	task1 := git.NewInit(ctx)
-	task1.WD = wd1
-	task1.Directory = name
-
-	err := task1.Run()
+	task := &cli.Task{
+		Context: ctx,
+		Command: "git init " + name,
+		WD:      wd1.GetPath(),
+	}
+	err := unit.cli.GetClient().Run(task)
 	if err != nil {
 		t.Error(err)
 	}
+	ctx = task.Context
 
 	////////////////////////////////
 	// git status
 
-	task2 := git.NewStatus(ctx)
-	task2.WD = wd2
-
-	err = task2.Run()
+	task = &cli.Task{
+		Context: ctx,
+		Command: "git status",
+		WD:      wd2.GetPath(),
+	}
+	err = unit.cli.GetClient().Run(task)
 	if err != nil {
 		t.Error(err)
 	}
+
 }

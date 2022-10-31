@@ -5,7 +5,8 @@ import (
 
 	"bitwormhole.com/starter/vlog"
 	"github.com/bitwormhole/gitlib/git"
-	"github.com/bitwormhole/gitlib/git/services"
+	"github.com/bitwormhole/gitlib/git/instructions"
+
 	"github.com/bitwormhole/gitlib/git/store"
 )
 
@@ -13,29 +14,32 @@ import (
 type GitStatusService struct {
 }
 
-func (inst *GitStatusService) _Impl() (services.ServiceRegistry, git.StatusService) {
+func (inst *GitStatusService) _Impl() (instructions.ServiceRegistry, git.StatusService) {
 	return inst, inst
 }
 
 // ListRegistrations ...
-func (inst *GitStatusService) ListRegistrations() []*services.ServiceRegistration {
+func (inst *GitStatusService) ListRegistrations() []*instructions.ServiceRegistration {
 	name := inst.Name()
-	reg := &services.ServiceRegistration{
+	reg := &instructions.ServiceRegistration{
 		Name:    name,
 		Service: inst,
 	}
-	return []*services.ServiceRegistration{reg}
+	return []*instructions.ServiceRegistration{reg}
 }
 
 // Name ...
 func (inst *GitStatusService) Name() string {
-	return services.GitStatus
+	return instructions.GitStatus
 }
 
 // Run ...
 func (inst *GitStatusService) Run(task *git.Status) error {
 
-	lib := store.GetLib(task.Context)
+	lib, err := store.GetLib(task.Context)
+	if err != nil {
+		return err
+	}
 
 	layout, err := lib.RepositoryLocator().Locate(task.WD)
 	if err != nil {

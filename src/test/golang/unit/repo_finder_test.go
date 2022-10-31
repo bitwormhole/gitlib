@@ -2,24 +2,19 @@ package unit
 
 import (
 	"testing"
-
-	"github.com/bitwormhole/gitlib"
-	"github.com/bitwormhole/gitlib/git/store"
 )
 
 func TestRepoFinder(t *testing.T) {
 
-	ctx := gitlib.Init(nil, nil)
-	lib := store.GetLib(ctx)
-	files := lib.FS()
+	unit := initUnit(t)
 
-	tmp := files.NewPath(t.TempDir())
+	tmp := unit.tmp
 	wd := tmp.GetChild("a/b/c")
 	wd.Mkdirs(nil)
 
 	////////////////////////////////
 
-	finder := lib.RepositoryFinder()
+	finder := unit.lib.RepositoryFinder()
 	layout, err := finder.Find(wd)
 	if err != nil {
 		t.Fatal(err)

@@ -4,52 +4,28 @@ import (
 	"context"
 
 	"github.com/bitwormhole/gitlib/git/store"
-	"github.com/bitwormhole/gitlib/git/support"
-	"github.com/bitwormhole/gitlib/git/support/services"
 )
 
-// Init 初始化git模块
-func Init(ctx context.Context, cfg *store.ContextConfiguration) context.Context {
-
-	ctx = store.SetupBinding(ctx)
-	binding := store.GetBinding(ctx)
+// New 初始化git模块
+func New(cfg *store.ContextConfiguration) store.Lib {
 
 	if cfg == nil {
-		cfg = makeDefaultConfig()
+		cfg = GetDefaultConfiguration()
 	}
 
-	factory := cfg.Factory
-	if factory == nil {
-		factory = &support.DefaultContextFactory{}
-		cfg.Factory = factory
+	storeContext, err := cfg.Factory.Create(cfg)
+	if err != nil {
+		panic(err)
 	}
 
-	binding.Config(cfg)
-	lib := binding.GetLib()
-	lib.RepositoryFinder() // panic if nil
-
-	return ctx
+	lib := storeContext.Lib
+	if lib == nil {
+		panic("lib is nil")
+	}
+	return lib
 }
 
-// GetLib 取 Lib 对象
-func GetLib(c context.Context) store.Lib {
-	return store.GetLib(c)
-}
-
-func makeDefaultConfig() *store.ContextConfiguration {
-
-	cfg := &store.ContextConfiguration{}
-	c4ctx := cfg.ContextConfigurers
-	c4core := cfg.CoreConfigurers
-
-	c4ctx = append(c4ctx, &support.BaseContextConfigurer{})
-	c4ctx = append(c4ctx, &services.Configurer{})
-
-	c4core = append(c4core, &support.BaseCoreConfigurer{})
-
-	cfg.ContextConfigurers = c4ctx
-	cfg.CoreConfigurers = c4core
-	cfg.Factory = &support.DefaultContextFactory{}
-
-	return cfg
+// Bind ...
+func Bind(cc context.Context) context.Context {
+	return store.Bind(cc)
 }

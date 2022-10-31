@@ -1,7 +1,11 @@
 package config
 
 import (
+	"os"
+
 	"bitwormhole.com/starter/afs"
+	"bitwormhole.com/starter/afs/files"
+	"bitwormhole.com/starter/vlog"
 	"github.com/bitwormhole/gitlib/git/store"
 )
 
@@ -9,21 +13,32 @@ import (
 
 // ChainFactory ... 实现配置链工厂
 type ChainFactory struct {
+	fs afs.FS // cached
 }
 
 func (inst *ChainFactory) _Impl() store.ConfigChainFactory {
 	return inst
 }
 
+func (inst *ChainFactory) getFS() afs.FS {
+	f := inst.fs
+	if f == nil {
+		f = files.FS()
+		inst.fs = f
+	}
+	return f
+}
+
 // Create ...
-func (inst *ChainFactory) Create(file afs.Path, parent store.ConfigChain, scope store.ConfigScope, required bool) store.ConfigChain {
+func (inst *ChainFactory) Create(p *store.ConfigChainParams) store.ConfigChain {
 	config := &simpleConfig{}
-	config.init(file)
+	config.init(p)
 	return &configChainNode{
-		scope:    scope,
-		parent:   parent,
-		config:   config,
-		required: required,
+		scope:    p.Scope,
+		parent:   p.Parent,
+		required: p.Required,
+
+		config: config,
 	}
 }
 
@@ -38,13 +53,18 @@ func (inst *ChainFactory) Root() store.ConfigChain {
 }
 
 func (inst *ChainFactory) getUserConfigFile() afs.Path {
-	// todo ...
-	return nil
+	uhdir, err := os.UserHomeDir()
+	if err != nil {
+		vlog.Warn(err)
+		return nil
+	}
+	base := inst.getFS().NewPath(uhdir)
+	return base.GetChild(".gitconfig")
 }
 
 func (inst *ChainFactory) getSystemConfigFile() afs.Path {
-	// todo ...
-	return nil
+	const p = "/etc/gitconfig"
+	return inst.getFS().NewPath(p)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,7 +76,14 @@ type configChainBuilder struct {
 
 func (inst *configChainBuilder) add(file afs.Path, scope store.ConfigScope, required bool) {
 	parent := inst.chain
-	child := inst.factory.Create(file, parent, scope, required)
+	params := &store.ConfigChainParams{
+		File:       file,
+		Parent:     parent,
+		Scope:      scope,
+		Required:   required,
+		IgnoreCase: true,
+	}
+	child := inst.factory.Create(params)
 	inst.chain = child
 }
 

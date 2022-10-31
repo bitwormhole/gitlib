@@ -3,12 +3,12 @@ package git
 import (
 	"context"
 
-	"github.com/bitwormhole/gitlib/git/services"
+	"github.com/bitwormhole/gitlib/git/instructions"
 )
 
 // Push 表示一条git命令
 type Push struct {
-	services.Command
+	instructions.Meta
 
 	Service PushService
 
@@ -20,9 +20,9 @@ func (inst *Push) Run() error {
 	return inst.Service.Run(inst)
 }
 
-// GetCommand ...
-func (inst *Push) GetCommand() *services.Command {
-	return &inst.Command
+// GetMeta ...
+func (inst *Push) GetMeta() *instructions.Meta {
+	return &inst.Meta
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ type PushService interface {
 func NewPush(c context.Context) *Push {
 	cmd := &Push{}
 	cmd.Context = c
-	cmd.Name = services.GitPush
-	cmd.Service = findServiceForCommand(&cmd.Command).(PushService)
+	cmd.Name = instructions.GitPush
+	cmd.Service = findService(&cmd.Meta).(PushService)
 	return cmd
 }

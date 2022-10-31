@@ -1,4 +1,4 @@
-package services
+package instructions
 
 // 定义标准的git命令名称
 const (

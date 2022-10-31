@@ -3,12 +3,12 @@ package git
 import (
 	"context"
 
-	"github.com/bitwormhole/gitlib/git/services"
+	"github.com/bitwormhole/gitlib/git/instructions"
 )
 
 // Status 表示一条git命令
 type Status struct {
-	services.Command
+	instructions.Meta
 
 	Service StatusService
 
@@ -20,9 +20,9 @@ func (inst *Status) Run() error {
 	return inst.Service.Run(inst)
 }
 
-// GetCommand ...
-func (inst *Status) GetCommand() *services.Command {
-	return &inst.Command
+// GetMeta ...
+func (inst *Status) GetMeta() *instructions.Meta {
+	return &inst.Meta
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ type StatusService interface {
 func NewStatus(c context.Context) *Status {
 	cmd := &Status{}
 	cmd.Context = c
-	cmd.Name = services.GitStatus
-	cmd.Service = findServiceForCommand(&cmd.Command).(StatusService)
+	cmd.Name = instructions.GitStatus
+	cmd.Service = findService(&cmd.Meta).(StatusService)
 	return cmd
 }

@@ -1,6 +1,8 @@
 package config
 
 import (
+	"strings"
+
 	"bitwormhole.com/starter/afs"
 	"github.com/bitwormhole/gitlib/git/data/dxo"
 	"github.com/bitwormhole/gitlib/git/data/gdio"
@@ -10,6 +12,7 @@ import (
 type simpleConfig struct {
 	path       afs.Path
 	properties map[string]string
+	ignoreCase bool
 }
 
 func (inst *simpleConfig) _Impl() (store.Config, store.RepositoryConfig) {
@@ -20,9 +23,17 @@ func (inst *simpleConfig) NodeType() store.NodeType {
 	return store.NodeConfig
 }
 
-func (inst *simpleConfig) init(path afs.Path) {
+func (inst *simpleConfig) init(p *store.ConfigChainParams) {
 	inst.properties = make(map[string]string)
-	inst.path = path
+	inst.path = p.File
+	inst.ignoreCase = p.IgnoreCase
+}
+
+func (inst *simpleConfig) prepareKey(k string) string {
+	if inst.ignoreCase {
+		return strings.ToLower(k)
+	}
+	return k
 }
 
 func (inst *simpleConfig) Import(src map[string]string) {
@@ -32,6 +43,7 @@ func (inst *simpleConfig) Import(src map[string]string) {
 		inst.properties = dst
 	}
 	for k, v := range src {
+		k = inst.prepareKey(k)
 		dst[k] = v
 	}
 }
@@ -40,16 +52,19 @@ func (inst *simpleConfig) Export() map[string]string {
 	dst := make(map[string]string)
 	src := inst.properties
 	for k, v := range src {
+		k = inst.prepareKey(k)
 		dst[k] = v
 	}
 	return dst
 }
 
 func (inst *simpleConfig) GetProperty(name string) string {
+	name = inst.prepareKey(name)
 	return inst.properties[name]
 }
 
 func (inst *simpleConfig) SetProperty(name, value string) {
+	name = inst.prepareKey(name)
 	inst.properties[name] = value
 }
 
@@ -67,7 +82,7 @@ func (inst *simpleConfig) Save() error {
 		return nil
 	}
 	props := &dxo.Properties{}
-	props.Import(inst.properties)
+	props.Import(inst.Export())
 	text := gdio.FormatPropertiesWithSegment(props)
 	opt := &afs.Options{Create: true, Mkdirs: true}
 	err := file.GetIO().WriteText(text, opt)
@@ -90,6 +105,7 @@ func (inst *simpleConfig) Load() error {
 	if err != nil {
 		return err
 	}
-	inst.properties = src.Export(nil)
+	inst.properties = nil
+	inst.Import(src.Export(nil))
 	return nil
 }

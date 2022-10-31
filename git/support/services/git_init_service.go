@@ -8,30 +8,30 @@ import (
 
 	"bitwormhole.com/starter/afs"
 	"github.com/bitwormhole/gitlib/git"
-	"github.com/bitwormhole/gitlib/git/services"
+	"github.com/bitwormhole/gitlib/git/instructions"
 )
 
 // GitInitService ...
 type GitInitService struct {
 }
 
-func (inst *GitInitService) _Impl() (git.InitService, services.ServiceRegistry) {
+func (inst *GitInitService) _Impl() (git.InitService, instructions.ServiceRegistry) {
 	return inst, inst
 }
 
 // ListRegistrations ...
-func (inst *GitInitService) ListRegistrations() []*services.ServiceRegistration {
+func (inst *GitInitService) ListRegistrations() []*instructions.ServiceRegistration {
 	name := inst.Name()
-	reg := &services.ServiceRegistration{
+	reg := &instructions.ServiceRegistration{
 		Name:    name,
 		Service: inst,
 	}
-	return []*services.ServiceRegistration{reg}
+	return []*instructions.ServiceRegistration{reg}
 }
 
 // Name ...
 func (inst *GitInitService) Name() string {
-	return services.GitInit
+	return instructions.GitInit
 }
 
 // Run ...

@@ -2,14 +2,17 @@ package store
 
 import (
 	"bitwormhole.com/starter/afs"
-	"github.com/bitwormhole/gitlib/git/services"
+	"bitwormhole.com/starter/cli"
+	"github.com/bitwormhole/gitlib/git/instructions"
 )
 
 // Context 表示仓库对象的周边环境
 type Context struct {
 	Lib Lib
 
-	Services []services.ServiceRegistry
+	CLI cli.CLI
+
+	Services []instructions.ServiceRegistry
 
 	CoreConfigurers []CoreConfigurer
 
@@ -19,7 +22,7 @@ type Context struct {
 
 	Finder RepositoryFinder
 
-	ServiceManager services.ServiceManager
+	ServiceManager instructions.ServiceManager
 
 	RepositoryLoader RepositoryLoader
 
@@ -31,11 +34,15 @@ type ContextConfiguration struct {
 	Factory            ContextFactory
 	ContextConfigurers []ContextConfigurer
 	CoreConfigurers    []CoreConfigurer
+
+	UseCLI    bool
+	CLIConfig *cli.Configuration
+	CLI       cli.CLI
 }
 
 // ContextFactory  是用来创建 repository.Context 的工厂
 type ContextFactory interface {
-	Create(cfg *ContextConfiguration) *Context
+	Create(cfg *ContextConfiguration) (*Context, error)
 
 	// get info about the factory
 	String() string

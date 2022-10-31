@@ -12,6 +12,8 @@ const (
 	ConfigScopeUser       ConfigScope = 2
 	ConfigScopeRepository ConfigScope = 3
 	ConfigScopeMix        ConfigScope = 4
+	ConfigScopeCommand    ConfigScope = 11
+	ConfigScopeWorktree   ConfigScope = 12
 )
 
 // RepositoryConfig  表示基本的配置文件
@@ -46,9 +48,17 @@ type ConfigChain interface {
 	Load() error
 }
 
+// ConfigChainParams 创建配置连的参数
+type ConfigChainParams struct {
+	File       afs.Path
+	Parent     ConfigChain
+	Scope      ConfigScope
+	Required   bool
+	IgnoreCase bool
+}
+
 // ConfigChainFactory ...
 type ConfigChainFactory interface {
-	Create(file afs.Path, parent ConfigChain, scope ConfigScope, required bool) ConfigChain
-
+	Create(p *ConfigChainParams) ConfigChain
 	Root() ConfigChain
 }

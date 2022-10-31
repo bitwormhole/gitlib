@@ -1,4 +1,4 @@
-package services
+package instructions
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 	"bitwormhole.com/starter/afs"
 )
 
-// Command 包含git-command-object 的基本字段
-type Command struct {
+// Meta 包含git-command-object 的基本字段
+type Meta struct {
 	Context context.Context
 	Name    string   // the command name
 	WD      afs.Path // Working Directory
@@ -15,6 +15,6 @@ type Command struct {
 
 // Task 接口表示git-command-object 的外观
 type Task interface {
-	GetCommand() *Command
+	GetMeta() *Meta
 	Run() error
 }
