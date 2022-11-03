@@ -4,6 +4,8 @@ bitwormhole.com/starter/afs v0.0.1 h1:J9QEqmgBlu6plvoLis/pmcWplKdl6eu5ShrjOM46uj
 bitwormhole.com/starter/afs v0.0.1/go.mod h1:ZhznfGjTwltwXxm8Rpx7fTAWJzWvtT7YqKdS9P8tYTU=
 bitwormhole.com/starter/base v0.0.0-20220718031435-6de2532eedf1 h1:iqjIy0b9aZlyHRA5uQd+nfw5f2ZyFet/s9UoPPZjbe4=
 bitwormhole.com/starter/base v0.0.0-20220718031435-6de2532eedf1/go.mod h1:a8v7ioNoU380zyISNEXTaVInVFu00FvXo3UHJAckPG0=
+bitwormhole.com/starter/base v0.0.1 h1:/dXgICIoYcMATbA2N+DD1tMYEsyimwQKal2xPaR8cfA=
+bitwormhole.com/starter/base v0.0.1/go.mod h1:a8v7ioNoU380zyISNEXTaVInVFu00FvXo3UHJAckPG0=
 bitwormhole.com/starter/cli v0.0.1 h1:hUmgDGyYsp5L++K9T8mWBmisl9mlyzD/w+cVfP4w4xk=
 bitwormhole.com/starter/cli v0.0.1/go.mod h1:dBMquKY7xUEhqhUjHOlgfplzLw8koHk6b7ZpRNRsz7Q=
 bitwormhole.com/starter/cli v0.0.2 h1:25Omrphk6s2vjdwFohSoOJLkbz2ln47/UJagsF6XE9U=
@@ -18,3 +20,5 @@ bitwormhole.com/starter/cli v0.0.6 h1:s8h2h8zI3Qhyu4q7yyfk/+M+s/5/89V0+mAdPmtd1y
 bitwormhole.com/starter/cli v0.0.6/go.mod h1:XvDXD5cEsFpyO5AkxfGRXU7pGHTUZAvGTBx09yHyAzc=
 bitwormhole.com/starter/vlog v0.0.0-20220717141231-71498d1f5184 h1:HkOmqSZbE+I0kE336mxZdPYw85OwQs9lLDHwNB8AWe0=
 bitwormhole.com/starter/vlog v0.0.0-20220717141231-71498d1f5184/go.mod h1:bb4xDVyOD0+tAhaiscUmuzsFJ+/EL+qE79Je8U0ZqTQ=
+bitwormhole.com/starter/vlog v0.0.1 h1:7DCV2jUD1oHEPrfci14IVBK/oXeQ/pHbfbYws1nfu3w=
+bitwormhole.com/starter/vlog v0.0.1/go.mod h1:bb4xDVyOD0+tAhaiscUmuzsFJ+/EL+qE79Je8U0ZqTQ=
