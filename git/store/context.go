@@ -12,6 +12,8 @@ type Context struct {
 
 	CLI cli.CLI
 
+	Algorithms []AlgorithmRegistry
+
 	Services []instructions.ServiceRegistry
 
 	CoreConfigurers []CoreConfigurer
@@ -27,6 +29,8 @@ type Context struct {
 	RepositoryLoader RepositoryLoader
 
 	ConfigChainFactory ConfigChainFactory
+
+	AlgorithmManager AlgorithmManager
 }
 
 // ContextConfiguration 是用来初始化模块的配置
@@ -49,6 +53,7 @@ type ContextFactory interface {
 }
 
 // ContextConfigurer 是用来配置 repository.Context 的组件
+// [inject:".git-context-configurer"]
 type ContextConfigurer interface {
 	Configure(c *Context) error
 }

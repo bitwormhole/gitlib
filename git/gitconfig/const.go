@@ -9,3 +9,7 @@ type KeyTemplate string
 
 // NamePlaceholder 名称占位符
 const NamePlaceholder = "<name>"
+
+func (kt KeyTemplate) String() string {
+	return string(kt)
+}

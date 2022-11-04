@@ -6,6 +6,7 @@ import (
 	"bitwormhole.com/starter/afs"
 	"bitwormhole.com/starter/afs/files"
 	"bitwormhole.com/starter/vlog"
+	"github.com/bitwormhole/gitlib/git/gitconfig"
 	"github.com/bitwormhole/gitlib/git/store"
 )
 
@@ -47,9 +48,26 @@ func (inst *ChainFactory) Root() store.ConfigChain {
 	file1 := inst.getSystemConfigFile()
 	file2 := inst.getUserConfigFile()
 	builder := configChainBuilder{factory: inst}
+	builder.add(nil, store.ConfigScopeDefault, false)
 	builder.add(file1, store.ConfigScopeSystem, false)
 	builder.add(file2, store.ConfigScopeUser, false)
-	return builder.create()
+	chain := builder.create()
+	inst.initDefaultConfig(chain)
+	return chain
+}
+
+func (inst *ChainFactory) initDefaultConfig(chain store.ConfigChain) {
+
+	src := make(map[gitconfig.KeyTemplate]string)
+
+	src[gitconfig.CoreCompressionAlgorithm] = "deflate"
+	src[gitconfig.CoreDigestAlgorithm] = "sha1"
+	src[gitconfig.CoreObjectsPathPattern] = "xx/xxxx"
+
+	dst := chain.FindByScope(store.ConfigScopeDefault).Config()
+	for k, v := range src {
+		dst.SetProperty(k.String(), v)
+	}
 }
 
 func (inst *ChainFactory) getUserConfigFile() afs.Path {

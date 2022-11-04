@@ -12,6 +12,7 @@ type ServiceRegistration struct {
 }
 
 // ServiceRegistry ...
+// [inject:".git-instruction-registry"]
 type ServiceRegistry interface {
 	ListRegistrations() []*ServiceRegistration
 }

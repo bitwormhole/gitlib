@@ -41,5 +41,6 @@ func (inst *configMixer) putAll(src map[string]string) {
 func (inst *configMixer) create() (store.Config, error) {
 	cfg := &simpleConfig{}
 	cfg.properties = inst.table
+	cfg.ignoreCase = true
 	return cfg, nil
 }

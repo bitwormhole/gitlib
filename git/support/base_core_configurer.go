@@ -40,6 +40,11 @@ func (inst *BaseCoreConfigurer) Configure(c *store.Core) error {
 	c.Head = &others.GitHeadImpl{Core: c}
 	c.Index = &index.GitIndexImpl{Core: c}
 
+	c.SessionFactory = nil
+	c.Digest = nil
+	c.PathMapping = nil
+	c.Compression = nil
+
 	return nil
 }
 

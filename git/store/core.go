@@ -34,6 +34,7 @@ type Core struct {
 }
 
 // CoreConfigurer 是用来配置 repository.Core 的组件
+// [inject:".git-core-configurer"]
 type CoreConfigurer interface {
 	Configure(c *Core) error
 }

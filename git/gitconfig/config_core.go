@@ -8,4 +8,8 @@ const (
 	CoreBare                    KeyTemplate = "core.bare"
 	CoreRepositoryFormatVersion KeyTemplate = "core.repositoryFormatVersion"
 	CoreFileMode                KeyTemplate = "core.fileMode"
+
+	CoreCompressionAlgorithm KeyTemplate = "core.compressionAlgorithm"
+	CoreDigestAlgorithm      KeyTemplate = "core.digestAlgorithm"
+	CoreObjectsPathPattern   KeyTemplate = "core.objectsPathPattern"
 )

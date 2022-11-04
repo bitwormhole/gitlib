@@ -14,6 +14,7 @@ const (
 	ConfigScopeMix        ConfigScope = 4
 	ConfigScopeCommand    ConfigScope = 11
 	ConfigScopeWorktree   ConfigScope = 12
+	ConfigScopeFinal      ConfigScope = 99
 )
 
 // RepositoryConfig  表示基本的配置文件

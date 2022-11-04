@@ -26,6 +26,11 @@ type Lib interface {
 	Bind(cc context.Context) context.Context
 }
 
+// LibAgent ... [inject:"#git-lib-agent"]
+type LibAgent interface {
+	GetLib() (Lib, error)
+}
+
 // GetLib 从给定的 Context 取与之绑定的 Lib 对象
 func GetLib(cc context.Context) (Lib, error) {
 	b, err := GetBinding(cc)
