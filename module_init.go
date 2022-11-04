@@ -11,8 +11,8 @@ import (
 
 const (
 	theModuleName        = "github.com/bitwormhole/gitlib"
-	theModuleVersion     = "v0.0.1"
-	theModuleRevision    = 1
+	theModuleVersion     = "v0.0.3"
+	theModuleRevision    = 3
 	theModuleResPath     = "src/main/resources"
 	theModuleTestResPath = "src/test/resources"
 )
