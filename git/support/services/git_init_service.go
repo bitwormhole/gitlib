@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"errors"
 	"io/fs"
 	"strconv"
@@ -9,6 +10,7 @@ import (
 	"bitwormhole.com/starter/afs"
 	"github.com/bitwormhole/gitlib/git"
 	"github.com/bitwormhole/gitlib/git/instructions"
+	"github.com/bitwormhole/gitlib/git/store"
 )
 
 // GitInitService ...
@@ -107,7 +109,25 @@ func (inst *GitInitService) getDotGitDir(task *git.Init) (afs.Path, error) {
 		return nil, errors.New("the repository directory is exists, path=" + path)
 	}
 
+	err := inst.checkTargetDir(task.Context, dotgit)
+	if err != nil {
+		return nil, err
+	}
+
 	return dotgit, nil
+}
+
+func (inst *GitInitService) checkTargetDir(ctx context.Context, dir afs.Path) error {
+	lib, err := store.GetLib(ctx)
+	if err != nil {
+		return err
+	}
+	layout, err := lib.RepositoryLocator().Locate(dir)
+	if layout != nil && err == nil {
+		path := layout.Repository().GetPath()
+		return errors.New("the repository is exists, path=" + path)
+	}
+	return nil
 }
 
 ////////////////////////////////////////////////////////////////////////////////
