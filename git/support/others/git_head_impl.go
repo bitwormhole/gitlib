@@ -2,7 +2,7 @@ package others
 
 import (
 	"bitwormhole.com/starter/afs"
-	"github.com/bitwormhole/gitlib/git/data/dxo"
+	"github.com/bitwormhole/gitlib/git"
 	"github.com/bitwormhole/gitlib/git/store"
 )
 
@@ -33,6 +33,10 @@ func (inst *GitHeadImpl) NodeType() store.NodeType {
 }
 
 // GetValue ...
-func (inst *GitHeadImpl) GetValue(s store.Session) (dxo.ReferenceName, error) {
-	return s.LoadHEAD(inst)
+func (inst *GitHeadImpl) GetValue(s store.Session) (git.ReferenceName, error) {
+	h, err := s.LoadHEAD(inst)
+	if err != nil {
+		return "", err
+	}
+	return h.Name, nil
 }

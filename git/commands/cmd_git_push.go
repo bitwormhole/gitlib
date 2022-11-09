@@ -2,7 +2,7 @@ package commands
 
 import (
 	"bitwormhole.com/starter/cli"
-	"github.com/bitwormhole/gitlib/git"
+	"github.com/bitwormhole/gitlib/git/instructions"
 )
 
 // GitPush ...
@@ -42,7 +42,7 @@ func (inst *GitPush) GetHelp() *cli.HelpInfo {
 func (inst *GitPush) handle(t *cli.Task) error {
 
 	ctx := t.Context
-	task := git.NewPush(ctx)
+	task := instructions.NewPush(ctx)
 
 	// todo ...
 

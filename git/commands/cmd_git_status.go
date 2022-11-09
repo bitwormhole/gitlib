@@ -2,7 +2,7 @@ package commands
 
 import (
 	"bitwormhole.com/starter/cli"
-	"github.com/bitwormhole/gitlib/git"
+	"github.com/bitwormhole/gitlib/git/instructions"
 )
 
 // GitStatus ...
@@ -62,7 +62,7 @@ func (inst *GitStatus) handle(t1 *cli.Task) error {
 	//
 	//////////////
 
-	t2 := git.NewStatus(t1.Context)
+	t2 := instructions.NewStatus(t1.Context)
 	initMeta(&t2.Meta, t1)
 
 	// todo ...

@@ -1,6 +1,11 @@
 package algorithms
 
-import "github.com/bitwormhole/gitlib/git/store"
+import (
+	"crypto/sha1"
+	"hash"
+
+	"github.com/bitwormhole/gitlib/git/store"
+)
 
 // DigestSHA1  ...
 type DigestSHA1 struct {
@@ -23,4 +28,9 @@ func (inst *DigestSHA1) GetInfo() *store.AlgorithmRegistration {
 		Type:     store.AlgorithmDigest,
 		Provider: inst,
 	}
+}
+
+// New ...
+func (inst *DigestSHA1) New() hash.Hash {
+	return sha1.New()
 }

@@ -43,6 +43,18 @@ type TheSHA256 struct {
 	algorithms.DigestSHA256
 }
 
+// TheSHA512  ...
+type TheSHA512 struct {
+	markup.Component `class:"git-algorithm-registry"`
+	algorithms.DigestSHA512
+}
+
+// TheMD5  ...
+type TheMD5 struct {
+	markup.Component `class:"git-algorithm-registry"`
+	algorithms.DigestMD5
+}
+
 // TheDeflate  ...
 type TheDeflate struct {
 	markup.Component `class:"git-algorithm-registry"`

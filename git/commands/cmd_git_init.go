@@ -3,7 +3,7 @@ package commands
 import (
 	"bitwormhole.com/starter/cli"
 	"bitwormhole.com/starter/cli/arguments"
-	"github.com/bitwormhole/gitlib/git"
+	"github.com/bitwormhole/gitlib/git/instructions"
 )
 
 // GitInit ...
@@ -85,7 +85,7 @@ func (inst *GitInit) handle(t1 *cli.Task) error {
 	aDirectory := args.GetItem(0)
 
 	// for instruction
-	t2 := git.NewInit(t1.Context)
+	t2 := instructions.NewInit(t1.Context)
 	initMeta(&t2.Meta, t1)
 
 	t2.Quiet = aQ.Exists() || aQuiet.Exists()

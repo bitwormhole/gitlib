@@ -3,7 +3,6 @@ package store
 import (
 	"bitwormhole.com/starter/afs"
 	"bitwormhole.com/starter/cli"
-	"github.com/bitwormhole/gitlib/git/instructions"
 )
 
 // Context 表示仓库对象的周边环境
@@ -14,7 +13,7 @@ type Context struct {
 
 	Algorithms []AlgorithmRegistry
 
-	Services []instructions.ServiceRegistry
+	Services []ServiceRegistry
 
 	CoreConfigurers []CoreConfigurer
 
@@ -24,7 +23,7 @@ type Context struct {
 
 	Finder RepositoryFinder
 
-	ServiceManager instructions.ServiceManager
+	ServiceManager ServiceManager
 
 	RepositoryLoader RepositoryLoader
 

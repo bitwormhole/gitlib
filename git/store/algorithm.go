@@ -1,9 +1,11 @@
 package store
 
 import (
-	"bitwormhole.com/starter/afs"
+	"hash"
+	"io"
 
-	"github.com/bitwormhole/gitlib/git/data/dxo"
+	"bitwormhole.com/starter/afs"
+	"github.com/bitwormhole/gitlib/git"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -54,11 +56,16 @@ type AlgorithmManager interface {
 // Compression 压缩算法
 type Compression interface {
 	Algorithm
+
+	NewReader(r io.Reader) (io.ReadCloser, error)
+	NewWriter(w io.Writer) (io.WriteCloser, error)
 }
 
 // Digest 摘要算法
 type Digest interface {
 	Algorithm
+
+	New() hash.Hash
 }
 
 // PathMapping 路径映射算法
@@ -67,5 +74,5 @@ type PathMapping interface {
 
 	WithPattern(pattern string) PathMapping
 
-	Map(base afs.Path, id dxo.ObjectID) afs.Path
+	Map(base afs.Path, id git.ObjectID) afs.Path
 }

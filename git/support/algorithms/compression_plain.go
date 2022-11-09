@@ -1,6 +1,10 @@
 package algorithms
 
-import "github.com/bitwormhole/gitlib/git/store"
+import (
+	"io"
+
+	"github.com/bitwormhole/gitlib/git/store"
+)
 
 // CompressionPlain  ...
 type CompressionPlain struct {
@@ -23,4 +27,14 @@ func (inst *CompressionPlain) GetInfo() *store.AlgorithmRegistration {
 		Type:     store.AlgorithmCompression,
 		Provider: inst,
 	}
+}
+
+// NewReader ...
+func (inst *CompressionPlain) NewReader(r io.Reader) (io.ReadCloser, error) {
+	return r.(io.ReadCloser), nil
+}
+
+// NewWriter ...
+func (inst *CompressionPlain) NewWriter(w io.Writer) (io.WriteCloser, error) {
+	return w.(io.WriteCloser), nil
 }

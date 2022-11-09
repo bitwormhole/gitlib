@@ -41,6 +41,21 @@ func (inst *GitRepositoryImpl) Objects() store.Objects {
 	return inst.Core.Objects
 }
 
+// Digest ...
+func (inst *GitRepositoryImpl) Digest() store.Digest {
+	return inst.Core.Digest
+}
+
+// Compression ...
+func (inst *GitRepositoryImpl) Compression() store.Compression {
+	return inst.Core.Compression
+}
+
+// PathMapping ...
+func (inst *GitRepositoryImpl) PathMapping() store.PathMapping {
+	return inst.Core.PathMapping
+}
+
 // OpenSession ...
 func (inst *GitRepositoryImpl) OpenSession() (store.Session, error) {
 	factory := inst.Core.SessionFactory

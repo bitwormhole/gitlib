@@ -2,7 +2,7 @@ package store
 
 import (
 	"bitwormhole.com/starter/afs"
-	"github.com/bitwormhole/gitlib/git/data/dxo"
+	"github.com/bitwormhole/gitlib/git"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -11,16 +11,18 @@ import (
 type Ref interface {
 	Path() afs.Path
 
-	Name() dxo.ReferenceName
+	Name() git.ReferenceName
 
 	Exists() bool
 
-	GetValue(s Session) (dxo.ObjectID, error)
+	GetValue(s Session) (git.ObjectID, error)
 }
 
 // Refs  is the key-value for .git/refs/*
 type Refs interface {
 	Path() afs.Path
 
-	GetRef(name dxo.ReferenceName) Ref
+	GetRef(name git.ReferenceName) Ref
+
+	List() []git.ReferenceName
 }

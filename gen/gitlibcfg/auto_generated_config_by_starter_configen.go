@@ -7,7 +7,6 @@ package gitlibcfg
 import (
 	cli0xf7c71e "bitwormhole.com/starter/cli"
 	lib0x4595be "github.com/bitwormhole/gitlib/etc/lib"
-	instructions0xbd608d "github.com/bitwormhole/gitlib/git/instructions"
 	store0x8467b3 "github.com/bitwormhole/gitlib/git/store"
 	application "github.com/bitwormhole/starter/application"
 	config "github.com/bitwormhole/starter/application/config"
@@ -587,11 +586,11 @@ func (inst * comFactory4pComConfigContextWithInstructions) Inject(instance appli
 }
 
 //getterForFieldInstructionsSelector
-func (inst * comFactory4pComConfigContextWithInstructions) getterForFieldInstructionsSelector (context application.InstanceContext) []instructions0xbd608d.ServiceRegistry {
+func (inst * comFactory4pComConfigContextWithInstructions) getterForFieldInstructionsSelector (context application.InstanceContext) []store0x8467b3.ServiceRegistry {
 	list1 := inst.mInstructionsSelector.GetList(context)
-	list2 := make([]instructions0xbd608d.ServiceRegistry, 0, len(list1))
+	list2 := make([]store0x8467b3.ServiceRegistry, 0, len(list1))
 	for _, item1 := range list1 {
-		item2, ok := item1.(instructions0xbd608d.ServiceRegistry)
+		item2, ok := item1.(store0x8467b3.ServiceRegistry)
 		if ok {
 			list2 = append(list2, item2)
 		}

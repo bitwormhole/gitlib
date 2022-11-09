@@ -1,10 +1,10 @@
 package store
 
-import "github.com/bitwormhole/gitlib/git/data/dxo"
+import "github.com/bitwormhole/gitlib/git"
 
 // HEAD ...
 type HEAD interface {
 	NodeLocation
 
-	GetValue(s Session) (dxo.ReferenceName, error)
+	GetValue(s Session) (git.ReferenceName, error)
 }

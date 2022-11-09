@@ -6,7 +6,6 @@ package gitlibcfg
 import (
 	cli0xf7c71e "bitwormhole.com/starter/cli"
 	lib0x4595be "github.com/bitwormhole/gitlib/etc/lib"
-	instructions0xbd608d "github.com/bitwormhole/gitlib/git/instructions"
 	store0x8467b3 "github.com/bitwormhole/gitlib/git/store"
 	markup0x23084a "github.com/bitwormhole/starter/markup"
 )
@@ -57,7 +56,7 @@ type pComConfigContextBase struct {
 type pComConfigContextWithInstructions struct {
 	instance *lib0x4595be.ConfigContextWithInstructions
 	 markup0x23084a.Component `class:"git-context-configurer"`
-	Instructions []instructions0xbd608d.ServiceRegistry `inject:".git-instruction-registry"`
+	Instructions []store0x8467b3.ServiceRegistry `inject:".git-instruction-registry"`
 }
 
 

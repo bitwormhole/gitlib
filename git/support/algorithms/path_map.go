@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"bitwormhole.com/starter/afs"
-	"github.com/bitwormhole/gitlib/git/data/dxo"
+	"github.com/bitwormhole/gitlib/git"
 	"github.com/bitwormhole/gitlib/git/store"
 )
 
@@ -81,7 +81,7 @@ func (inst *PathPatternMapping) getparts() ([]int, int) {
 }
 
 // Map ...
-func (inst *PathPatternMapping) Map(base afs.Path, id dxo.ObjectID) afs.Path {
+func (inst *PathPatternMapping) Map(base afs.Path, id git.ObjectID) afs.Path {
 
 	parts, minStrLen := inst.getparts()
 	str := id.String()

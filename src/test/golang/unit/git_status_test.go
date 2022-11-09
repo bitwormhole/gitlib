@@ -34,12 +34,11 @@ func TestGitStatus(t *testing.T) {
 	////////////////////////////////
 	// git status
 
-	task = &cli.Task{
+	err = unit.cli.GetClient().Run(&cli.Task{
 		Context: ctx,
 		Command: "git status",
 		WD:      wd2.GetPath(),
-	}
-	err = unit.cli.GetClient().Run(task)
+	})
 	if err != nil {
 		t.Error(err)
 	}

@@ -5,7 +5,6 @@ import (
 
 	"bitwormhole.com/starter/afs"
 	"bitwormhole.com/starter/cli"
-	"github.com/bitwormhole/gitlib/git/instructions"
 )
 
 // Lib ...
@@ -20,7 +19,7 @@ type Lib interface {
 
 	RepositoryLocator() RepositoryLocator
 
-	InstructionServiceManager() instructions.ServiceManager
+	InstructionServiceManager() ServiceManager
 
 	// 把这个 Lib 绑定到指定的 Context
 	Bind(cc context.Context) context.Context

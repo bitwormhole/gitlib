@@ -14,6 +14,10 @@ type RepositoryProfile interface {
 
 	Objects() Objects
 
+	Digest() Digest           // default="SHA-1"
+	Compression() Compression // default="DEFLATE"
+	PathMapping() PathMapping // default="xx/xxxx"
+
 	OpenSession() (Session, error)
 }
 

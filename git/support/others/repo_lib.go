@@ -5,7 +5,6 @@ import (
 
 	"bitwormhole.com/starter/afs"
 	"bitwormhole.com/starter/cli"
-	"github.com/bitwormhole/gitlib/git/instructions"
 	"github.com/bitwormhole/gitlib/git/store"
 )
 
@@ -39,7 +38,7 @@ func (inst *LibImpl) RepositoryLoader() store.RepositoryLoader {
 }
 
 // InstructionServiceManager ...
-func (inst *LibImpl) InstructionServiceManager() instructions.ServiceManager {
+func (inst *LibImpl) InstructionServiceManager() store.ServiceManager {
 	return inst.Context.ServiceManager
 }
 

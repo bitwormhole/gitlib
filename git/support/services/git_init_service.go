@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"bitwormhole.com/starter/afs"
-	"github.com/bitwormhole/gitlib/git"
 	"github.com/bitwormhole/gitlib/git/instructions"
 	"github.com/bitwormhole/gitlib/git/store"
 )
@@ -17,18 +16,18 @@ import (
 type GitInitService struct {
 }
 
-func (inst *GitInitService) _Impl() (git.InitService, instructions.ServiceRegistry) {
+func (inst *GitInitService) _Impl() (instructions.InitService, store.ServiceRegistry) {
 	return inst, inst
 }
 
 // ListRegistrations ...
-func (inst *GitInitService) ListRegistrations() []*instructions.ServiceRegistration {
+func (inst *GitInitService) ListRegistrations() []*store.ServiceRegistration {
 	name := inst.Name()
-	reg := &instructions.ServiceRegistration{
+	reg := &store.ServiceRegistration{
 		Name:    name,
 		Service: inst,
 	}
-	return []*instructions.ServiceRegistration{reg}
+	return []*store.ServiceRegistration{reg}
 }
 
 // Name ...
@@ -37,7 +36,7 @@ func (inst *GitInitService) Name() string {
 }
 
 // Run ...
-func (inst *GitInitService) Run(task *git.Init) error {
+func (inst *GitInitService) Run(task *instructions.Init) error {
 
 	dotgit, err := inst.getDotGitDir(task)
 	if err != nil {
@@ -86,7 +85,7 @@ func (inst *GitInitService) Run(task *git.Init) error {
 	return nil
 }
 
-func (inst *GitInitService) getDotGitDir(task *git.Init) (afs.Path, error) {
+func (inst *GitInitService) getDotGitDir(task *instructions.Init) (afs.Path, error) {
 
 	wd := task.WD
 	bare := task.Bare
@@ -133,7 +132,7 @@ func (inst *GitInitService) checkTargetDir(ctx context.Context, dir afs.Path) er
 ////////////////////////////////////////////////////////////////////////////////
 
 type gitInitServiceRepoBuilder struct {
-	task   *git.Init
+	task   *instructions.Init
 	dotgit afs.Path
 	files  []afs.Path
 	dirs   []afs.Path

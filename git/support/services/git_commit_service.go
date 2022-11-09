@@ -3,26 +3,26 @@ package services
 import (
 	"errors"
 
-	"github.com/bitwormhole/gitlib/git"
 	"github.com/bitwormhole/gitlib/git/instructions"
+	"github.com/bitwormhole/gitlib/git/store"
 )
 
 // GitCommitService ...
 type GitCommitService struct {
 }
 
-func (inst *GitCommitService) _Impl() (instructions.ServiceRegistry, git.CommitService) {
+func (inst *GitCommitService) _Impl() (store.ServiceRegistry, instructions.CommitService) {
 	return inst, inst
 }
 
 // ListRegistrations ...
-func (inst *GitCommitService) ListRegistrations() []*instructions.ServiceRegistration {
+func (inst *GitCommitService) ListRegistrations() []*store.ServiceRegistration {
 	name := inst.Name()
-	reg := &instructions.ServiceRegistration{
+	reg := &store.ServiceRegistration{
 		Name:    name,
 		Service: inst,
 	}
-	return []*instructions.ServiceRegistration{reg}
+	return []*store.ServiceRegistration{reg}
 }
 
 // Name ...
@@ -31,6 +31,6 @@ func (inst *GitCommitService) Name() string {
 }
 
 // Run ...
-func (inst *GitCommitService) Run(task *git.Commit) error {
+func (inst *GitCommitService) Run(task *instructions.Commit) error {
 	return errors.New("no impl")
 }

@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"github.com/bitwormhole/gitlib/git/instructions"
 	"github.com/bitwormhole/gitlib/git/store"
 	"github.com/bitwormhole/gitlib/git/support"
 	"github.com/bitwormhole/starter/markup"
@@ -25,7 +24,7 @@ func (inst *ConfigContextBase) _Impl() store.ContextConfigurer {
 type ConfigContextWithInstructions struct {
 	markup.Component `class:"git-context-configurer"`
 
-	Instructions []instructions.ServiceRegistry `inject:".git-instruction-registry"`
+	Instructions []store.ServiceRegistry `inject:".git-instruction-registry"`
 }
 
 func (inst *ConfigContextWithInstructions) _Impl() store.ContextConfigurer {

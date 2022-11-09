@@ -1,7 +1,7 @@
 package lib
 
 import (
-	"github.com/bitwormhole/gitlib/git/instructions"
+	"github.com/bitwormhole/gitlib/git/store"
 	"github.com/bitwormhole/gitlib/git/support/services"
 	"github.com/bitwormhole/starter/markup"
 )
@@ -11,14 +11,14 @@ type ConfigInstructions struct {
 	markup.Component `class:"git-instruction-registry"`
 }
 
-func (inst *ConfigInstructions) _Impl() instructions.ServiceRegistry {
+func (inst *ConfigInstructions) _Impl() store.ServiceRegistry {
 	return inst
 }
 
 // ListRegistrations ...
-func (inst *ConfigInstructions) ListRegistrations() []*instructions.ServiceRegistration {
+func (inst *ConfigInstructions) ListRegistrations() []*store.ServiceRegistration {
 
-	list := []*instructions.ServiceRegistration{}
+	list := []*store.ServiceRegistration{}
 
 	list = inst.add(list, &services.GitAddService{})
 	list = inst.add(list, &services.GitCommitService{})
@@ -29,7 +29,7 @@ func (inst *ConfigInstructions) ListRegistrations() []*instructions.ServiceRegis
 	return list
 }
 
-func (inst *ConfigInstructions) add(dst []*instructions.ServiceRegistration, src instructions.ServiceRegistry) []*instructions.ServiceRegistration {
+func (inst *ConfigInstructions) add(dst []*store.ServiceRegistration, src store.ServiceRegistry) []*store.ServiceRegistration {
 	some := src.ListRegistrations()
 	return append(dst, some...)
 }

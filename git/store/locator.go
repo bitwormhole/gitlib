@@ -9,5 +9,5 @@ type RepositoryLocator interface {
 
 // RepositoryFinder 表示一个git仓库查找器，用来查找指定路径下的所有仓库
 type RepositoryFinder interface {
-	Find(pwd afs.Path) ([]RepositoryLayout, error)
+	Find(pwd afs.Path) ([]afs.Path, error)
 }

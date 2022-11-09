@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"bitwormhole.com/starter/afs"
-	"github.com/bitwormhole/gitlib/git/data/dxo"
-	"github.com/bitwormhole/gitlib/git/data/gdio"
+	"github.com/bitwormhole/gitlib/git"
+	"github.com/bitwormhole/gitlib/git/data/gitfmt"
 	"github.com/bitwormhole/gitlib/git/store"
 )
 
@@ -81,9 +81,9 @@ func (inst *simpleConfig) Save() error {
 	if file == nil {
 		return nil
 	}
-	props := &dxo.Properties{}
+	props := &git.Properties{}
 	props.Import(inst.Export())
-	text := gdio.FormatPropertiesWithSegment(props)
+	text := gitfmt.FormatPropertiesWithSegment(props)
 	opt := &afs.Options{Create: true, Mkdirs: true}
 	err := file.GetIO().WriteText(text, opt)
 	if err != nil {
@@ -101,7 +101,7 @@ func (inst *simpleConfig) Load() error {
 	if err != nil {
 		return err
 	}
-	src, err := gdio.ParseProperties(text, nil)
+	src, err := gitfmt.ParseProperties(text, nil)
 	if err != nil {
 		return err
 	}

@@ -2,14 +2,19 @@ package sessions
 
 import (
 	"errors"
+	"fmt"
+	"io"
+	"io/ioutil"
 
 	"bitwormhole.com/starter/afs"
-	"github.com/bitwormhole/gitlib/git/data/dxo"
+	"github.com/bitwormhole/gitlib/git"
+	"github.com/bitwormhole/gitlib/git/data/gitfmt"
 	"github.com/bitwormhole/gitlib/git/store"
 )
 
 type sessionImpl struct {
 	profile store.RepositoryProfile
+	// core    *store.Core
 }
 
 func (inst *sessionImpl) _Impl() store.Session {
@@ -18,6 +23,10 @@ func (inst *sessionImpl) _Impl() store.Session {
 
 func (inst *sessionImpl) Close() error {
 	return nil
+}
+
+func (inst *sessionImpl) getSmallObjectSizeMax() int {
+	return 8 * 1024 * 1024
 }
 
 func (inst *sessionImpl) GetRepository() store.RepositoryProfile {
@@ -41,19 +50,98 @@ func (inst *sessionImpl) GetLayout() store.RepositoryLayout {
 }
 
 // objects
-func (inst *sessionImpl) LoadCommit(id dxo.ObjectID) (*dxo.Commit, error) {
+
+func (inst *sessionImpl) LoadText(id git.ObjectID) (string, error) {
+	bin, err := inst.LoadBinary(id)
+	if err != nil {
+		return "", err
+	}
+	return string(bin), nil
+}
+
+func (inst *sessionImpl) LoadBinary(id git.ObjectID) ([]byte, error) {
+	reader, o, err := inst.ReadObject(id)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		reader.Close()
+	}()
+	limit := inst.getSmallObjectSizeMax()
+	if o.Length > int64(limit) {
+		const f = "the size of small object is over limit, size=%v limit=%v id=%v"
+		return nil, fmt.Errorf(f, o.Length, limit, id)
+	}
+	return ioutil.ReadAll(reader)
+}
+
+func (inst *sessionImpl) LoadCommit(id git.ObjectID) (*git.Commit, error) {
+	text, err := inst.LoadText(id)
+	if err != nil {
+		return nil, err
+	}
+	return gitfmt.ParseCommit(text)
+}
+
+func (inst *sessionImpl) LoadTag(id git.ObjectID) (*git.Tag, error) {
+	text, err := inst.LoadText(id)
+	if err != nil {
+		return nil, err
+	}
+	return gitfmt.ParseTag(text)
+}
+
+func (inst *sessionImpl) LoadTree(id git.ObjectID) (*git.Tree, error) {
+	bin, err := inst.LoadBinary(id)
+	if err != nil {
+		return nil, err
+	}
+	return gitfmt.ParseTree(bin)
+}
+
+// HEAD ...
+func (inst *sessionImpl) LoadHEAD(h store.HEAD) (*git.HEAD, error) {
+	text, err := h.Path().GetIO().ReadText(nil)
+	if err != nil {
+		return nil, err
+	}
+	return gitfmt.ParseHEAD(text)
+}
+
+// LoadRef ...
+func (inst *sessionImpl) LoadRef(r store.Ref) (*git.Ref, error) {
+	text, err := r.Path().GetIO().ReadText(nil)
+	if err != nil {
+		return nil, err
+	}
+	return gitfmt.ParseRef(text)
+}
+
+func (inst *sessionImpl) ReadPackObject(o store.PackObject) (io.ReadCloser, *store.Object, error) {
+	return nil, nil, errors.New("no impl")
+}
+
+func (inst *sessionImpl) ReadSparseObject(o store.SparseObject) (io.ReadCloser, *store.Object, error) {
+	in := &sparseObjectReaderBuilder{
+		so:      o,
+		profile: inst.profile,
+	}
+	return in.open()
+}
+
+func (inst *sessionImpl) ReadSparseObjectRaw(o store.SparseObject) (io.ReadCloser, error) {
 	return nil, errors.New("no impl")
 }
 
-func (inst *sessionImpl) LoadTag(id dxo.ObjectID) (*dxo.Tag, error) {
+func (inst *sessionImpl) WriteSparseObject(o *store.Object, data io.Reader) (*store.Object, error) {
 	return nil, errors.New("no impl")
 }
 
-func (inst *sessionImpl) LoadTree(id dxo.ObjectID) (*dxo.Tree, error) {
+func (inst *sessionImpl) WriteSparseObjectRaw(o *store.Object, data io.Reader) (*store.Object, error) {
 	return nil, errors.New("no impl")
 }
 
-// HEAD
-func (inst *sessionImpl) LoadHEAD(head store.HEAD) (dxo.ReferenceName, error) {
-	return "", errors.New("no impl")
+func (inst *sessionImpl) ReadObject(id git.ObjectID) (io.ReadCloser, *store.Object, error) {
+	so := inst.profile.Objects().GetSparseObject(id)
+	return inst.ReadSparseObject(so)
 }

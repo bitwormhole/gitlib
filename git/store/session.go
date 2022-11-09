@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"bitwormhole.com/starter/afs"
-	"github.com/bitwormhole/gitlib/git/data/dxo"
+	"github.com/bitwormhole/gitlib/git"
 )
 
 // Session ...
@@ -23,17 +23,33 @@ type Session interface {
 	// 取仓库布局
 	GetLayout() RepositoryLayout
 
+	/////////////////////////////////////////////////
+
 	// config
 	// SaveConfig(cfg Config) error
 	// LoadConfig(cfg Config) error
 
 	// objects
-	LoadCommit(id dxo.ObjectID) (*dxo.Commit, error)
-	LoadTag(id dxo.ObjectID) (*dxo.Tag, error)
-	LoadTree(id dxo.ObjectID) (*dxo.Tree, error)
+	ReadObject(id git.ObjectID) (io.ReadCloser, *Object, error)
+	// WriteObject(o *Object) (io.WriteCloser, error)
+
+	SparseObjectLS
+
+	PackObjectLS
+
+	LoadText(id git.ObjectID) (string, error)
+	LoadBinary(id git.ObjectID) ([]byte, error)
+
+	// commit, tag, tree
+	LoadCommit(id git.ObjectID) (*git.Commit, error)
+	LoadTag(id git.ObjectID) (*git.Tag, error)
+	LoadTree(id git.ObjectID) (*git.Tree, error)
+
+	// refs
+	LoadRef(r Ref) (*git.Ref, error)
 
 	// HEAD
-	LoadHEAD(head HEAD) (dxo.ReferenceName, error)
+	LoadHEAD(head HEAD) (*git.HEAD, error)
 }
 
 // SessionFactory ...
