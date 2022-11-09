@@ -2,7 +2,6 @@ package commands
 
 import (
 	"bitwormhole.com/starter/cli"
-	"github.com/bitwormhole/gitlib/git/instructions"
 )
 
 // GitAdd ...
@@ -41,10 +40,12 @@ func (inst *GitAdd) GetHelp() *cli.HelpInfo {
 
 func (inst *GitAdd) handle(t *cli.Task) error {
 
-	ctx := t.Context
-	task := instructions.NewAdd(ctx)
-
+	// ctx := t.Context
+	// task := instructions.NewAdd(ctx)
 	// todo ...
+	// return task.Run()
 
-	return task.Run()
+	// 暂时 delegate to go-git
+	t.Command = "go-git-add"
+	return t.Client.Run(t)
 }
