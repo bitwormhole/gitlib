@@ -80,7 +80,12 @@ func (inst *sessionImpl) LoadCommit(id git.ObjectID) (*git.Commit, error) {
 	if err != nil {
 		return nil, err
 	}
-	return gitfmt.ParseCommit(text)
+	commit, err := gitfmt.ParseCommit(text)
+	if err != nil {
+		return nil, err
+	}
+	commit.ID = id
+	return commit, nil
 }
 
 func (inst *sessionImpl) LoadTag(id git.ObjectID) (*git.Tag, error) {
@@ -88,7 +93,12 @@ func (inst *sessionImpl) LoadTag(id git.ObjectID) (*git.Tag, error) {
 	if err != nil {
 		return nil, err
 	}
-	return gitfmt.ParseTag(text)
+	tag, err := gitfmt.ParseTag(text)
+	if err != nil {
+		return nil, err
+	}
+	tag.ID = id
+	return tag, nil
 }
 
 func (inst *sessionImpl) LoadTree(id git.ObjectID) (*git.Tree, error) {
@@ -96,7 +106,12 @@ func (inst *sessionImpl) LoadTree(id git.ObjectID) (*git.Tree, error) {
 	if err != nil {
 		return nil, err
 	}
-	return gitfmt.ParseTree(bin)
+	tree, err := gitfmt.ParseTree(bin)
+	if err != nil {
+		return nil, err
+	}
+	tree.ID = id
+	return tree, nil
 }
 
 // HEAD ...

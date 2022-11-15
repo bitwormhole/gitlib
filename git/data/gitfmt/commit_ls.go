@@ -70,10 +70,10 @@ func (inst *CommitBuilder) SetTree(value *git.HyperHeader) error {
 
 // AddExt ...
 func (inst *CommitBuilder) AddExt(src *git.HyperHeader) error {
-	table := inst.data.Ext
+	table := inst.data.Headers
 	if table == nil {
 		table = make(map[string]*git.HyperHeader)
-		inst.data.Ext = table
+		inst.data.Headers = table
 	}
 	name := src.Name
 	dst := table[name]

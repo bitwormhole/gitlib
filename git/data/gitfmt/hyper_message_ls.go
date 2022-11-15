@@ -2,14 +2,35 @@ package gitfmt
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/bitwormhole/gitlib/git"
 )
 
+// FormatHyperMessage ...
 func FormatHyperMessage(msg *git.HyperMessage) (string, error) {
-
-	return "", fmt.Errorf("no impl")
+	const nl = '\n'
+	builder := strings.Builder{}
+	hds := msg.Headers
+	keys := make([]string, 0)
+	for key := range hds {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		hh := hds[key]
+		values := hh.Values
+		for _, v := range values {
+			builder.WriteString(hh.Name)
+			builder.WriteRune(' ')
+			builder.WriteString(v)
+			builder.WriteRune(nl)
+		}
+	}
+	builder.WriteRune(nl)
+	builder.WriteString(msg.Content)
+	return builder.String(), nil
 }
 
 // ParseHyperMessage ...

@@ -28,6 +28,7 @@ func (inst *HyperHeader) AddValue(v string) {
 
 // HyperMessage ...
 type HyperMessage struct {
+	ID      ObjectID
 	Headers map[string]*HyperHeader
 	Content string
 }
