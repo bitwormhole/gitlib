@@ -6,6 +6,7 @@ import (
 )
 
 // GitPush ...
+// 参考 https://git-scm.com/docs/git-push
 type GitPush struct {
 }
 

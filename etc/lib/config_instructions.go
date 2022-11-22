@@ -22,6 +22,7 @@ func (inst *ConfigInstructions) ListRegistrations() []*store.ServiceRegistration
 
 	list = inst.add(list, &services.GitAddService{})
 	list = inst.add(list, &services.GitCommitService{})
+	list = inst.add(list, &services.GitFetchService{})
 	list = inst.add(list, &services.GitInitService{})
 	list = inst.add(list, &services.GitPushService{})
 	list = inst.add(list, &services.GitStatusService{})

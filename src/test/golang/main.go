@@ -7,7 +7,7 @@ import (
 
 func main() {
 	i := starter.InitApp()
-	i.SetArguments([]string{"--application.profiles.active=git-status"})
+	// i.SetArguments(  )
 	i.UseMain(libgit.ModuleDemo())
 	i.Run()
 }

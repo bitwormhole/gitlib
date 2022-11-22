@@ -23,6 +23,7 @@ func (inst *ConfigCommands) GetHandlers() []*cli.HandlerRegistration {
 
 	list = inst.fill(list, &commands.GitAdd{})
 	list = inst.fill(list, &commands.GitCommit{})
+	list = inst.fill(list, &commands.GitFetch{})
 	list = inst.fill(list, &commands.GitInit{})
 	list = inst.fill(list, &commands.GitPush{})
 	list = inst.fill(list, &commands.GitStatus{})

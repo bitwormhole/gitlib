@@ -3,6 +3,7 @@ package store
 import (
 	"bitwormhole.com/starter/afs"
 	"bitwormhole.com/starter/cli"
+	"github.com/bitwormhole/gitlib/git/network/pktline"
 )
 
 // Context 表示仓库对象的周边环境
@@ -17,6 +18,8 @@ type Context struct {
 
 	CoreConfigurers []CoreConfigurer
 
+	Connectors []pktline.Connector
+
 	FS afs.FS
 
 	Locator RepositoryLocator
@@ -30,6 +33,8 @@ type Context struct {
 	ConfigChainFactory ConfigChainFactory
 
 	AlgorithmManager AlgorithmManager
+
+	ConnectorManager pktline.ConnectorManager // the main connector
 }
 
 // ContextConfiguration 是用来初始化模块的配置

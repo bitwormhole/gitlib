@@ -3,6 +3,7 @@ package others
 import (
 	"errors"
 
+	"bitwormhole.com/starter/afs"
 	"github.com/bitwormhole/gitlib/git/store"
 )
 
@@ -34,6 +35,15 @@ func (inst *RepositoryLoaderImpl) Load(l store.RepositoryLayout) (store.Reposito
 	}
 
 	return repo, nil
+}
+
+func (inst *RepositoryLoaderImpl) LoadWithPath(path afs.Path) (store.Repository, error) {
+	locator := inst.Context.Lib.RepositoryLocator()
+	layout, err := locator.Locate(path)
+	if err != nil {
+		return nil, err
+	}
+	return inst.Load(layout)
 }
 
 func (inst *RepositoryLoaderImpl) configCore(core *store.Core) error {

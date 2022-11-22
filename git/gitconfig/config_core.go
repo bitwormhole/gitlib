@@ -13,3 +13,11 @@ const (
 	CoreDigestAlgorithm      KeyTemplate = "core.digestAlgorithm"
 	CoreObjectsPathPattern   KeyTemplate = "core.objectsPathPattern"
 )
+
+// Core ...
+type Core struct {
+	Exists bool
+
+	Bare                    bool
+	RepositoryFormatVersion int
+}

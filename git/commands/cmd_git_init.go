@@ -7,6 +7,7 @@ import (
 )
 
 // GitInit ...
+// 参考 https://git-scm.com/docs/git-init
 type GitInit struct {
 }
 

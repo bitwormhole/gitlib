@@ -5,6 +5,7 @@ import (
 )
 
 // GitCommit ...
+// 参考 https://git-scm.com/docs/git-commit
 type GitCommit struct {
 }
 

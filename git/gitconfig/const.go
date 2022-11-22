@@ -4,6 +4,8 @@
 
 package gitconfig
 
+import "strings"
+
 // KeyTemplate 表示仓库配置的属性名模板
 type KeyTemplate string
 
@@ -11,5 +13,6 @@ type KeyTemplate string
 const NamePlaceholder = "<name>"
 
 func (kt KeyTemplate) String() string {
-	return string(kt)
+	str := string(kt)
+	return strings.ToLower(str)
 }

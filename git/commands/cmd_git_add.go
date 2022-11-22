@@ -5,6 +5,7 @@ import (
 )
 
 // GitAdd ...
+// 参考 https://git-scm.com/docs/git-add
 type GitAdd struct {
 }
 

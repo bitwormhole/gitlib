@@ -7,6 +7,7 @@ package gitlibcfg
 import (
 	cli0xf7c71e "bitwormhole.com/starter/cli"
 	lib0x4595be "github.com/bitwormhole/gitlib/etc/lib"
+	pktline0xd37953 "github.com/bitwormhole/gitlib/git/network/pktline"
 	store0x8467b3 "github.com/bitwormhole/gitlib/git/store"
 	application "github.com/bitwormhole/starter/application"
 	config "github.com/bitwormhole/starter/application/config"
@@ -55,63 +56,90 @@ func autoGenConfig(cb application.ConfigBuilder) error {
 		return err
 	}
 
-	// component: com3-lib0x4595be.TheDeflate
+	// component: com3-lib0x4595be.TheSHA512
 	cominfobuilder.Next()
-	cominfobuilder.ID("com3-lib0x4595be.TheDeflate").Class("git-algorithm-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com3-lib0x4595be.TheSHA512").Class("git-algorithm-registry").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComTheSHA512{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com4-lib0x4595be.TheMD5
+	cominfobuilder.Next()
+	cominfobuilder.ID("com4-lib0x4595be.TheMD5").Class("git-algorithm-registry").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComTheMD5{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com5-lib0x4595be.TheDeflate
+	cominfobuilder.Next()
+	cominfobuilder.ID("com5-lib0x4595be.TheDeflate").Class("git-algorithm-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComTheDeflate{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com4-lib0x4595be.ThePlain
+	// component: com6-lib0x4595be.ThePlain
 	cominfobuilder.Next()
-	cominfobuilder.ID("com4-lib0x4595be.ThePlain").Class("git-algorithm-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com6-lib0x4595be.ThePlain").Class("git-algorithm-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComThePlain{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com5-lib0x4595be.ConfigCommands
+	// component: com7-lib0x4595be.ConfigCommands
 	cominfobuilder.Next()
-	cominfobuilder.ID("com5-lib0x4595be.ConfigCommands").Class("cli-handler-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com7-lib0x4595be.ConfigCommands").Class("cli-handler-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigCommands{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com6-lib0x4595be.ConfigContextBase
+	// component: com8-lib0x4595be.ConfigConnectors
 	cominfobuilder.Next()
-	cominfobuilder.ID("com6-lib0x4595be.ConfigContextBase").Class("git-context-configurer").Aliases("").Scope("")
+	cominfobuilder.ID("com8-lib0x4595be.ConfigConnectors").Class("git-context-configurer").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComConfigConnectors{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com9-lib0x4595be.ConfigContextBase
+	cominfobuilder.Next()
+	cominfobuilder.ID("com9-lib0x4595be.ConfigContextBase").Class("git-context-configurer").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigContextBase{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com7-lib0x4595be.ConfigContextWithInstructions
+	// component: com10-lib0x4595be.ConfigContextWithInstructions
 	cominfobuilder.Next()
-	cominfobuilder.ID("com7-lib0x4595be.ConfigContextWithInstructions").Class("git-context-configurer").Aliases("").Scope("")
+	cominfobuilder.ID("com10-lib0x4595be.ConfigContextWithInstructions").Class("git-context-configurer").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigContextWithInstructions{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com8-lib0x4595be.ConfigCore
+	// component: com11-lib0x4595be.ConfigCore
 	cominfobuilder.Next()
-	cominfobuilder.ID("com8-lib0x4595be.ConfigCore").Class("git-core-configurer").Aliases("").Scope("")
+	cominfobuilder.ID("com11-lib0x4595be.ConfigCore").Class("git-core-configurer").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigCore{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com9-lib0x4595be.ConfigInstructions
+	// component: com12-lib0x4595be.ConfigInstructions
 	cominfobuilder.Next()
-	cominfobuilder.ID("com9-lib0x4595be.ConfigInstructions").Class("git-instruction-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com12-lib0x4595be.ConfigInstructions").Class("git-instruction-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigInstructions{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
@@ -314,7 +342,115 @@ func (inst * comFactory4pComTheSHA256) Inject(instance application.ComponentInst
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComTheDeflate : the factory of component: com3-lib0x4595be.TheDeflate
+// comFactory4pComTheSHA512 : the factory of component: com3-lib0x4595be.TheSHA512
+type comFactory4pComTheSHA512 struct {
+
+    mPrototype * lib0x4595be.TheSHA512
+
+	
+
+}
+
+func (inst * comFactory4pComTheSHA512) init() application.ComponentFactory {
+
+	
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComTheSHA512) newObject() * lib0x4595be.TheSHA512 {
+	return & lib0x4595be.TheSHA512 {}
+}
+
+func (inst * comFactory4pComTheSHA512) castObject(instance application.ComponentInstance) * lib0x4595be.TheSHA512 {
+	return instance.Get().(*lib0x4595be.TheSHA512)
+}
+
+func (inst * comFactory4pComTheSHA512) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComTheSHA512) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComTheSHA512) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComTheSHA512) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComTheSHA512) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComTheSHA512) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	return nil
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComTheMD5 : the factory of component: com4-lib0x4595be.TheMD5
+type comFactory4pComTheMD5 struct {
+
+    mPrototype * lib0x4595be.TheMD5
+
+	
+
+}
+
+func (inst * comFactory4pComTheMD5) init() application.ComponentFactory {
+
+	
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComTheMD5) newObject() * lib0x4595be.TheMD5 {
+	return & lib0x4595be.TheMD5 {}
+}
+
+func (inst * comFactory4pComTheMD5) castObject(instance application.ComponentInstance) * lib0x4595be.TheMD5 {
+	return instance.Get().(*lib0x4595be.TheMD5)
+}
+
+func (inst * comFactory4pComTheMD5) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComTheMD5) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComTheMD5) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComTheMD5) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComTheMD5) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComTheMD5) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	return nil
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComTheDeflate : the factory of component: com5-lib0x4595be.TheDeflate
 type comFactory4pComTheDeflate struct {
 
     mPrototype * lib0x4595be.TheDeflate
@@ -368,7 +504,7 @@ func (inst * comFactory4pComTheDeflate) Inject(instance application.ComponentIns
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComThePlain : the factory of component: com4-lib0x4595be.ThePlain
+// comFactory4pComThePlain : the factory of component: com6-lib0x4595be.ThePlain
 type comFactory4pComThePlain struct {
 
     mPrototype * lib0x4595be.ThePlain
@@ -422,7 +558,7 @@ func (inst * comFactory4pComThePlain) Inject(instance application.ComponentInsta
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigCommands : the factory of component: com5-lib0x4595be.ConfigCommands
+// comFactory4pComConfigCommands : the factory of component: com7-lib0x4595be.ConfigCommands
 type comFactory4pComConfigCommands struct {
 
     mPrototype * lib0x4595be.ConfigCommands
@@ -476,7 +612,79 @@ func (inst * comFactory4pComConfigCommands) Inject(instance application.Componen
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigContextBase : the factory of component: com6-lib0x4595be.ConfigContextBase
+// comFactory4pComConfigConnectors : the factory of component: com8-lib0x4595be.ConfigConnectors
+type comFactory4pComConfigConnectors struct {
+
+    mPrototype * lib0x4595be.ConfigConnectors
+
+	
+	mConnectorsSelector config.InjectionSelector
+
+}
+
+func (inst * comFactory4pComConfigConnectors) init() application.ComponentFactory {
+
+	
+	inst.mConnectorsSelector = config.NewInjectionSelector(".pktline-connector-registry",nil)
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComConfigConnectors) newObject() * lib0x4595be.ConfigConnectors {
+	return & lib0x4595be.ConfigConnectors {}
+}
+
+func (inst * comFactory4pComConfigConnectors) castObject(instance application.ComponentInstance) * lib0x4595be.ConfigConnectors {
+	return instance.Get().(*lib0x4595be.ConfigConnectors)
+}
+
+func (inst * comFactory4pComConfigConnectors) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComConfigConnectors) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComConfigConnectors) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComConfigConnectors) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComConfigConnectors) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComConfigConnectors) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	
+	obj := inst.castObject(instance)
+	obj.Connectors = inst.getterForFieldConnectorsSelector(context)
+	return context.LastError()
+}
+
+//getterForFieldConnectorsSelector
+func (inst * comFactory4pComConfigConnectors) getterForFieldConnectorsSelector (context application.InstanceContext) []pktline0xd37953.ConnectorRegistry {
+	list1 := inst.mConnectorsSelector.GetList(context)
+	list2 := make([]pktline0xd37953.ConnectorRegistry, 0, len(list1))
+	for _, item1 := range list1 {
+		item2, ok := item1.(pktline0xd37953.ConnectorRegistry)
+		if ok {
+			list2 = append(list2, item2)
+		}
+	}
+	return list2
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComConfigContextBase : the factory of component: com9-lib0x4595be.ConfigContextBase
 type comFactory4pComConfigContextBase struct {
 
     mPrototype * lib0x4595be.ConfigContextBase
@@ -530,7 +738,7 @@ func (inst * comFactory4pComConfigContextBase) Inject(instance application.Compo
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigContextWithInstructions : the factory of component: com7-lib0x4595be.ConfigContextWithInstructions
+// comFactory4pComConfigContextWithInstructions : the factory of component: com10-lib0x4595be.ConfigContextWithInstructions
 type comFactory4pComConfigContextWithInstructions struct {
 
     mPrototype * lib0x4595be.ConfigContextWithInstructions
@@ -602,7 +810,7 @@ func (inst * comFactory4pComConfigContextWithInstructions) getterForFieldInstruc
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigCore : the factory of component: com8-lib0x4595be.ConfigCore
+// comFactory4pComConfigCore : the factory of component: com11-lib0x4595be.ConfigCore
 type comFactory4pComConfigCore struct {
 
     mPrototype * lib0x4595be.ConfigCore
@@ -656,7 +864,7 @@ func (inst * comFactory4pComConfigCore) Inject(instance application.ComponentIns
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigInstructions : the factory of component: com9-lib0x4595be.ConfigInstructions
+// comFactory4pComConfigInstructions : the factory of component: com12-lib0x4595be.ConfigInstructions
 type comFactory4pComConfigInstructions struct {
 
     mPrototype * lib0x4595be.ConfigInstructions

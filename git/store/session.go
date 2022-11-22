@@ -12,7 +12,7 @@ type Session interface {
 	io.Closer
 
 	// 取仓库接口
-	GetRepository() RepositoryProfile
+	GetRepository() Repository
 
 	// 根据名称，取指定的组件
 	GetComponent(name string) (any, error)

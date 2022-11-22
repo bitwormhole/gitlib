@@ -6,6 +6,7 @@ package gitlibcfg
 import (
 	cli0xf7c71e "bitwormhole.com/starter/cli"
 	lib0x4595be "github.com/bitwormhole/gitlib/etc/lib"
+	pktline0xd37953 "github.com/bitwormhole/gitlib/git/network/pktline"
 	store0x8467b3 "github.com/bitwormhole/gitlib/git/store"
 	markup0x23084a "github.com/bitwormhole/starter/markup"
 )
@@ -29,6 +30,18 @@ type pComTheSHA256 struct {
 }
 
 
+type pComTheSHA512 struct {
+	instance *lib0x4595be.TheSHA512
+	 markup0x23084a.Component `class:"git-algorithm-registry"`
+}
+
+
+type pComTheMD5 struct {
+	instance *lib0x4595be.TheMD5
+	 markup0x23084a.Component `class:"git-algorithm-registry"`
+}
+
+
 type pComTheDeflate struct {
 	instance *lib0x4595be.TheDeflate
 	 markup0x23084a.Component `class:"git-algorithm-registry"`
@@ -44,6 +57,13 @@ type pComThePlain struct {
 type pComConfigCommands struct {
 	instance *lib0x4595be.ConfigCommands
 	 markup0x23084a.Component `class:"cli-handler-registry"`
+}
+
+
+type pComConfigConnectors struct {
+	instance *lib0x4595be.ConfigConnectors
+	 markup0x23084a.Component `class:"git-context-configurer"`
+	Connectors []pktline0xd37953.ConnectorRegistry `inject:".pktline-connector-registry"`
 }
 
 

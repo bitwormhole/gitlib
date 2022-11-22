@@ -29,7 +29,7 @@ func (inst *sessionImpl) getSmallObjectSizeMax() int {
 	return 8 * 1024 * 1024
 }
 
-func (inst *sessionImpl) GetRepository() store.RepositoryProfile {
+func (inst *sessionImpl) GetRepository() store.Repository {
 	return inst.profile
 }
 

@@ -6,6 +6,7 @@ import (
 )
 
 // GitStatus ...
+// 参考 https://git-scm.com/docs/git-status
 type GitStatus struct {
 }
 
@@ -41,7 +42,6 @@ func (inst *GitStatus) GetHelp() *cli.HelpInfo {
 
 func (inst *GitStatus) handle(t1 *cli.Task) error {
 
-	// 参考 https://git-scm.com/docs/git-status
 	//
 	// git status [<options>…​] [--] [<pathspec>…​]
 	// -s | --short

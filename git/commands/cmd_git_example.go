@@ -6,6 +6,7 @@ import (
 )
 
 // GitExample ...
+// 参考 https://git-scm.com/docs/git-example
 type GitExample struct {
 }
 

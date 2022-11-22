@@ -84,7 +84,7 @@ func (inst *simpleConfig) Save() error {
 	props := &git.Properties{}
 	props.Import(inst.Export())
 	text := gitfmt.FormatPropertiesWithSegment(props)
-	opt := &afs.Options{Create: true, Mkdirs: true}
+	opt := &afs.Options{}
 	err := file.GetIO().WriteText(text, opt)
 	if err != nil {
 		return err

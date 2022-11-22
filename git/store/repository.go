@@ -1,5 +1,7 @@
 package store
 
+import "bitwormhole.com/starter/afs"
+
 // RepositoryProfile 表示一个存在的git仓库的视图
 type RepositoryProfile interface {
 	Layout() RepositoryLayout
@@ -29,4 +31,5 @@ type Repository interface {
 // RepositoryLoader ...
 type RepositoryLoader interface {
 	Load(l RepositoryLayout) (Repository, error)
+	LoadWithPath(path afs.Path) (Repository, error)
 }

@@ -10,3 +10,14 @@ const (
 	BranchNameRebase       KeyTemplate = "branch.<name>.rebase"
 	BranchNameDescription  KeyTemplate = "branch.<name>.description"
 )
+
+// Branch 表示 config["branch.<name>.*"]
+type Branch struct {
+	Name   string
+	Exists bool
+
+	Merge       string // ='refs/heads/main'
+	Remote      string // the remote name
+	PushRemote  string
+	Description string
+}

@@ -5,6 +5,7 @@ import (
 
 	"bitwormhole.com/starter/afs"
 	"bitwormhole.com/starter/cli"
+	"github.com/bitwormhole/gitlib/git/network/pktline"
 )
 
 // Lib ...
@@ -20,6 +21,8 @@ type Lib interface {
 	RepositoryLocator() RepositoryLocator
 
 	InstructionServiceManager() ServiceManager
+
+	Connectors() pktline.ConnectorManager
 
 	// 把这个 Lib 绑定到指定的 Context
 	Bind(cc context.Context) context.Context
