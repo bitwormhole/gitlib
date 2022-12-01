@@ -4,28 +4,28 @@ import (
 	"crypto/sha512"
 	"hash"
 
-	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git"
 )
 
 // DigestSHA512 ...
 type DigestSHA512 struct {
 }
 
-func (inst *DigestSHA512) _Impl() (store.AlgorithmRegistry, store.Digest) {
+func (inst *DigestSHA512) _Impl() (git.AlgorithmRegistry, git.Digest) {
 	return inst, inst
 }
 
 // ListRegistrations ...
-func (inst *DigestSHA512) ListRegistrations() []*store.AlgorithmRegistration {
+func (inst *DigestSHA512) ListRegistrations() []*git.AlgorithmRegistration {
 	ar := inst.GetInfo()
-	return []*store.AlgorithmRegistration{ar}
+	return []*git.AlgorithmRegistration{ar}
 }
 
 // GetInfo ...
-func (inst *DigestSHA512) GetInfo() *store.AlgorithmRegistration {
-	return &store.AlgorithmRegistration{
+func (inst *DigestSHA512) GetInfo() *git.AlgorithmRegistration {
+	return &git.AlgorithmRegistration{
 		Name:     "sha512",
-		Type:     store.AlgorithmDigest,
+		Type:     git.AlgorithmDigest,
 		Provider: inst,
 	}
 }
@@ -33,4 +33,10 @@ func (inst *DigestSHA512) GetInfo() *store.AlgorithmRegistration {
 // New ...
 func (inst *DigestSHA512) New() hash.Hash {
 	return sha512.New()
+}
+
+// Size ...
+func (inst *DigestSHA512) Size() git.HashSize {
+	const size = 512 / 8
+	return git.HashSizeInBytes(size)
 }

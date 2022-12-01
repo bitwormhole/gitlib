@@ -11,42 +11,30 @@ import (
 	"github.com/bitwormhole/gitlib/git/store"
 )
 
-////////////////////////////////////////////////////////////////////////////////
-
-// Local ...
-type Local struct {
+// Context ...
+type Context struct {
 	Lib        store.Lib
 	Repository store.Repository
 	Session    store.Session
 	Path       afs.Path
-}
+	Connection pktline.Connection
 
-// Remote ...
-type Remote struct {
-	Raw gitconfig.Remote
+	Actions Actions
 
+	// collections
+	Branches map[string]*gitconfig.Branch // all
+	Remotes  map[string]*gitconfig.Remote // all
+	RnB      []*gitconfig.RemoteAndBranch
+
+	// current
 	RemoteName    string
-	Connection    pktline.Connection
 	URL           string
+	RawRemote     gitconfig.Remote
+	RawBranch     gitconfig.Branch
 	FetchTemplate gitconfig.FetchRefspecTemplate
-}
-
-// Branch ...
-type Branch struct {
-	Raw gitconfig.Branch
-
-	Merge     git.ReferenceName // like 'refs/heads/main'
-	FetchRef  git.ReferenceName // like 'refs/remotes/origin/main'
-	RemoteRef git.ReferenceName // like 'refs/heads/main'
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-// Context ...
-type Context struct {
-	Local  Local
-	Remote Remote
-	Branch Branch
+	MergeRef      git.ReferenceName // like 'refs/heads/main'
+	FetchRef      git.ReferenceName // like 'refs/remotes/origin/main'
+	RemoteRef     git.ReferenceName // like 'refs/heads/main'
 }
 
 // Init ...
@@ -62,10 +50,9 @@ func (inst *Context) Init(ctx context.Context, wd afs.Path) error {
 		return err
 	}
 
-	local := &inst.Local
-	local.Lib = lib
-	local.Repository = repo
-	local.Path = wd
+	inst.Lib = lib
+	inst.Repository = repo
+	inst.Path = wd
 	return nil
 }
 
@@ -85,7 +72,7 @@ func (inst *Context) loadRepository(wd afs.Path, lib store.Lib) (store.Repositor
 
 // OpenSession ...
 func (inst *Context) OpenSession() (store.Session, error) {
-	repo := inst.Local.Repository
+	repo := inst.Repository
 	session, err := repo.OpenSession()
 	if err != nil {
 		return nil, err
@@ -94,21 +81,27 @@ func (inst *Context) OpenSession() (store.Session, error) {
 }
 
 // OpenConnection ...
-func (inst *Context) OpenConnection(service string) (pktline.Connection, error) {
+func (inst *Context) OpenConnection(params *pktline.ConnParams) (pktline.Connection, error) {
 
-	remote := &inst.Remote
-	conn := remote.Connection
+	conn := inst.Connection
 	if conn != nil {
 		return conn, nil
 	}
 
-	params := &pktline.ConnParams{
-		Service: service,
-		URL:     remote.URL,
-		Method:  http.MethodGet,
+	if params == nil {
+		params = &pktline.ConnParams{}
+	}
+	if params.Service == "" {
+		params.Service = pktline.ServiceGitUploadPack
+	}
+	if params.URL == "" {
+		params.URL = inst.URL
+	}
+	if params.Method == "" {
+		params.Method = http.MethodGet
 	}
 
-	lib := inst.Local.Lib
+	lib := inst.Lib
 	conn, err := lib.Connectors().Connect(params)
 	if err != nil {
 		return nil, err

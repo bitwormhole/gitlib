@@ -53,6 +53,21 @@ func (inst *outputWriterCloser) Close() error {
 	return nil
 }
 
+func (inst *outputWriterCloser) makeSpecialData(p *Packet) ([]byte, error) {
+	const (
+		z   = '0'
+		min = 0
+		max = 3
+	)
+	n := p.Length
+	if min <= n && n <= max {
+		z3 := byte('0' + n)
+		data := []byte{z, z, z, z3}
+		return data, nil
+	}
+	return nil, fmt.Errorf("bad Special pktline-length:%v", n)
+}
+
 // Write ...
 func (inst *outputWriterCloser) Write(p *Packet) error {
 
@@ -61,12 +76,19 @@ func (inst *outputWriterCloser) Write(p *Packet) error {
 		return fmt.Errorf("stream is closed")
 	}
 
-	if p.Flush {
-		const z = '0'
-		data := []byte{z, z, z, z}
+	if p == nil {
+		return nil
+	}
+
+	if p.Special {
+		data, err := inst.makeSpecialData(p)
+		if err != nil {
+			return err
+		}
 		return inst.writeTo(o, data)
 	}
 
+	// else, a normal packet
 	head := p.Head
 	body := p.Body
 	builder := bytes.Buffer{}

@@ -4,12 +4,13 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/bitwormhole/gitlib/git"
 	"github.com/bitwormhole/gitlib/git/store"
 )
 
 // AlgorithmManager ...
 type AlgorithmManager struct {
-	table map[string]*store.AlgorithmRegistration
+	table map[string]*git.AlgorithmRegistration
 }
 
 func (inst *AlgorithmManager) _Impl() store.AlgorithmManager {
@@ -17,9 +18,9 @@ func (inst *AlgorithmManager) _Impl() store.AlgorithmManager {
 }
 
 // Init ...
-func (inst *AlgorithmManager) Init(src []store.AlgorithmRegistry) {
+func (inst *AlgorithmManager) Init(src []git.AlgorithmRegistry) {
 	dst := inst.table
-	dst = make(map[string]*store.AlgorithmRegistration)
+	dst = make(map[string]*git.AlgorithmRegistration)
 	for _, ar1 := range src {
 		some := ar1.ListRegistrations()
 		for _, ar2 := range some {
@@ -37,7 +38,7 @@ func (inst *AlgorithmManager) normalizeName(name string) string {
 }
 
 // Find ...
-func (inst *AlgorithmManager) Find(name string) (store.Algorithm, error) {
+func (inst *AlgorithmManager) Find(name string) (git.Algorithm, error) {
 	name = inst.normalizeName(name)
 	ar := inst.table[name]
 	if ar != nil {
@@ -50,31 +51,31 @@ func (inst *AlgorithmManager) Find(name string) (store.Algorithm, error) {
 }
 
 // FindCompression ...
-func (inst *AlgorithmManager) FindCompression(name string) (store.Compression, error) {
+func (inst *AlgorithmManager) FindCompression(name string) (git.Compression, error) {
 	a, err := inst.Find(name)
 	if err != nil {
 		return nil, err
 	}
-	p := a.(store.Compression)
+	p := a.(git.Compression)
 	return p, nil
 }
 
 // FindDigest ...
-func (inst *AlgorithmManager) FindDigest(name string) (store.Digest, error) {
+func (inst *AlgorithmManager) FindDigest(name string) (git.Digest, error) {
 	a, err := inst.Find(name)
 	if err != nil {
 		return nil, err
 	}
-	p := a.(store.Digest)
+	p := a.(git.Digest)
 	return p, nil
 }
 
 // FindPathMapping 。。。
-func (inst *AlgorithmManager) FindPathMapping(name string) (store.PathMapping, error) {
+func (inst *AlgorithmManager) FindPathMapping(name string) (git.PathMapping, error) {
 	a, err := inst.Find(name)
 	if err != nil {
 		return nil, err
 	}
-	p := a.(store.PathMapping)
+	p := a.(git.PathMapping)
 	return p, nil
 }

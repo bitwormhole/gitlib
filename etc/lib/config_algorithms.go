@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"github.com/bitwormhole/gitlib/git"
 	"github.com/bitwormhole/gitlib/git/store"
 	"github.com/bitwormhole/gitlib/git/support"
 	"github.com/bitwormhole/gitlib/git/support/algorithms"
@@ -11,7 +12,7 @@ import (
 type ConfigAlgorithms struct {
 	markup.Component `class:"git-context-configurer"`
 
-	Algorithms []store.AlgorithmRegistry `inject:".git-algorithm-registry"`
+	Algorithms []git.AlgorithmRegistry `inject:".git-algorithm-registry"`
 }
 
 func (inst *ConfigAlgorithms) _Impl() store.ContextConfigurer {

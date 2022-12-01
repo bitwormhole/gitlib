@@ -12,7 +12,10 @@ func TestReaderWriter(t *testing.T) {
 	packs2 := []*Packet{}
 
 	packs1 = append(packs1, &Packet{})
-	packs1 = append(packs1, &Packet{Flush: true})
+	packs1 = append(packs1, &Packet{Special: true, Length: 0})
+	packs1 = append(packs1, &Packet{Special: true, Length: 1})
+	packs1 = append(packs1, &Packet{Special: true, Length: 2})
+	packs1 = append(packs1, &Packet{Special: true, Length: 3})
 	packs1 = append(packs1, &Packet{Head: "example1"})
 	packs1 = append(packs1, &Packet{Head: "example2", Body: []byte{'a', 'b', 'c'}})
 	packs1 = append(packs1, &Packet{Body: []byte{'x', 'y', 'z'}})
@@ -32,12 +35,15 @@ func TestReaderWriter(t *testing.T) {
 	for {
 		p, err := r.Read()
 		if err != nil {
-			if err != io.EOF {
+			if err == io.EOF {
+				break
+			} else {
 				t.Error(err)
+				return
 			}
-			return
 		}
 		packs2 = append(packs2, p)
 	}
 
+	t.Logf("%v", len(packs2))
 }

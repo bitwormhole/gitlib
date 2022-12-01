@@ -102,7 +102,7 @@ func (inst *RepositoryLocatorImpl) loadSubmodule(b *store.LayoutBuilder, point a
 		return errors.New("bad submodule, path=" + point.GetPath())
 	}
 
-	return errors.New("no impl")
+	return errors.New("no impl: loadSubmodule")
 }
 
 func (inst *RepositoryLocatorImpl) loadWorktree(b *store.LayoutBuilder, point afs.Path) error {
@@ -111,7 +111,7 @@ func (inst *RepositoryLocatorImpl) loadWorktree(b *store.LayoutBuilder, point af
 		return errors.New("bad worktree, path=" + point.GetPath())
 	}
 
-	return errors.New("no impl")
+	return errors.New("no impl: loadWorktree")
 }
 
 func (inst *RepositoryLocatorImpl) initOtherDirs(b *store.LayoutBuilder) error {
@@ -138,7 +138,7 @@ func (inst *RepositoryLocatorImpl) initOtherDirs(b *store.LayoutBuilder) error {
 }
 
 func (inst *RepositoryLocatorImpl) findInBareRepo(b *store.LayoutBuilder) error {
-	return errors.New("no impl")
+	return errors.New("no impl: findInBareRepo")
 }
 
 func (inst *RepositoryLocatorImpl) findConfigFile(p afs.Path) (afs.Path, error) {

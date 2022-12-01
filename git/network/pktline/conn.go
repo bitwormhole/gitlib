@@ -4,16 +4,13 @@ import (
 	"io"
 )
 
-// 定义 git 服务名称
-const (
-	ServiceGitUpload = "git-upload-objects"
-)
-
 // ConnParams ...
 type ConnParams struct {
-	Method  string
-	URL     string
-	Service string
+	Method       string
+	URL          string
+	Service      string
+	ContentType  string // the request content-type
+	SecurityOnly bool
 }
 
 // ConnectionGroup ...
@@ -37,12 +34,13 @@ type Connection interface {
 
 	GetService() string
 
-	Reader() Reader
+	// @return (reader,contentType,error)
+	OpenReader() (ReaderCloser, string, error)
 
-	Writer() Writer
+	OpenWriter(contentType string) (WriterCloser, error)
 
 	// 创建新的附加连接
-	NewConnection(service string) (Connection, error)
+	NewConnection(p *ConnParams) (Connection, error)
 }
 
 // Connector ...

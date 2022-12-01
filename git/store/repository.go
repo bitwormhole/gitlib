@@ -1,6 +1,9 @@
 package store
 
-import "bitwormhole.com/starter/afs"
+import (
+	"bitwormhole.com/starter/afs"
+	"github.com/bitwormhole/gitlib/git"
+)
 
 // RepositoryProfile 表示一个存在的git仓库的视图
 type RepositoryProfile interface {
@@ -16,9 +19,9 @@ type RepositoryProfile interface {
 
 	Objects() Objects
 
-	Digest() Digest           // default="SHA-1"
-	Compression() Compression // default="DEFLATE"
-	PathMapping() PathMapping // default="xx/xxxx"
+	Digest() git.Digest           // default="SHA-1"
+	Compression() git.Compression // default="DEFLATE"
+	PathMapping() git.PathMapping // default="xx/xxxx"
 
 	OpenSession() (Session, error)
 }

@@ -23,6 +23,15 @@ type Session interface {
 	// 取仓库布局
 	GetLayout() RepositoryLayout
 
+	// 新建临时文件
+	NewTemporaryFile(dir afs.Path) afs.Path
+
+	NewTemporaryBuffer(dir afs.Path) TemporaryBuffer
+
+	NewReaderPool(size int) afs.ReaderPool
+
+	GetReaderPool() afs.ReaderPool
+
 	/////////////////////////////////////////////////
 
 	// config
@@ -35,7 +44,7 @@ type Session interface {
 
 	SparseObjectLS
 
-	PackObjectLS
+	GetPacks() PackDAO
 
 	LoadText(id git.ObjectID) (string, error)
 	LoadBinary(id git.ObjectID) ([]byte, error)
@@ -54,5 +63,5 @@ type Session interface {
 
 // SessionFactory ...
 type SessionFactory interface {
-	OpenSession(profile RepositoryProfile) (Session, error)
+	OpenSession(repo Repository) (Session, error)
 }

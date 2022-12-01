@@ -7,6 +7,7 @@ package gitlibcfg
 import (
 	cli0xf7c71e "bitwormhole.com/starter/cli"
 	lib0x4595be "github.com/bitwormhole/gitlib/etc/lib"
+	git0x229c8a "github.com/bitwormhole/gitlib/git"
 	pktline0xd37953 "github.com/bitwormhole/gitlib/git/network/pktline"
 	store0x8467b3 "github.com/bitwormhole/gitlib/git/store"
 	application "github.com/bitwormhole/starter/application"
@@ -110,36 +111,45 @@ func autoGenConfig(cb application.ConfigBuilder) error {
 		return err
 	}
 
-	// component: com9-lib0x4595be.ConfigContextBase
+	// component: com9-lib0x4595be.HTTPGitConnectorReg
 	cominfobuilder.Next()
-	cominfobuilder.ID("com9-lib0x4595be.ConfigContextBase").Class("git-context-configurer").Aliases("").Scope("")
+	cominfobuilder.ID("com9-lib0x4595be.HTTPGitConnectorReg").Class("pktline-connector-registry").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComHTTPGitConnectorReg{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com10-lib0x4595be.ConfigContextBase
+	cominfobuilder.Next()
+	cominfobuilder.ID("com10-lib0x4595be.ConfigContextBase").Class("git-context-configurer").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigContextBase{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com10-lib0x4595be.ConfigContextWithInstructions
+	// component: com11-lib0x4595be.ConfigContextWithInstructions
 	cominfobuilder.Next()
-	cominfobuilder.ID("com10-lib0x4595be.ConfigContextWithInstructions").Class("git-context-configurer").Aliases("").Scope("")
+	cominfobuilder.ID("com11-lib0x4595be.ConfigContextWithInstructions").Class("git-context-configurer").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigContextWithInstructions{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com11-lib0x4595be.ConfigCore
+	// component: com12-lib0x4595be.ConfigCore
 	cominfobuilder.Next()
-	cominfobuilder.ID("com11-lib0x4595be.ConfigCore").Class("git-core-configurer").Aliases("").Scope("")
+	cominfobuilder.ID("com12-lib0x4595be.ConfigCore").Class("git-core-configurer").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigCore{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com12-lib0x4595be.ConfigInstructions
+	// component: com13-lib0x4595be.ConfigInstructions
 	cominfobuilder.Next()
-	cominfobuilder.ID("com12-lib0x4595be.ConfigInstructions").Class("git-instruction-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com13-lib0x4595be.ConfigInstructions").Class("git-instruction-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigInstructions{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
@@ -218,11 +228,11 @@ func (inst * comFactory4pComConfigAlgorithms) Inject(instance application.Compon
 }
 
 //getterForFieldAlgorithmsSelector
-func (inst * comFactory4pComConfigAlgorithms) getterForFieldAlgorithmsSelector (context application.InstanceContext) []store0x8467b3.AlgorithmRegistry {
+func (inst * comFactory4pComConfigAlgorithms) getterForFieldAlgorithmsSelector (context application.InstanceContext) []git0x229c8a.AlgorithmRegistry {
 	list1 := inst.mAlgorithmsSelector.GetList(context)
-	list2 := make([]store0x8467b3.AlgorithmRegistry, 0, len(list1))
+	list2 := make([]git0x229c8a.AlgorithmRegistry, 0, len(list1))
 	for _, item1 := range list1 {
-		item2, ok := item1.(store0x8467b3.AlgorithmRegistry)
+		item2, ok := item1.(git0x229c8a.AlgorithmRegistry)
 		if ok {
 			list2 = append(list2, item2)
 		}
@@ -684,7 +694,61 @@ func (inst * comFactory4pComConfigConnectors) getterForFieldConnectorsSelector (
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigContextBase : the factory of component: com9-lib0x4595be.ConfigContextBase
+// comFactory4pComHTTPGitConnectorReg : the factory of component: com9-lib0x4595be.HTTPGitConnectorReg
+type comFactory4pComHTTPGitConnectorReg struct {
+
+    mPrototype * lib0x4595be.HTTPGitConnectorReg
+
+	
+
+}
+
+func (inst * comFactory4pComHTTPGitConnectorReg) init() application.ComponentFactory {
+
+	
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComHTTPGitConnectorReg) newObject() * lib0x4595be.HTTPGitConnectorReg {
+	return & lib0x4595be.HTTPGitConnectorReg {}
+}
+
+func (inst * comFactory4pComHTTPGitConnectorReg) castObject(instance application.ComponentInstance) * lib0x4595be.HTTPGitConnectorReg {
+	return instance.Get().(*lib0x4595be.HTTPGitConnectorReg)
+}
+
+func (inst * comFactory4pComHTTPGitConnectorReg) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComHTTPGitConnectorReg) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComHTTPGitConnectorReg) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComHTTPGitConnectorReg) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComHTTPGitConnectorReg) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComHTTPGitConnectorReg) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	return nil
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComConfigContextBase : the factory of component: com10-lib0x4595be.ConfigContextBase
 type comFactory4pComConfigContextBase struct {
 
     mPrototype * lib0x4595be.ConfigContextBase
@@ -738,7 +802,7 @@ func (inst * comFactory4pComConfigContextBase) Inject(instance application.Compo
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigContextWithInstructions : the factory of component: com10-lib0x4595be.ConfigContextWithInstructions
+// comFactory4pComConfigContextWithInstructions : the factory of component: com11-lib0x4595be.ConfigContextWithInstructions
 type comFactory4pComConfigContextWithInstructions struct {
 
     mPrototype * lib0x4595be.ConfigContextWithInstructions
@@ -810,7 +874,7 @@ func (inst * comFactory4pComConfigContextWithInstructions) getterForFieldInstruc
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigCore : the factory of component: com11-lib0x4595be.ConfigCore
+// comFactory4pComConfigCore : the factory of component: com12-lib0x4595be.ConfigCore
 type comFactory4pComConfigCore struct {
 
     mPrototype * lib0x4595be.ConfigCore
@@ -864,7 +928,7 @@ func (inst * comFactory4pComConfigCore) Inject(instance application.ComponentIns
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigInstructions : the factory of component: com12-lib0x4595be.ConfigInstructions
+// comFactory4pComConfigInstructions : the factory of component: com13-lib0x4595be.ConfigInstructions
 type comFactory4pComConfigInstructions struct {
 
     mPrototype * lib0x4595be.ConfigInstructions

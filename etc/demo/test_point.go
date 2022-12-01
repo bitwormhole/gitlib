@@ -3,6 +3,7 @@ package demo
 import (
 	"context"
 
+	"bitwormhole.com/starter/cli"
 	"github.com/bitwormhole/gitlib/git/store"
 	"github.com/bitwormhole/starter/application"
 	"github.com/bitwormhole/starter/markup"
@@ -14,6 +15,7 @@ type TestPoint struct {
 
 	Agent   store.LibAgent `inject:"#git-lib-agent"`
 	Command string         `inject:"${test.gitlib.command}"`
+	WD      string         `inject:"${test.repo.path}"`
 }
 
 func (inst *TestPoint) _Impl() application.LifeRegistry {
@@ -34,12 +36,17 @@ func (inst *TestPoint) start() error {
 		return err
 	}
 
-	cli := lib.GetCLI(true)
+	cli2 := lib.GetCLI(true)
 	ctx := context.Background()
 	ctx = lib.Bind(ctx)
-	ctx = cli.Bind(ctx)
+	ctx = cli2.Bind(ctx)
 
 	cmd := inst.Command
+	wd := inst.WD
 
-	return cli.GetClient().RunCCA(ctx, cmd, nil)
+	return cli2.GetClient().Run(&cli.Task{
+		Context: ctx,
+		Command: cmd,
+		WD:      wd,
+	})
 }

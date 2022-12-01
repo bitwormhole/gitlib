@@ -3,6 +3,7 @@ package lib
 import (
 	"github.com/bitwormhole/gitlib/git/network/pktline"
 	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git/support/net/http4git"
 	"github.com/bitwormhole/starter/markup"
 )
 
@@ -34,4 +35,12 @@ func (inst *ConfigConnectors) Configure(c *store.Context) error {
 	c.ConnectorManager = pktline.NewConnectorManager(crlist)
 
 	return nil
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// HTTPGitConnectorReg ...
+type HTTPGitConnectorReg struct {
+	markup.Component `class:"pktline-connector-registry"`
+	http4git.HTTPGitConnector
 }

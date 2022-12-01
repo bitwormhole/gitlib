@@ -1,13 +1,63 @@
 package clients
 
-// type remoteBranchLoader struct {
-// 	context *Context
-// }
+import (
+	"github.com/bitwormhole/gitlib/git/gitconfig"
+	"github.com/bitwormhole/gitlib/git/store"
+)
 
-// func (inst *remoteBranchLoader) load(holder *gitconfig.RemoteAndBranches) error {
+// RemoteConfigLoader ...
+type RemoteConfigLoader struct {
+	context *Context
+}
 
-// 	cfg := inst.context.Local.Repository.Config()
-// 	cfg = cfg.FindByScope(store.ConfigScopeMix)
+// Load ...
+func (inst *RemoteConfigLoader) Load() error {
+	cfg := inst.context.Repository.Config()
+	cfg = cfg.FindByScope(store.ConfigScopeMix)
 
-// 	return nil
-// }
+	err := inst.loadRemotes(cfg)
+	if err != nil {
+		return err
+	}
+
+	err = inst.loadBranches(cfg)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (inst *RemoteConfigLoader) loadRemotes(cc store.ConfigChain) error {
+
+	cfg := cc.Config()
+	loader := gitconfig.ConfigLoader{}
+	idx := loader.GetIndex(cfg)
+	namelist := idx.ListNames("remote")
+	dst := make(map[string]*gitconfig.Remote)
+
+	for _, name := range namelist {
+		remote := loader.LoadRemote(cfg, name)
+		dst[name] = remote
+	}
+
+	inst.context.Remotes = dst
+	return nil
+}
+
+func (inst *RemoteConfigLoader) loadBranches(cc store.ConfigChain) error {
+
+	cfg := cc.Config()
+	loader := gitconfig.ConfigLoader{}
+	idx := loader.GetIndex(cfg)
+	namelist := idx.ListNames("branch")
+	dst := make(map[string]*gitconfig.Branch)
+
+	for _, name := range namelist {
+		branch := loader.LoadBranch(cfg, name)
+		dst[name] = branch
+	}
+
+	inst.context.Branches = dst
+	return nil
+}

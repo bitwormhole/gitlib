@@ -80,7 +80,8 @@ func (inst *inputReaderCloser) Read() (*Packet, error) {
 	buffer2size := total - buffer1size
 	if buffer2size <= 0 {
 		// flush
-		pack.Flush = true
+		pack.Special = true
+		pack.Length = total
 		return pack, nil
 	}
 

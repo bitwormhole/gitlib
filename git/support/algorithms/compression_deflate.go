@@ -4,28 +4,28 @@ import (
 	"compress/zlib"
 	"io"
 
-	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git"
 )
 
 // CompressionDeflate  ...
 type CompressionDeflate struct {
 }
 
-func (inst *CompressionDeflate) _Impl() (store.AlgorithmRegistry, store.Compression) {
+func (inst *CompressionDeflate) _Impl() (git.AlgorithmRegistry, git.Compression) {
 	return inst, inst
 }
 
 // ListRegistrations ...
-func (inst *CompressionDeflate) ListRegistrations() []*store.AlgorithmRegistration {
+func (inst *CompressionDeflate) ListRegistrations() []*git.AlgorithmRegistration {
 	ar := inst.GetInfo()
-	return []*store.AlgorithmRegistration{ar}
+	return []*git.AlgorithmRegistration{ar}
 }
 
 // GetInfo ...
-func (inst *CompressionDeflate) GetInfo() *store.AlgorithmRegistration {
-	return &store.AlgorithmRegistration{
+func (inst *CompressionDeflate) GetInfo() *git.AlgorithmRegistration {
+	return &git.AlgorithmRegistration{
 		Name:     "deflate",
-		Type:     store.AlgorithmCompression,
+		Type:     git.AlgorithmCompression,
 		Provider: inst,
 	}
 }

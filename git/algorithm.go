@@ -1,14 +1,11 @@
-package store
+package git
 
 import (
 	"hash"
 	"io"
 
 	"bitwormhole.com/starter/afs"
-	"github.com/bitwormhole/gitlib/git"
 )
-
-////////////////////////////////////////////////////////////////////////////////
 
 // AlgorithmType 表示算法的类型
 type AlgorithmType int
@@ -19,8 +16,6 @@ const (
 	AlgorithmDigest      AlgorithmType = 2
 	AlgorithmPathMapping AlgorithmType = 3
 )
-
-////////////////////////////////////////////////////////////////////////////////
 
 // Algorithm 表示抽象的算法
 type Algorithm interface {
@@ -40,17 +35,6 @@ type AlgorithmRegistry interface {
 	ListRegistrations() []*AlgorithmRegistration
 }
 
-// AlgorithmManager 是用来管理各种算法的对象
-type AlgorithmManager interface {
-	Find(name string) (Algorithm, error)
-
-	FindCompression(name string) (Compression, error)
-
-	FindDigest(name string) (Digest, error)
-
-	FindPathMapping(name string) (PathMapping, error)
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 // Compression 压缩算法
@@ -65,6 +49,8 @@ type Compression interface {
 type Digest interface {
 	Algorithm
 
+	Size() HashSize
+
 	New() hash.Hash
 }
 
@@ -74,5 +60,5 @@ type PathMapping interface {
 
 	WithPattern(pattern string) PathMapping
 
-	Map(base afs.Path, id git.ObjectID) afs.Path
+	Map(base afs.Path, id ObjectID) afs.Path
 }

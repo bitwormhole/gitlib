@@ -3,28 +3,28 @@ package algorithms
 import (
 	"io"
 
-	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git"
 )
 
 // CompressionPlain  ...
 type CompressionPlain struct {
 }
 
-func (inst *CompressionPlain) _Impl() (store.AlgorithmRegistry, store.Compression) {
+func (inst *CompressionPlain) _Impl() (git.AlgorithmRegistry, git.Compression) {
 	return inst, inst
 }
 
 // ListRegistrations ...
-func (inst *CompressionPlain) ListRegistrations() []*store.AlgorithmRegistration {
+func (inst *CompressionPlain) ListRegistrations() []*git.AlgorithmRegistration {
 	ar := inst.GetInfo()
-	return []*store.AlgorithmRegistration{ar}
+	return []*git.AlgorithmRegistration{ar}
 }
 
 // GetInfo ...
-func (inst *CompressionPlain) GetInfo() *store.AlgorithmRegistration {
-	return &store.AlgorithmRegistration{
+func (inst *CompressionPlain) GetInfo() *git.AlgorithmRegistration {
+	return &git.AlgorithmRegistration{
 		Name:     "plain",
-		Type:     store.AlgorithmCompression,
+		Type:     git.AlgorithmCompression,
 		Provider: inst,
 	}
 }

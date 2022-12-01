@@ -4,28 +4,28 @@ import (
 	"crypto/md5"
 	"hash"
 
-	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git"
 )
 
 // DigestMD5 ...
 type DigestMD5 struct {
 }
 
-func (inst *DigestMD5) _Impl() (store.AlgorithmRegistry, store.Digest) {
+func (inst *DigestMD5) _Impl() (git.AlgorithmRegistry, git.Digest) {
 	return inst, inst
 }
 
 // ListRegistrations ...
-func (inst *DigestMD5) ListRegistrations() []*store.AlgorithmRegistration {
+func (inst *DigestMD5) ListRegistrations() []*git.AlgorithmRegistration {
 	ar := inst.GetInfo()
-	return []*store.AlgorithmRegistration{ar}
+	return []*git.AlgorithmRegistration{ar}
 }
 
 // GetInfo ...
-func (inst *DigestMD5) GetInfo() *store.AlgorithmRegistration {
-	return &store.AlgorithmRegistration{
+func (inst *DigestMD5) GetInfo() *git.AlgorithmRegistration {
+	return &git.AlgorithmRegistration{
 		Name:     "md5",
-		Type:     store.AlgorithmDigest,
+		Type:     git.AlgorithmDigest,
 		Provider: inst,
 	}
 }
@@ -33,4 +33,10 @@ func (inst *DigestMD5) GetInfo() *store.AlgorithmRegistration {
 // New ...
 func (inst *DigestMD5) New() hash.Hash {
 	return md5.New()
+}
+
+// Size ...
+func (inst *DigestMD5) Size() git.HashSize {
+	const size = 128 / 8
+	return git.HashSizeInBytes(size)
 }

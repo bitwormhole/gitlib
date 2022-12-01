@@ -6,8 +6,9 @@ import (
 
 	"bitwormhole.com/starter/afs"
 	"bitwormhole.com/starter/cli"
-	"github.com/bitwormhole/gitlib"
 	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/libgit"
+	"github.com/bitwormhole/starter"
 )
 
 type gitUnit struct {
@@ -21,7 +22,7 @@ type gitUnit struct {
 func initUnit(t *testing.T) *gitUnit {
 
 	ctx := context.Background()
-	lib := gitlib.New(nil)
+	lib := initLib()
 	cli := lib.GetCLI(true)
 	fs1 := lib.FS()
 
@@ -37,4 +38,29 @@ func initUnit(t *testing.T) *gitUnit {
 	unit.cli = cli
 	unit.tmp = tmp
 	return unit
+}
+
+func initLib() store.Lib {
+
+	mod := libgit.Module()
+	i := starter.InitApp()
+	i.UseMain(mod)
+	rt, err := i.RunEx()
+	if err != nil {
+		panic(err)
+	}
+
+	ctx := rt.Context()
+	o, err := ctx.GetComponent("#git-lib-agent")
+	if err != nil {
+		panic(err)
+	}
+
+	la := o.(store.LibAgent)
+	lib, err := la.GetLib()
+	if err != nil {
+		panic(err)
+	}
+
+	return lib
 }

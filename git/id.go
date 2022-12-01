@@ -1,7 +1,6 @@
 package git
 
 import (
-	"bytes"
 	"fmt"
 	"strings"
 
@@ -10,16 +9,48 @@ import (
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// HashSize 表示 Hash 的长度, 单位是 byte
+type HashSize int
+
+// SizeInBytes ...
+func (size HashSize) SizeInBytes() int {
+	return int(size)
+}
+
+// SizeInBits ...
+func (size HashSize) SizeInBits() int {
+	return int(size * 8)
+}
+
+// SizeInRune ...
+func (size HashSize) SizeInRune() int {
+	return int(size * 2)
+}
+
+// IsValid ...
+func (size HashSize) IsValid() bool {
+	const minSize = 12
+	return size >= minSize
+}
+
+// HashSizeInBytes ...
+func HashSizeInBytes(n int) HashSize {
+	return HashSize(n)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 // HashID 表示git的一个 hash 值
 type HashID interface {
 	GetFactory() IdentityFactory
 
-	// size in bits
-	Size() int
+	Size() HashSize
 
 	Bytes() []byte
 
 	String() string
+
+	GetByte(index int) byte
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,9 +69,7 @@ type PackID interface {
 
 // IdentityFactory 表示git的一个 hash 值
 type IdentityFactory interface {
-
-	// size in bits
-	Size() int
+	Size() HashSize
 
 	Zero() HashID
 
@@ -61,7 +90,8 @@ var theDefautIdentityFactory IdentityFactory = nil
 func DefaultIdentityFactory() IdentityFactory {
 	f := theDefautIdentityFactory
 	if f == nil {
-		f = &commonIDFactory{size: 160} // default.size = 160-bits (sha-1)
+		size := HashSizeInBytes(160 / 8) // default.size = 160-bits (sha-1)
+		f = &commonIDFactory{size: size}
 		theDefautIdentityFactory = f
 	}
 	return f
@@ -116,13 +146,49 @@ func CreatePackID(b []byte) (PackID, error) {
 }
 
 // HashEqual 判断两个ID是否相等
-func HashEqual(x, y HashID) bool {
-	if x == nil || y == nil {
+func HashEqual(h1, h2 HashID) bool {
+	if h1 == nil || h2 == nil {
 		return false
 	}
-	b1 := x.Bytes()
-	b2 := y.Bytes()
-	return bytes.Equal(b1, b2)
+	size1 := h1.Size()
+	size2 := h2.Size()
+	if size1 != size2 {
+		return false
+	}
+	size := size1.SizeInBytes()
+	for i := 0; i < size; i++ {
+		digit1 := h1.GetByte(i)
+		digit2 := h2.GetByte(i)
+		if digit1 != digit2 {
+			return false
+		}
+	}
+	return true
+}
+
+// HashCompare 比较两个ID的大小
+func HashCompare(h1, h2 HashID) int {
+	if h1 == nil || h2 == nil {
+		return 0
+	}
+	size1 := h1.Size()
+	size2 := h2.Size()
+	if size1 < size2 {
+		return 1
+	} else if size1 > size2 {
+		return -1
+	}
+	size := size1.SizeInBytes()
+	for i := 0; i < size; i++ {
+		digit1 := h1.GetByte(i)
+		digit2 := h2.GetByte(i)
+		if digit1 < digit2 {
+			return 1
+		} else if digit1 > digit2 {
+			return -1
+		}
+	}
+	return 0
 }
 
 // HashZero 取 0
@@ -150,7 +216,7 @@ func HashString(x HashID) string {
 ////////////////////////////////////////////////////////////////////////////////
 
 type commonIDFactory struct {
-	size int // in bits
+	size HashSize
 
 	// cache
 	zeroID HashID
@@ -160,16 +226,8 @@ func (inst *commonIDFactory) _Impl() IdentityFactory {
 	return inst
 }
 
-func (inst *commonIDFactory) Size() int {
+func (inst *commonIDFactory) Size() HashSize {
 	return inst.size
-}
-
-func (inst *commonIDFactory) sizeInByte() int {
-	return inst.size / 8
-}
-
-func (inst *commonIDFactory) sizeInRune() int {
-	return inst.size / 4
 }
 
 func (inst *commonIDFactory) Zero() HashID {
@@ -177,7 +235,7 @@ func (inst *commonIDFactory) Zero() HashID {
 	if z != nil {
 		return z
 	}
-	size := inst.sizeInByte()
+	size := inst.size.SizeInBytes()
 	data := make([]byte, size)
 	z = &commonID{data: data, factory: inst}
 	inst.zeroID = z
@@ -204,7 +262,7 @@ func (inst *commonIDFactory) TryCreate(src []byte) (HashID, error) {
 	if src == nil {
 		return nil, fmt.Errorf("id data is nil")
 	}
-	wantSize := inst.sizeInByte()
+	wantSize := inst.size.SizeInBytes()
 	haveSize := len(src)
 	if wantSize != haveSize {
 		return nil, fmt.Errorf("bad id size, have:%v want: %v", haveSize, wantSize)
@@ -223,7 +281,7 @@ func (inst *commonIDFactory) TryParse(s string) (HashID, error) {
 		return nil, err
 	}
 	haveSize := len(data)
-	wantSize := inst.sizeInByte()
+	wantSize := inst.size.SizeInBytes()
 	if wantSize != haveSize {
 		return nil, fmt.Errorf("bad id size, have:%v want: %v", haveSize, wantSize)
 	}
@@ -246,8 +304,17 @@ func (inst *commonID) GetFactory() IdentityFactory {
 	return inst.factory
 }
 
+func (inst *commonID) GetByte(index int) byte {
+	data := inst.data
+	size := len(data)
+	if 0 <= index && index < size {
+		return data[index]
+	}
+	return 0
+}
+
 func (inst *commonID) Bytes() []byte {
-	size := inst.factory.sizeInByte()
+	size := inst.factory.size.SizeInBytes()
 	src := inst.data
 	dst := make([]byte, size)
 	copy(dst, src)
@@ -258,7 +325,6 @@ func (inst *commonID) String() string {
 	return util.StringifyBytes(inst.data)
 }
 
-// size in bits
-func (inst *commonID) Size() int {
+func (inst *commonID) Size() HashSize {
 	return inst.factory.size
 }

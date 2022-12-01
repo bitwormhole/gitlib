@@ -3,6 +3,7 @@ package store
 import (
 	"bitwormhole.com/starter/afs"
 	"bitwormhole.com/starter/cli"
+	"github.com/bitwormhole/gitlib/git"
 	"github.com/bitwormhole/gitlib/git/network/pktline"
 )
 
@@ -12,7 +13,7 @@ type Context struct {
 
 	CLI cli.CLI
 
-	Algorithms []AlgorithmRegistry
+	Algorithms []git.AlgorithmRegistry
 
 	Services []ServiceRegistry
 

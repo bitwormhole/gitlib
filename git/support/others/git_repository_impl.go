@@ -1,6 +1,9 @@
 package others
 
-import "github.com/bitwormhole/gitlib/git/store"
+import (
+	"github.com/bitwormhole/gitlib/git"
+	"github.com/bitwormhole/gitlib/git/store"
+)
 
 // GitRepositoryImpl ...
 type GitRepositoryImpl struct {
@@ -42,17 +45,17 @@ func (inst *GitRepositoryImpl) Objects() store.Objects {
 }
 
 // Digest ...
-func (inst *GitRepositoryImpl) Digest() store.Digest {
+func (inst *GitRepositoryImpl) Digest() git.Digest {
 	return inst.Core.Digest
 }
 
 // Compression ...
-func (inst *GitRepositoryImpl) Compression() store.Compression {
+func (inst *GitRepositoryImpl) Compression() git.Compression {
 	return inst.Core.Compression
 }
 
 // PathMapping ...
-func (inst *GitRepositoryImpl) PathMapping() store.PathMapping {
+func (inst *GitRepositoryImpl) PathMapping() git.PathMapping {
 	return inst.Core.PathMapping
 }
 

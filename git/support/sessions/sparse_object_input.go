@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"bitwormhole.com/starter/vlog"
+	"github.com/bitwormhole/gitlib/git"
 	"github.com/bitwormhole/gitlib/git/store"
 )
 
@@ -89,7 +90,7 @@ func (inst *sparseObjectReaderBuilder) readHead(r io.Reader) (*store.Object, err
 		return nil, err
 	}
 	obj := &store.Object{
-		Type:   p1,
+		Type:   git.ObjectType(p1),
 		Length: size,
 	}
 	return obj, nil

@@ -2,6 +2,7 @@ package store
 
 import (
 	"bitwormhole.com/starter/afs"
+	"github.com/bitwormhole/gitlib/git"
 )
 
 // Core 表示仓库对象的核心
@@ -28,9 +29,9 @@ type Core struct {
 
 	SessionFactory SessionFactory
 
-	Digest      Digest      // default="SHA-1"
-	Compression Compression // default="DEFLATE"
-	PathMapping PathMapping // default="xx/xxxx"
+	Digest      git.Digest      // default="SHA-1"
+	Compression git.Compression // default="DEFLATE"
+	PathMapping git.PathMapping // default="xx/xxxx"
 }
 
 // CoreConfigurer 是用来配置 repository.Core 的组件

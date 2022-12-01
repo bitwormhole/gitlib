@@ -11,9 +11,11 @@ func (inst *Factory) _Impl() store.SessionFactory {
 }
 
 // OpenSession ...
-func (inst *Factory) OpenSession(profile store.RepositoryProfile) (store.Session, error) {
-
-	se := &sessionImpl{profile: profile}
-
+func (inst *Factory) OpenSession(profile store.Repository) (store.Session, error) {
+	se := &sessionImpl{repo: profile}
+	err := se.open()
+	if err != nil {
+		return nil, err
+	}
 	return se, nil
 }

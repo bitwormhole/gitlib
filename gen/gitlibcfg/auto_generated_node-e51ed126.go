@@ -6,6 +6,7 @@ package gitlibcfg
 import (
 	cli0xf7c71e "bitwormhole.com/starter/cli"
 	lib0x4595be "github.com/bitwormhole/gitlib/etc/lib"
+	git0x229c8a "github.com/bitwormhole/gitlib/git"
 	pktline0xd37953 "github.com/bitwormhole/gitlib/git/network/pktline"
 	store0x8467b3 "github.com/bitwormhole/gitlib/git/store"
 	markup0x23084a "github.com/bitwormhole/starter/markup"
@@ -14,7 +15,7 @@ import (
 type pComConfigAlgorithms struct {
 	instance *lib0x4595be.ConfigAlgorithms
 	 markup0x23084a.Component `class:"git-context-configurer"`
-	Algorithms []store0x8467b3.AlgorithmRegistry `inject:".git-algorithm-registry"`
+	Algorithms []git0x229c8a.AlgorithmRegistry `inject:".git-algorithm-registry"`
 }
 
 
@@ -64,6 +65,12 @@ type pComConfigConnectors struct {
 	instance *lib0x4595be.ConfigConnectors
 	 markup0x23084a.Component `class:"git-context-configurer"`
 	Connectors []pktline0xd37953.ConnectorRegistry `inject:".pktline-connector-registry"`
+}
+
+
+type pComHTTPGitConnectorReg struct {
+	instance *lib0x4595be.HTTPGitConnectorReg
+	 markup0x23084a.Component `class:"pktline-connector-registry"`
 }
 
 

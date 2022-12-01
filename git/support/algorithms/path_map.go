@@ -5,7 +5,6 @@ import (
 
 	"bitwormhole.com/starter/afs"
 	"github.com/bitwormhole/gitlib/git"
-	"github.com/bitwormhole/gitlib/git/store"
 )
 
 // PathPatternMapping ...
@@ -15,27 +14,27 @@ type PathPatternMapping struct {
 	minStringLength int   // 最小字符串长度，低于这个值的不予处理
 }
 
-func (inst *PathPatternMapping) _Impl() (store.AlgorithmRegistry, store.PathMapping) {
+func (inst *PathPatternMapping) _Impl() (git.AlgorithmRegistry, git.PathMapping) {
 	return inst, inst
 }
 
 // ListRegistrations ...
-func (inst *PathPatternMapping) ListRegistrations() []*store.AlgorithmRegistration {
+func (inst *PathPatternMapping) ListRegistrations() []*git.AlgorithmRegistration {
 	ar := inst.GetInfo()
-	return []*store.AlgorithmRegistration{ar}
+	return []*git.AlgorithmRegistration{ar}
 }
 
 // GetInfo ...
-func (inst *PathPatternMapping) GetInfo() *store.AlgorithmRegistration {
-	return &store.AlgorithmRegistration{
+func (inst *PathPatternMapping) GetInfo() *git.AlgorithmRegistration {
+	return &git.AlgorithmRegistration{
 		Name:     "pattern",
-		Type:     store.AlgorithmPathMapping,
+		Type:     git.AlgorithmPathMapping,
 		Provider: inst,
 	}
 }
 
 // WithPattern ...
-func (inst *PathPatternMapping) WithPattern(pattern string) store.PathMapping {
+func (inst *PathPatternMapping) WithPattern(pattern string) git.PathMapping {
 	old := inst.pattern
 	if old == pattern {
 		return inst

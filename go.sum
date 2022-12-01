@@ -2,6 +2,12 @@ bitwormhole.com/starter/afs v0.0.1 h1:J9QEqmgBlu6plvoLis/pmcWplKdl6eu5ShrjOM46uj
 bitwormhole.com/starter/afs v0.0.1/go.mod h1:ZhznfGjTwltwXxm8Rpx7fTAWJzWvtT7YqKdS9P8tYTU=
 bitwormhole.com/starter/afs v0.0.2 h1:ogNYxPA/WHsHoFxvhN4RmYVL3BB7qF5ArmwVpC2MLlw=
 bitwormhole.com/starter/afs v0.0.2/go.mod h1:ZhznfGjTwltwXxm8Rpx7fTAWJzWvtT7YqKdS9P8tYTU=
+bitwormhole.com/starter/afs v0.0.3 h1:z878JLa0j+vQfyJC3x9unHTwZF4ctvfRIMQ5AVe0l7g=
+bitwormhole.com/starter/afs v0.0.3/go.mod h1:ZhznfGjTwltwXxm8Rpx7fTAWJzWvtT7YqKdS9P8tYTU=
+bitwormhole.com/starter/afs v0.0.4 h1:PiwwhFqGIiWTTForHmemqKM4PpFEipqykA0mn9UaJw4=
+bitwormhole.com/starter/afs v0.0.4/go.mod h1:ZhznfGjTwltwXxm8Rpx7fTAWJzWvtT7YqKdS9P8tYTU=
+bitwormhole.com/starter/afs v0.0.5 h1:Y8aS1vNQ4yt3KCiWDJxHSf2Bu4QUXl36NgN4ckwkxO8=
+bitwormhole.com/starter/afs v0.0.5/go.mod h1:ZhznfGjTwltwXxm8Rpx7fTAWJzWvtT7YqKdS9P8tYTU=
 bitwormhole.com/starter/base v0.0.1 h1:/dXgICIoYcMATbA2N+DD1tMYEsyimwQKal2xPaR8cfA=
 bitwormhole.com/starter/base v0.0.1/go.mod h1:a8v7ioNoU380zyISNEXTaVInVFu00FvXo3UHJAckPG0=
 bitwormhole.com/starter/cli v0.0.9 h1:Ayo2VQ9cXhzKsaIxtHkLtCp0PCywuIY2K+95qOzStDo=
