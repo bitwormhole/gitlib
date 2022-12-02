@@ -12,6 +12,22 @@ type commonReader struct {
 	buffer4b [4]byte
 }
 
+func (inst *commonReader) read4Bytes(in io.Reader) ([4]byte, error) {
+	buf := inst.buffer4b[:]
+	n, err := in.Read(buf)
+	if n == len(buf) && err == nil {
+		return inst.buffer4b, nil
+	}
+	inst.buffer4b[0] = 0
+	inst.buffer4b[1] = 0
+	inst.buffer4b[2] = 0
+	inst.buffer4b[3] = 0
+	if err == nil {
+		err = fmt.Errorf("bad read size, want:4 have:%v", n)
+	}
+	return inst.buffer4b, err
+}
+
 func (inst *commonReader) readUInt32(in io.Reader) (uint32, error) {
 	value := uint32(0)
 	buf := inst.buffer4b[:]
@@ -76,4 +92,50 @@ func (inst *commonReader) readHexID(in io.Reader, size git.HashSize) ([]byte, er
 		return nil, fmt.Errorf("bad id size: %v-bits", sizeInBytes*8)
 	}
 	return buf, nil
+}
+
+func (inst *commonReader) readPackFileTail(f *File) (git.PackID, git.PackID, error) {
+
+	file := f.Path
+	digest := f.Digest
+	pool := f.Pool
+
+	// check size
+	idSize1 := digest.Size()
+	idSize := int64(idSize1.SizeInBytes())
+	fileSize := file.GetInfo().Length()
+	tailSize := (2 * idSize)
+
+	if fileSize < tailSize {
+		return nil, nil, fmt.Errorf("bad file size")
+	}
+
+	// open
+	in, err := pool.OpenReader(file, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer func() { in.Close() }()
+
+	// seek
+	pos1 := fileSize - tailSize
+	pos2, err := in.Seek(pos1, io.SeekStart)
+	if err != nil {
+		return nil, nil, err
+	}
+	if pos1 != pos2 {
+		return nil, nil, fmt.Errorf("bad seek position")
+	}
+
+	// read
+	pid1, err := inst.readPackID(in, idSize1)
+	if err != nil {
+		return nil, nil, err
+	}
+	pid2, err := inst.readPackID(in, idSize1)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return pid1, pid2, nil
 }

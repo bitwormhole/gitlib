@@ -12,7 +12,7 @@ type Idx interface {
 	Load() error
 	Reload() error
 	Check(flags CheckFlag) error
-	ReadPackID() (git.PackID, error)
+	GetPackID() git.PackID
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -21,6 +21,10 @@ type Idx interface {
 func NewIdx(file *File) (Idx, error) {
 	idx := &idxFileFacade{}
 	err := idx.Init(file)
+	if err != nil {
+		return nil, err
+	}
+	err = idx.Load()
 	if err != nil {
 		return nil, err
 	}
@@ -99,6 +103,6 @@ func (inst *idxFileFacade) Reload() error {
 }
 
 // ReadPackID ...
-func (inst *idxFileFacade) ReadPackID() (git.PackID, error) {
-	return inst.impl.ReadPackID()
+func (inst *idxFileFacade) GetPackID() git.PackID {
+	return inst.impl.GetPackID()
 }

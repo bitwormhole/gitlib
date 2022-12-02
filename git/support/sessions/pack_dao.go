@@ -43,7 +43,21 @@ func (inst *packDaoImpl) CheckPack(pid git.PackID, flags pack.CheckFlag) error {
 	if err != nil {
 		return err
 	}
-	return holder.idx.Check(flags)
+
+	idx := holder.idx
+	ent := holder.entity
+
+	err = idx.Check(flags)
+	if err != nil {
+		return err
+	}
+
+	err = ent.Check(flags)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (inst *packDaoImpl) ListPacks() ([]git.PackID, error) {

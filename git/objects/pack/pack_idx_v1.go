@@ -10,6 +10,7 @@ type idxFileV1 struct {
 	file   *File
 	fanout *git.PackIdxFanOut
 	total  int64
+	pid    git.PackID
 }
 
 func (inst *idxFileV1) _Impl() Idx {
@@ -41,6 +42,6 @@ func (inst *idxFileV1) Reload() error {
 }
 
 // ReadPackID ...
-func (inst *idxFileV1) ReadPackID() (git.PackID, error) {
-	return nil, fmt.Errorf("no impl: idxFileV1.ReadPackID()")
+func (inst *idxFileV1) GetPackID() git.PackID {
+	return inst.pid
 }

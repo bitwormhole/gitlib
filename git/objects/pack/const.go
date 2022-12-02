@@ -30,3 +30,13 @@ const (
 const (
 	MagicNumberIdxV2 = 0xff744f63 // aka `\xfftOc`
 )
+
+// 定义 pack 对象类型
+const (
+	OBJ_COMMIT    = (1)
+	OBJ_TREE      = (2)
+	OBJ_BLOB      = (3)
+	OBJ_TAG       = (4)
+	OBJ_OFS_DELTA = (6)
+	OBJ_REF_DELTA = (7)
+)

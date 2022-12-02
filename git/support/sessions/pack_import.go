@@ -121,7 +121,11 @@ func (inst *packImporter) checkPackIdxFile(file afs.Path) (git.PackID, error) {
 	if err != nil {
 		return nil, err
 	}
-	return idx.ReadPackID()
+	pid := idx.GetPackID()
+	if pid == nil {
+		return nil, fmt.Errorf("pid is nil")
+	}
+	return pid, nil
 }
 
 func (inst *packImporter) checkPackFile(file afs.Path) (git.PackID, error) {
@@ -140,5 +144,9 @@ func (inst *packImporter) checkPackFile(file afs.Path) (git.PackID, error) {
 	if err != nil {
 		return nil, err
 	}
-	return pp.ReadPackID()
+	pid := pp.GetPackID()
+	if pid == nil {
+		return nil, fmt.Errorf("pid is nil")
+	}
+	return pid, nil
 }

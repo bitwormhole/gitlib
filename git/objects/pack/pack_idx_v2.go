@@ -2,7 +2,6 @@ package pack
 
 import (
 	"fmt"
-	"io"
 
 	"github.com/bitwormhole/gitlib/git"
 )
@@ -14,7 +13,10 @@ type idxFileV2 struct {
 	total   int64 // ids 条目数量
 	version int
 	magic   int
+	pid     git.PackID
 
+	loaded      bool
+	loading     bool
 	checkSizeOK bool
 	checkHeadOK bool
 	hasOffset64 bool
@@ -58,16 +60,30 @@ func (inst *idxFileV2) Check(flags CheckFlag) error {
 
 // Load ...
 func (inst *idxFileV2) Load() error {
-	fo := inst.fanout
-	if fo != nil {
+	if inst.loaded {
 		return nil
 	}
-	return inst.Reload()
+	err := inst.Reload()
+	if err != nil {
+		return err
+	}
+	inst.loaded = true
+	return nil
 }
 
 // Reload ...
 func (inst *idxFileV2) Reload() error {
 
+	// check state
+	if inst.loading {
+		return nil
+	}
+	inst.loading = true
+	defer func() {
+		inst.loading = false
+	}()
+
+	// open reader
 	in, err := inst.file.OpenReader()
 	if err != nil {
 		return err
@@ -94,10 +110,18 @@ func (inst *idxFileV2) Reload() error {
 		return fmt.Errorf("fan-out table is nil")
 	}
 
+	// tail for id
+	pid1, _, err := cr.readPackFileTail(inst.file)
+	if err != nil {
+		return err
+	}
+
+	// keep values
 	inst.magic = int(magic)
 	inst.version = int(version)
 	inst.fanout = fo
 	inst.total = fo.Total()
+	inst.pid = pid1
 
 	return inst.Check(CheckSize | CheckHead)
 }
@@ -173,8 +197,8 @@ func (inst *idxFileV2) checkSize() error {
 }
 
 func (inst *idxFileV2) checkSum() error {
-
-	return nil
+	ch := packSumChecker{}
+	return ch.check(inst.file)
 }
 
 func (inst *idxFileV2) headSize() int64 {
@@ -182,41 +206,6 @@ func (inst *idxFileV2) headSize() int64 {
 }
 
 // ReadPackID ...
-func (inst *idxFileV2) ReadPackID() (git.PackID, error) {
-
-	file := inst.file.Path
-	digest := inst.file.Digest
-	pool := inst.file.Pool
-
-	// check size
-	idSize1 := digest.Size()
-	idSize := int64(idSize1.SizeInBytes())
-	fileSize := file.GetInfo().Length()
-	headSize := inst.headSize()
-
-	if fileSize < headSize+(2*idSize) {
-		return nil, fmt.Errorf("bad file size")
-	}
-
-	// open
-	in, err := pool.OpenReader(file, nil)
-	if err != nil {
-		return nil, err
-	}
-	defer func() { in.Close() }()
-
-	// seek
-	pos1 := fileSize - (2 * idSize)
-	pos2, err := in.Seek(pos1, io.SeekStart)
-	if err != nil {
-		return nil, err
-	}
-
-	if pos1 != pos2 {
-		return nil, fmt.Errorf("bad seek position")
-	}
-
-	// read
-	cr := commonReader{}
-	return cr.readPackID(in, idSize1)
+func (inst *idxFileV2) GetPackID() git.PackID {
+	return inst.pid
 }
