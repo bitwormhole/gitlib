@@ -64,11 +64,11 @@ func doTestWriteSparseObject(session store.Session) error {
 	buffer.Write(data)
 	size := len(data)
 
-	obj := &store.Object{
+	obj := &git.Object{
 		Type:   git.ObjectTypeBLOB,
 		Length: int64(size),
 	}
-	obj, err := session.WriteSparseObject(obj, buffer)
+	obj, err := session.GetSparseObjects().WriteSparseObject(obj, buffer)
 	if err != nil {
 		return err
 	}

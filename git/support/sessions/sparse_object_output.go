@@ -15,18 +15,21 @@ type plainSparseObjectSaver struct {
 	session store.Session
 }
 
-func (inst *plainSparseObjectSaver) readObject(so store.SparseObject) (*store.Object, error) {
-	in, obj, err := inst.session.ReadSparseObject(so)
+func (inst *plainSparseObjectSaver) readObject(so store.SparseObject) (*git.Object, error) {
+	spo := inst.session.GetSparseObjects()
+	obj, in, err := spo.ReadSparseObject(so)
 	if err != nil {
 		return nil, err
 	}
-	if in != nil {
-		in.Close()
-	}
+	defer func() {
+		if in != nil {
+			in.Close()
+		}
+	}()
 	return obj, nil
 }
 
-func (inst *plainSparseObjectSaver) Save(o *store.Object, data io.Reader) (*store.Object, error) {
+func (inst *plainSparseObjectSaver) Save(o *git.Object, data io.Reader) (*git.Object, error) {
 
 	if o == nil || data == nil {
 		return nil, fmt.Errorf("param is nil")
@@ -115,7 +118,7 @@ func (inst *plainSparseObjectSaver) Save(o *store.Object, data io.Reader) (*stor
 		return nil, err
 	}
 
-	return &store.Object{
+	return &git.Object{
 		ID:     haveID,
 		Type:   o.Type,
 		Length: total,
@@ -128,7 +131,7 @@ type rawSparseObjectSaver struct {
 	session store.Session
 }
 
-func (inst *rawSparseObjectSaver) Save(o *store.Object, data io.Reader) (*store.Object, error) {
+func (inst *rawSparseObjectSaver) Save(o *git.Object, data io.Reader) (*git.Object, error) {
 	return nil, fmt.Errorf("no impl: rawSparseObjectSaver.save")
 }
 

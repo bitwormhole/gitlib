@@ -14,7 +14,7 @@ func FormatRef(ref *git.Ref) (string, error) {
 	}
 	str := ref.ID.String()
 	str = strings.TrimSpace(str) + "\n"
-	size := ref.ID.Size()
+	size := ref.ID.Size().SizeInBits()
 	if size < 100 {
 		return "", errors.New("bad object-id: " + str)
 	}

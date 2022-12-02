@@ -18,6 +18,7 @@ type sessionImpl struct {
 	closelist []io.Closer
 	pool      afs.ReaderPool
 	packDao   store.PackDAO
+	sparseDao store.SparseObjectLS
 
 	tempFiles tempFileFactory
 }
@@ -88,7 +89,7 @@ func (inst *sessionImpl) LoadText(id git.ObjectID) (string, error) {
 }
 
 func (inst *sessionImpl) LoadBinary(id git.ObjectID) ([]byte, error) {
-	reader, o, err := inst.ReadObject(id)
+	o, reader, err := inst.ReadObject(id)
 	if err != nil {
 		return nil, err
 	}
@@ -160,35 +161,19 @@ func (inst *sessionImpl) LoadRef(r store.Ref) (*git.Ref, error) {
 	return gitfmt.ParseRef(text)
 }
 
-func (inst *sessionImpl) ReadPackObject(o store.PackObject) (io.ReadCloser, *store.Object, error) {
-	return nil, nil, errors.New("no impl")
-}
+// func (inst *sessionImpl) ReadPackObject(o store.PackObject) (io.ReadCloser, *store.Object, error) {
+// 	return nil, nil, errors.New("no impl")
+// }
 
-func (inst *sessionImpl) ReadSparseObject(o store.SparseObject) (io.ReadCloser, *store.Object, error) {
-	in := &sparseObjectReaderBuilder{
-		so:      o,
-		profile: inst.repo,
-	}
-	return in.open()
-}
-
-func (inst *sessionImpl) ReadSparseObjectRaw(o store.SparseObject) (io.ReadCloser, error) {
-	return nil, errors.New("no impl")
-}
-
-func (inst *sessionImpl) WriteSparseObject(o *store.Object, data io.Reader) (*store.Object, error) {
-	saver := plainSparseObjectSaver{session: inst}
-	return saver.Save(o, data)
-}
-
-func (inst *sessionImpl) WriteSparseObjectRaw(o *store.Object, data io.Reader) (*store.Object, error) {
-	saver := rawSparseObjectSaver{session: inst}
-	return saver.Save(o, data)
-}
-
-func (inst *sessionImpl) ReadObject(id git.ObjectID) (io.ReadCloser, *store.Object, error) {
+func (inst *sessionImpl) ReadObject(id git.ObjectID) (*git.Object, io.ReadCloser, error) {
 	so := inst.repo.Objects().GetSparseObject(id)
-	return inst.ReadSparseObject(so)
+	spo := inst.GetSparseObjects()
+	return spo.ReadSparseObject(so)
+}
+
+func (inst *sessionImpl) WriteObject(o *git.Object, data io.Reader) (*git.Object, error) {
+	spo := inst.GetSparseObjects()
+	return spo.WriteSparseObject(o, data)
 }
 
 func (inst *sessionImpl) GetPacks() store.PackDAO {
@@ -201,6 +186,19 @@ func (inst *sessionImpl) GetPacks() store.PackDAO {
 	dao1 = dao2
 	inst.closelist = append(inst.closelist, dao2)
 	inst.packDao = dao1
+	return dao1
+}
+
+func (inst *sessionImpl) GetSparseObjects() store.SparseObjectLS {
+	dao1 := inst.sparseDao
+	if dao1 != nil {
+		return dao1
+	}
+	dao2 := &sparseObjectsImpl{session: inst}
+	dao2.init()
+	dao1 = dao2
+	inst.closelist = append(inst.closelist, dao2)
+	inst.sparseDao = dao1
 	return dao1
 }
 

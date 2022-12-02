@@ -39,10 +39,11 @@ type Session interface {
 	// LoadConfig(cfg Config) error
 
 	// objects
-	ReadObject(id git.ObjectID) (io.ReadCloser, *Object, error)
-	// WriteObject(o *Object) (io.WriteCloser, error)
+	ReadObject(id git.ObjectID) (*git.Object, io.ReadCloser, error)
 
-	SparseObjectLS
+	WriteObject(o *git.Object, data io.Reader) (*git.Object, error)
+
+	GetSparseObjects() SparseObjectLS
 
 	GetPacks() PackDAO
 

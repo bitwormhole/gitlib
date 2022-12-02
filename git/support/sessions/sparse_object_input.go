@@ -38,7 +38,7 @@ func (inst *sparseObjectReader) Close() error {
 
 type sparseObjectReaderBuilder struct {
 	so      store.SparseObject
-	profile store.RepositoryProfile
+	profile store.Repository
 	clist   []io.Closer
 }
 
@@ -58,7 +58,7 @@ func (inst *sparseObjectReaderBuilder) closeAll() {
 	}
 }
 
-func (inst *sparseObjectReaderBuilder) readHead(r io.Reader) (*store.Object, error) {
+func (inst *sparseObjectReaderBuilder) readHead(r io.Reader) (*git.Object, error) {
 	// read
 	buf := make([]byte, 1)
 	builder := bytes.Buffer{}
@@ -89,14 +89,14 @@ func (inst *sparseObjectReaderBuilder) readHead(r io.Reader) (*store.Object, err
 	if err != nil {
 		return nil, err
 	}
-	obj := &store.Object{
+	obj := &git.Object{
 		Type:   git.ObjectType(p1),
 		Length: size,
 	}
 	return obj, nil
 }
 
-func (inst *sparseObjectReaderBuilder) open() (io.ReadCloser, *store.Object, error) {
+func (inst *sparseObjectReaderBuilder) open() (*git.Object, io.ReadCloser, error) {
 
 	var reader io.Reader = nil
 	defer func() {
@@ -137,5 +137,5 @@ func (inst *sparseObjectReaderBuilder) open() (io.ReadCloser, *store.Object, err
 	r9.clist = inst.clist
 	r9.inner = reader
 	inst.clist = nil
-	return r9, head, nil
+	return head, r9, nil
 }

@@ -18,8 +18,8 @@ type SparseObject interface {
 
 // SparseObjectLS 读写稀疏对象
 type SparseObjectLS interface {
-	ReadSparseObject(o SparseObject) (io.ReadCloser, *Object, error)
+	ReadSparseObject(o SparseObject) (*git.Object, io.ReadCloser, error)
 	ReadSparseObjectRaw(o SparseObject) (io.ReadCloser, error)
-	WriteSparseObject(o *Object, data io.Reader) (*Object, error)
-	WriteSparseObjectRaw(o *Object, data io.Reader) (*Object, error)
+	WriteSparseObject(o *git.Object, data io.Reader) (*git.Object, error)
+	WriteSparseObjectRaw(o *git.Object, data io.Reader) (*git.Object, error)
 }

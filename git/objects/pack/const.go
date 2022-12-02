@@ -33,10 +33,10 @@ const (
 
 // 定义 pack 对象类型
 const (
-	OBJ_COMMIT    = (1)
-	OBJ_TREE      = (2)
-	OBJ_BLOB      = (3)
-	OBJ_TAG       = (4)
-	OBJ_OFS_DELTA = (6)
-	OBJ_REF_DELTA = (7)
+	ObjCommit   = 1 // OBJ_COMMIT    = (1)
+	ObjTree     = 2 // OBJ_TREE      = (2)
+	ObjBLOB     = 3 // OBJ_BLOB      = (3)
+	ObjTag      = 4 // OBJ_TAG       = (4)
+	ObjOfsDelta = 6 // OBJ_OFS_DELTA = (6)
+	ObjRefDelta = 7 // OBJ_REF_DELTA = (7)
 )
