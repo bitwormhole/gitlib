@@ -6,6 +6,9 @@ type FileType string
 // CheckFlag 表示检查标志位, 多个标志位可以通过'|'运算符组合
 type CheckFlag int
 
+// ObjectType 表示pack内对象的类型 ... 已弃用！改用 git.PackedObjectType 代替
+// type ObjectType git.PackedObjectType
+
 ////////////////////////////////////////////////////////////////////////////////
 
 // 定义各种pack文件的类型
@@ -29,14 +32,4 @@ const (
 // 定义魔数
 const (
 	MagicNumberIdxV2 = 0xff744f63 // aka `\xfftOc`
-)
-
-// 定义 pack 对象类型
-const (
-	ObjCommit   = 1 // OBJ_COMMIT    = (1)
-	ObjTree     = 2 // OBJ_TREE      = (2)
-	ObjBLOB     = 3 // OBJ_BLOB      = (3)
-	ObjTag      = 4 // OBJ_TAG       = (4)
-	ObjOfsDelta = 6 // OBJ_OFS_DELTA = (6)
-	ObjRefDelta = 7 // OBJ_REF_DELTA = (7)
 )

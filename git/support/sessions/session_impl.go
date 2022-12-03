@@ -80,18 +80,18 @@ func (inst *sessionImpl) GetLayout() store.RepositoryLayout {
 
 // objects
 
-func (inst *sessionImpl) LoadText(id git.ObjectID) (string, error) {
-	bin, err := inst.LoadBinary(id)
+func (inst *sessionImpl) LoadText(id git.ObjectID) (string, *git.Object, error) {
+	bin, o, err := inst.LoadBinary(id)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
-	return string(bin), nil
+	return string(bin), o, nil
 }
 
-func (inst *sessionImpl) LoadBinary(id git.ObjectID) ([]byte, error) {
+func (inst *sessionImpl) LoadBinary(id git.ObjectID) ([]byte, *git.Object, error) {
 	o, reader, err := inst.ReadObject(id)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer func() {
 		reader.Close()
@@ -99,15 +99,22 @@ func (inst *sessionImpl) LoadBinary(id git.ObjectID) ([]byte, error) {
 	limit := inst.getSmallObjectSizeMax()
 	if o.Length > int64(limit) {
 		const f = "the size of small object is over limit, size=%v limit=%v id=%v"
-		return nil, fmt.Errorf(f, o.Length, limit, id)
+		return nil, nil, fmt.Errorf(f, o.Length, limit, id)
 	}
-	return ioutil.ReadAll(reader)
+	data, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return nil, nil, err
+	}
+	return data, o, nil
 }
 
 func (inst *sessionImpl) LoadCommit(id git.ObjectID) (*git.Commit, error) {
-	text, err := inst.LoadText(id)
+	text, o, err := inst.LoadText(id)
 	if err != nil {
 		return nil, err
+	}
+	if o.Type != git.ObjectTypeCommit {
+		return nil, fmt.Errorf("bad object type, it's not a commit")
 	}
 	commit, err := gitfmt.ParseCommit(text)
 	if err != nil {
@@ -118,9 +125,12 @@ func (inst *sessionImpl) LoadCommit(id git.ObjectID) (*git.Commit, error) {
 }
 
 func (inst *sessionImpl) LoadTag(id git.ObjectID) (*git.Tag, error) {
-	text, err := inst.LoadText(id)
+	text, o, err := inst.LoadText(id)
 	if err != nil {
 		return nil, err
+	}
+	if o.Type != git.ObjectTypeTag {
+		return nil, fmt.Errorf("bad object type, it's not a tag")
 	}
 	tag, err := gitfmt.ParseTag(text)
 	if err != nil {
@@ -131,9 +141,12 @@ func (inst *sessionImpl) LoadTag(id git.ObjectID) (*git.Tag, error) {
 }
 
 func (inst *sessionImpl) LoadTree(id git.ObjectID) (*git.Tree, error) {
-	bin, err := inst.LoadBinary(id)
+	bin, o, err := inst.LoadBinary(id)
 	if err != nil {
 		return nil, err
+	}
+	if o.Type != git.ObjectTypeTree {
+		return nil, fmt.Errorf("bad object type, it's not a tree")
 	}
 	tree, err := gitfmt.ParseTree(bin)
 	if err != nil {
@@ -161,14 +174,32 @@ func (inst *sessionImpl) LoadRef(r store.Ref) (*git.Ref, error) {
 	return gitfmt.ParseRef(text)
 }
 
-// func (inst *sessionImpl) ReadPackObject(o store.PackObject) (io.ReadCloser, *store.Object, error) {
-// 	return nil, nil, errors.New("no impl")
-// }
-
 func (inst *sessionImpl) ReadObject(id git.ObjectID) (*git.Object, io.ReadCloser, error) {
 	so := inst.repo.Objects().GetSparseObject(id)
-	spo := inst.GetSparseObjects()
-	return spo.ReadSparseObject(so)
+	if so.Exists() {
+		spo := inst.GetSparseObjects()
+		return spo.ReadSparseObject(so)
+	}
+	return inst.findAndReadObjectInPacks(id)
+}
+
+func (inst *sessionImpl) findAndReadObjectInPacks(id git.ObjectID) (*git.Object, io.ReadCloser, error) {
+	// find in packs
+	pii := &git.PackIndexItem{OID: id}
+	packs := inst.GetPacks()
+	pii, err := packs.FindPackObject(pii)
+	if err != nil {
+		return nil, nil, err
+	}
+	in, err := packs.ReadPackObject(pii)
+	if err != nil {
+		return nil, nil, err
+	}
+	return &git.Object{
+		ID:     pii.OID,
+		Type:   pii.Type,
+		Length: pii.Length,
+	}, in, nil
 }
 
 func (inst *sessionImpl) WriteObject(o *git.Object, data io.Reader) (*git.Object, error) {

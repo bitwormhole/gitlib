@@ -11,9 +11,7 @@ import (
 
 type packDaoImpl struct {
 	session store.Session
-
-	cacheSize int
-	cache     map[string]*packPairHolder // map[ stringify(pid) ]
+	cache   PackCache
 }
 
 func (inst *packDaoImpl) _Impl() store.PackDAO {
@@ -21,8 +19,7 @@ func (inst *packDaoImpl) _Impl() store.PackDAO {
 }
 
 func (inst *packDaoImpl) init(size int) error {
-	inst.cache = make(map[string]*packPairHolder)
-	inst.cacheSize = size
+	inst.cache = NewPackCacheChain(size)
 	return nil
 }
 
@@ -31,23 +28,88 @@ func (inst *packDaoImpl) Close() error {
 }
 
 func (inst *packDaoImpl) FindPackObject(o *git.PackIndexItem) (*git.PackIndexItem, error) {
-	panic("no impl : packDaoImpl.FindPackObject")
+
+	q := &PackQuery{
+		PID:     o.PID,
+		OID:     o.OID,
+		Session: inst.session,
+	}
+
+	ok := inst.cache.Query(q)
+	item := q.ResultItem
+	if !ok || item == nil {
+		oid := o.OID
+		oidstr := "nil"
+		if oid != nil {
+			oidstr = oid.String()
+		}
+		return nil, fmt.Errorf("no wanted item [object.id:%v]", oidstr)
+	}
+
+	return item, nil
 }
 
-func (inst *packDaoImpl) ReadPackObject(o *git.PackIndexItem) (io.ReadCloser, error) {
-	panic("no impl : packDaoImpl.ReadPackObject")
+func (inst *packDaoImpl) ReadPackObject(pii *git.PackIndexItem) (io.ReadCloser, error) {
+	if pii == nil {
+		return nil, fmt.Errorf("param is nil")
+	}
+	pid := pii.PID
+	if pid == nil {
+		return nil, fmt.Errorf("pid is nil")
+	}
+	q := &PackQuery{PID: pid}
+	ok := inst.cache.Query(q)
+	if !ok {
+		return nil, fmt.Errorf("no pack with id:%v", pid.String())
+	}
+	holder := q.ResultHolder
+	pool := inst.session.GetReaderPool()
+	file := holder.pack.GetEntityFile()
+	in1, err := pool.OpenReader(file, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if in1 != nil {
+			in1.Close()
+		}
+	}()
+	readerbuilder := packEntityReaderBuilder{
+		input:   in1,
+		file:    file,
+		index:   pii,
+		session: inst.session,
+	}
+	in2, err := readerbuilder.open()
+	if err != nil {
+		return nil, err
+	}
+	pii.Type = readerbuilder.entityType.ToObjectType()
+	pii.PackedType = readerbuilder.entityType
+	pii.Length = readerbuilder.entityLength
+	in1 = nil
+	return in2, nil
 }
 
 func (inst *packDaoImpl) CheckPack(pid git.PackID, flags pack.CheckFlag) error {
-	holder, err := inst.getPack(pid)
-	if err != nil {
-		return err
+
+	q := &PackQuery{
+		PID:     pid,
+		Session: inst.session,
+	}
+	ok := inst.cache.Query(q)
+	if !ok {
+		return fmt.Errorf("pack.object not found")
+	}
+	holder := q.ResultHolder
+	if holder == nil {
+		return fmt.Errorf("pack-holder is nil")
 	}
 
 	idx := holder.idx
 	ent := holder.entity
 
-	err = idx.Check(flags)
+	err := idx.Check(flags)
 	if err != nil {
 		return err
 	}
@@ -75,79 +137,4 @@ func (inst *packDaoImpl) ImportPack(p *store.ImportPackParams) (*store.ImportPac
 	return imp.Import(p)
 }
 
-func (inst *packDaoImpl) getPack(pid git.PackID) (*packPairHolder, error) {
-	if pid == nil {
-		return nil, fmt.Errorf("param:pid is nil")
-	}
-	key := pid.String()
-	table := inst.cache
-	holder := table[key]
-	if holder != nil {
-		return holder, nil
-	}
-	// make new holder
-	repo := inst.session.GetRepository()
-	p := repo.Objects().GetPack(pid)
-	if !p.Exists() {
-		return nil, fmt.Errorf("no pack with id:%v", key)
-	}
-	holder = &packPairHolder{}
-	err := holder.init(p, inst.session)
-	if err != nil {
-		return nil, err
-	}
-	table[key] = holder
-	return holder, nil
-}
-
 ////////////////////////////////////////////////////////////////////////////////
-
-type packPairHolder struct {
-	pid git.PackID
-
-	session store.Session
-
-	idx    pack.Idx
-	entity pack.Pack
-}
-
-func (inst *packPairHolder) init(p store.Pack, session store.Session) error {
-
-	if p == nil || session == nil {
-		return fmt.Errorf("param is nil")
-	}
-
-	pool := session.GetReaderPool()
-	digest := session.GetRepository().Digest()
-	pathIdx := p.GetIndexFile()
-	pathPack := p.GetEntityFile()
-
-	// for .idx
-	idx, err := pack.NewIdx(&pack.File{
-		Pool:   pool,
-		Path:   pathIdx,
-		Type:   pack.FileTypeIdx,
-		Digest: digest,
-	})
-	if err != nil {
-		return err
-	}
-
-	// for .pack
-	ent, err := pack.NewPack(&pack.File{
-		Pool:   pool,
-		Path:   pathPack,
-		Type:   pack.FileTypePack,
-		Digest: digest,
-	})
-	if err != nil {
-		return err
-	}
-
-	// done
-	inst.idx = idx
-	inst.entity = ent
-	inst.session = session
-	inst.pid = p.GetID()
-	return nil
-}

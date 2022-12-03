@@ -45,3 +45,23 @@ func (inst *idxFileV1) Reload() error {
 func (inst *idxFileV1) GetPackID() git.PackID {
 	return inst.pid
 }
+
+// Find ...
+func (inst *idxFileV1) Find(oid git.ObjectID) (*git.PackIndexItem, error) {
+	return nil, fmt.Errorf("no impl: Find")
+}
+
+// Count ...
+func (inst *idxFileV1) Count() int64 {
+	return 0
+}
+
+// GetItem ...
+func (inst *idxFileV1) GetItem(index int64) (*git.PackIndexItem, error) {
+	return nil, fmt.Errorf("no impl: GetItem")
+}
+
+// GetItems ...
+func (inst *idxFileV1) GetItems(index int64, limit int) ([]*git.PackIndexItem, error) {
+	return nil, fmt.Errorf("no impl: GetItems")
+}

@@ -10,6 +10,14 @@ import (
 	markup0x23084a "github.com/bitwormhole/starter/markup"
 )
 
+type pComTestReadObjects struct {
+	instance *testcmds0x82bca1.TestReadObjects
+	 markup0x23084a.Component `class:"cli-handler-registry"`
+	WD string `inject:"${test.repo.path}"`
+	LA store0x8467b3.LibAgent `inject:"#git-lib-agent"`
+}
+
+
 type pComTestReadPackIdx struct {
 	instance *testcmds0x82bca1.TestReadPackIdx
 	 markup0x23084a.Component `class:"cli-handler-registry"`

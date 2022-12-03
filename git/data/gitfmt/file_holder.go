@@ -6,6 +6,7 @@ import (
 	"bitwormhole.com/starter/afs"
 )
 
+// FileHolder ...
 type FileHolder struct {
 	File afs.Path
 

@@ -47,8 +47,8 @@ type Session interface {
 
 	GetPacks() PackDAO
 
-	LoadText(id git.ObjectID) (string, error)
-	LoadBinary(id git.ObjectID) ([]byte, error)
+	LoadText(id git.ObjectID) (string, *git.Object, error)
+	LoadBinary(id git.ObjectID) ([]byte, *git.Object, error)
 
 	// commit, tag, tree
 	LoadCommit(id git.ObjectID) (*git.Commit, error)

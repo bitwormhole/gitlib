@@ -13,6 +13,10 @@ type Idx interface {
 	Reload() error
 	Check(flags CheckFlag) error
 	GetPackID() git.PackID
+	Find(oid git.ObjectID) (*git.PackIndexItem, error)
+	Count() int64
+	GetItem(index int64) (*git.PackIndexItem, error)
+	GetItems(index int64, limit int) ([]*git.PackIndexItem, error)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -105,4 +109,24 @@ func (inst *idxFileFacade) Reload() error {
 // ReadPackID ...
 func (inst *idxFileFacade) GetPackID() git.PackID {
 	return inst.impl.GetPackID()
+}
+
+// Find ...
+func (inst *idxFileFacade) Find(oid git.ObjectID) (*git.PackIndexItem, error) {
+	return inst.impl.Find(oid)
+}
+
+// Count ...
+func (inst *idxFileFacade) Count() int64 {
+	return inst.impl.Count()
+}
+
+// GetItem ...
+func (inst *idxFileFacade) GetItem(index int64) (*git.PackIndexItem, error) {
+	return inst.impl.GetItem(index)
+}
+
+// GetItems ...
+func (inst *idxFileFacade) GetItems(index int64, limit int) ([]*git.PackIndexItem, error) {
+	return inst.impl.GetItems(index, limit)
 }
