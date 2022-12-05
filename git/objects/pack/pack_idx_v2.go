@@ -530,11 +530,33 @@ func (inst *idxFileV2dao) readListID(index int64, limit int) ([]*git.PackIndexIt
 	return list, nil
 }
 
+func (inst *idxFileV2dao) findRangeInFanout(want git.ObjectID) (int64, int64, error) {
+	if want == nil {
+		return 0, 0, fmt.Errorf("wanted object-id is nil")
+	}
+	b0 := want.GetByte(0)
+	i := int(b0) & 0xff
+	cnt1 := uint32(0)
+	cnt9 := uint32(0)
+	if i > 0 {
+		cnt1 = inst.parent.fanout.Data[i-1]
+	}
+	cnt9 = inst.parent.fanout.Data[i]
+	i1 := int64(cnt1)
+	i9 := int64(cnt9) - 1
+	return i1, i9, nil
+}
+
 func (inst *idxFileV2dao) findItemByID(want git.ObjectID) (*git.PackIndexItem, error) {
 
-	total := inst.total
-	i1 := int64(0) // todo : use fanout
-	i9 := total - 1
+	// total := inst.total
+	// i1 := int64(0) // todo : use fanout
+	// i9 := total - 1
+	i1, i9, err := inst.findRangeInFanout(want)
+	if err != nil {
+		return nil, err
+	}
+
 	ids := make(map[int64]string)
 	result := &git.PackIndexItem{
 		PID: inst.parent.pid,

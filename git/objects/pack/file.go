@@ -10,10 +10,11 @@ import (
 
 // File ...
 type File struct {
-	Digest git.Digest
-	Pool   afs.ReaderPool
-	Path   afs.Path
-	Type   FileType
+	Digest      git.Digest
+	Compression git.Compression
+	Pool        afs.ReaderPool
+	Path        afs.Path
+	Type        FileType
 }
 
 // OpenReader ...

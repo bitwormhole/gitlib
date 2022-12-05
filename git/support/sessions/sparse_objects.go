@@ -1,7 +1,6 @@
 package sessions
 
 import (
-	"errors"
 	"io"
 
 	"github.com/bitwormhole/gitlib/git"
@@ -12,7 +11,7 @@ type sparseObjectsImpl struct {
 	session store.Session
 }
 
-func (inst *sparseObjectsImpl) _Impl() store.SparseObjectLS {
+func (inst *sparseObjectsImpl) _Impl() store.SparseObjects {
 	return inst
 }
 
@@ -25,7 +24,9 @@ func (inst *sparseObjectsImpl) Close() error {
 }
 
 func (inst *sparseObjectsImpl) ReadSparseObjectRaw(o store.SparseObject) (io.ReadCloser, error) {
-	return nil, errors.New("no impl")
+	file := o.Path()
+	pool := inst.session.GetReaderPool()
+	return pool.OpenReader(file, nil)
 }
 
 func (inst *sparseObjectsImpl) WriteSparseObject(o *git.Object, data io.Reader) (*git.Object, error) {

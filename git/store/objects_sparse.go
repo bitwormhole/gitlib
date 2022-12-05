@@ -16,8 +16,8 @@ type SparseObject interface {
 	Exists() bool
 }
 
-// SparseObjectLS 读写稀疏对象
-type SparseObjectLS interface {
+// SparseObjects 读写稀疏对象
+type SparseObjects interface {
 	ReadSparseObject(o SparseObject) (*git.Object, io.ReadCloser, error)
 	ReadSparseObjectRaw(o SparseObject) (io.ReadCloser, error)
 	WriteSparseObject(o *git.Object, data io.Reader) (*git.Object, error)

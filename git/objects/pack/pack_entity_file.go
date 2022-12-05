@@ -2,8 +2,11 @@ package pack
 
 import (
 	"fmt"
+	"io"
 
+	"bitwormhole.com/starter/afs"
 	"github.com/bitwormhole/gitlib/git"
+	"github.com/bitwormhole/starter/vlog"
 )
 
 // Pack 表示一个 pack-*.pack 文件
@@ -12,6 +15,12 @@ type Pack interface {
 	Reload() error
 	Check(flags CheckFlag) error
 	GetPackID() git.PackID
+
+	// 如果 pool 参数为 nil, 则使用内部的 pool 提供数据来源
+	OpenObjectReader(item *git.PackIndexItem, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, io.ReadCloser, error)
+
+	// 如果 pool 参数为 nil, 则使用内部的 pool 提供数据来源
+	ReadObjectHeader(item *git.PackIndexItem, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, error)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -190,3 +199,302 @@ func (inst *EntityFile) Reload() error {
 
 	return inst.Check(CheckSize | CheckHead)
 }
+
+func (inst *EntityFile) openRawReader(item *git.PackIndexItem, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, io.ReadCloser, error) {
+
+	if pool == nil {
+		pool = inst.file.Pool
+	}
+
+	if pool == nil {
+		return nil, nil, fmt.Errorf("no reader pool")
+	}
+
+	ehr := entityHeaderReader{}
+	file := inst.file.Path
+
+	// open
+	in, err := pool.OpenReader(file, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer func() {
+		if in != nil {
+			in.Close()
+		}
+	}()
+
+	// seek
+	err = ehr.seek(item, in)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// read header
+	hx, err := ehr.readHeader(item, in)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	stream := in
+	in = nil
+	return hx, stream, nil
+}
+
+// OpenObjectReader ...
+func (inst *EntityFile) OpenObjectReader(item *git.PackIndexItem, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, io.ReadCloser, error) {
+	hx, in1, err := inst.openRawReader(item, pool)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer func() {
+		if in1 != nil {
+			in1.Close()
+		}
+	}()
+	// unzip
+	in2, err := inst.file.Compression.NewReader(in1)
+	if err != nil {
+		return nil, nil, err
+	}
+	in3 := &entityReader{
+		in1: in1,
+		in2: in2,
+	}
+	in1 = nil
+	return hx, in3, nil
+}
+
+// ReadObjectHeader ...
+func (inst *EntityFile) ReadObjectHeader(item *git.PackIndexItem, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, error) {
+	hx, in, err := inst.openRawReader(item, pool)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		in.Close()
+	}()
+
+	// err = inst.tryReadBodyPlainData(in, hx)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	return hx, nil
+}
+
+// func (inst *EntityFile) tryReadBodyPlainData(raw io.Reader, hx *git.PackedObjectHeaderEx) error {
+
+// 	in, err := inst.file.Compression.NewReader(raw)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	defer func() {
+// 		in.Close()
+// 	}()
+
+// 	bin, err := ioutil.ReadAll(in)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	cb := len(bin)
+// 	t := hx.Type.ToObjectType().String()
+// 	vlog.Debug("read block in pack with size: ", cb, " type:", t)
+
+// 	return nil
+// }
+
+////////////////////////////////////////////////////////////////////////////////
+
+type entityReader struct {
+	in1    io.Closer
+	in2    io.ReadCloser
+	closed bool
+}
+
+func (inst *entityReader) Read(b []byte) (int, error) {
+	in := inst.in2
+	if in == nil || inst.closed {
+		return 0, fmt.Errorf("this stream is closed")
+	}
+	return in.Read(b)
+}
+
+func (inst *entityReader) Close() error {
+	clist := make([]io.Closer, 0)
+	clist = append(clist, inst.in1)
+	clist = append(clist, inst.in2)
+	for _, c := range clist {
+		if c == nil {
+			continue
+		}
+		err := c.Close()
+		if err != nil {
+			vlog.Warn(err)
+		}
+	}
+	inst.in1 = nil
+	inst.in2 = nil
+	inst.closed = true
+	return nil
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+type entityHeaderReader struct{}
+
+func (inst *entityHeaderReader) seek(item *git.PackIndexItem, in io.ReadSeeker) error {
+	pos1 := item.Offset
+	pos2, err := in.Seek(pos1, io.SeekStart)
+	if err != nil {
+		return err
+	}
+	if pos1 != pos2 {
+		return fmt.Errorf("cannot seek to position, want:%v have:%v", pos1, pos2)
+	}
+	return nil
+}
+
+func (inst *entityHeaderReader) readHeader(item *git.PackIndexItem, in io.ReadSeeker) (*git.PackedObjectHeaderEx, error) {
+
+	hx := &git.PackedObjectHeaderEx{}
+	hx.OID = item.OID
+	hx.PID = item.PID
+	hx.Offset = item.Offset
+
+	err := inst.readHeaderBase(hx, in)
+	if err != nil {
+		return nil, err
+	}
+
+	if hx.Type == git.PackedDeltaOFS {
+		err = inst.readHeaderDeltaOFS(hx, in)
+	} else if hx.Type == git.PackedDeltaRef {
+		err = inst.readHeaderDeltaRef(hx, in)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return hx, nil
+}
+
+func (inst *entityHeaderReader) readHeaderBase(hx *git.PackedObjectHeaderEx, in io.ReadSeeker) error {
+	buffer := entity7bitsBuffer{}
+	err := buffer.load(in)
+	if err != nil {
+		return err
+	}
+	hx.Type = buffer.parseType()
+	hx.Size = buffer.parseSize()
+	return nil
+}
+
+func (inst *entityHeaderReader) readHeaderDeltaOFS(hx *git.PackedObjectHeaderEx, in io.ReadSeeker) error {
+	buffer := entity7bitsBuffer{}
+	err := buffer.load(in)
+	if err != nil {
+		return err
+	}
+	ofs, err := buffer.parseDeltaOffset()
+	if err != nil {
+		return err
+	}
+	hx.DeltaOffset = ofs
+	return nil
+}
+
+func (inst *entityHeaderReader) readHeaderDeltaRef(hx *git.PackedObjectHeaderEx, in io.ReadSeeker) error {
+	pid := hx.PID
+	idsize := pid.Size()
+	cb1 := idsize.SizeInBytes()
+	buf := make([]byte, cb1)
+	cb2, err := in.Read(buf)
+	if err != nil {
+		return err
+	}
+	if cb1 != cb2 {
+		return fmt.Errorf("read id, with bad size")
+	}
+	xid := pid.GetFactory().Create(buf)
+	hx.DeltaRef = xid.(git.ObjectID)
+	return nil
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+type entity7bitsBuffer struct {
+	data   [16]byte
+	length int
+}
+
+func (inst *entity7bitsBuffer) load(in io.Reader) error {
+	buf := inst.data[:]
+	size := len(buf)
+	count := 0
+	for i := 0; i < size; i++ {
+		b := buf[i : i+1]
+		cb, err := in.Read(b)
+		if err != nil {
+			return err
+		} else if cb != 1 {
+			return fmt.Errorf("bad head in stream")
+		}
+		count++
+		c := uint8(b[0])
+		if (c & 0x80) == 0 {
+			inst.length = count
+			return nil
+		}
+	}
+	return fmt.Errorf("out of buffer")
+}
+
+func (inst *entity7bitsBuffer) parseType() git.PackedObjectType {
+	b := inst.data[0]
+	t := (b >> 4) & 0x07
+	return git.PackedObjectType(t)
+}
+
+func (inst *entity7bitsBuffer) parseSize() int64 {
+	value := int64(0)
+	for i := inst.length - 1; i >= 0; i-- {
+		b := inst.data[i]
+		if i == 0 {
+			value = (value << 4) | int64(b&0x0f)
+		} else {
+			value = (value << 7) | int64(b&0x7f)
+		}
+	}
+	return value
+}
+
+func (inst *entity7bitsBuffer) parseDeltaOffset() (int64, error) {
+	// as Git-VLQ formatted int
+	const (
+		maskContinue = uint8(128) // 1000 000
+		maskLength   = uint8(127) // 0111 1111
+		lengthBits   = uint8(7)   // subsequent bytes has 7 bits to store the length
+	)
+	i := 0
+	data := inst.data[:]
+	var c byte
+	c = data[i]
+	i++
+	var v = int64(c & maskLength)
+	for c&maskContinue > 0 {
+		v++
+		if i < inst.length {
+			c = data[i]
+			i++
+		} else {
+			return 0, fmt.Errorf("buffer overflow")
+		}
+		v = (v << lengthBits) + int64(c&maskLength)
+	}
+	return v, nil
+}
+
+////////////////////////////////////////////////////////////////////////////////

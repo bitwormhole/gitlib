@@ -58,11 +58,22 @@ type HashID interface {
 // ObjectID 表示git的 object-ID
 type ObjectID interface {
 	HashID
+	OID() ObjectID
 }
 
 // PackID 表示git的包ID
 type PackID interface {
 	HashID
+	PID() PackID
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// CommonID ... 表示一个多用途的ID
+type CommonID interface {
+	HashID
+	ObjectID
+	PackID
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -71,15 +82,15 @@ type PackID interface {
 type IdentityFactory interface {
 	Size() HashSize
 
-	Zero() HashID
+	Zero() CommonID
 
-	Create(b []byte) HashID
+	Create(b []byte) CommonID
 
-	Parse(s string) HashID
+	Parse(s string) CommonID
 
-	TryCreate(b []byte) (HashID, error)
+	TryCreate(b []byte) (CommonID, error)
 
-	TryParse(s string) (HashID, error)
+	TryParse(s string) (CommonID, error)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,7 +102,7 @@ func DefaultIdentityFactory() IdentityFactory {
 	f := theDefautIdentityFactory
 	if f == nil {
 		size := HashSizeInBytes(160 / 8) // default.size = 160-bits (sha-1)
-		f = &commonIDFactory{size: size}
+		f = &baseCommonIDFactory{size: size}
 		theDefautIdentityFactory = f
 	}
 	return f
@@ -112,7 +123,7 @@ func ParseObjectID(s string) (ObjectID, error) {
 	if err != nil {
 		return nil, err
 	}
-	return id, nil
+	return id.(ObjectID), nil
 }
 
 // CreateObjectID ...
@@ -122,7 +133,7 @@ func CreateObjectID(b []byte) (ObjectID, error) {
 	if err != nil {
 		return nil, err
 	}
-	return id, nil
+	return id.(ObjectID), nil
 }
 
 // ParsePackID ...
@@ -132,7 +143,7 @@ func ParsePackID(s string) (PackID, error) {
 	if err != nil {
 		return nil, err
 	}
-	return id, nil
+	return id.(PackID), nil
 }
 
 // CreatePackID ...
@@ -142,7 +153,7 @@ func CreatePackID(b []byte) (PackID, error) {
 	if err != nil {
 		return nil, err
 	}
-	return id, nil
+	return id.(PackID), nil
 }
 
 // HashEqual 判断两个ID是否相等
@@ -215,34 +226,34 @@ func HashString(x HashID) string {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-type commonIDFactory struct {
+type baseCommonIDFactory struct {
 	size HashSize
 
 	// cache
-	zeroID HashID
+	zeroID CommonID
 }
 
-func (inst *commonIDFactory) _Impl() IdentityFactory {
+func (inst *baseCommonIDFactory) _Impl() IdentityFactory {
 	return inst
 }
 
-func (inst *commonIDFactory) Size() HashSize {
+func (inst *baseCommonIDFactory) Size() HashSize {
 	return inst.size
 }
 
-func (inst *commonIDFactory) Zero() HashID {
+func (inst *baseCommonIDFactory) Zero() CommonID {
 	z := inst.zeroID
 	if z != nil {
 		return z
 	}
 	size := inst.size.SizeInBytes()
 	data := make([]byte, size)
-	z = &commonID{data: data, factory: inst}
+	z = &baseCommonID{data: data, factory: inst}
 	inst.zeroID = z
 	return z
 }
 
-func (inst *commonIDFactory) Create(b []byte) HashID {
+func (inst *baseCommonIDFactory) Create(b []byte) CommonID {
 	id, err := inst.TryCreate(b)
 	if err != nil {
 		return inst.Zero()
@@ -250,7 +261,7 @@ func (inst *commonIDFactory) Create(b []byte) HashID {
 	return id
 }
 
-func (inst *commonIDFactory) Parse(s string) HashID {
+func (inst *baseCommonIDFactory) Parse(s string) CommonID {
 	id, err := inst.TryParse(s)
 	if err != nil {
 		return inst.Zero()
@@ -258,7 +269,7 @@ func (inst *commonIDFactory) Parse(s string) HashID {
 	return id
 }
 
-func (inst *commonIDFactory) TryCreate(src []byte) (HashID, error) {
+func (inst *baseCommonIDFactory) TryCreate(src []byte) (CommonID, error) {
 	if src == nil {
 		return nil, fmt.Errorf("id data is nil")
 	}
@@ -269,11 +280,11 @@ func (inst *commonIDFactory) TryCreate(src []byte) (HashID, error) {
 	}
 	dst := make([]byte, wantSize)
 	copy(dst, src)
-	id := &commonID{factory: inst, data: dst}
+	id := &baseCommonID{factory: inst, data: dst}
 	return id, nil
 }
 
-func (inst *commonIDFactory) TryParse(s string) (HashID, error) {
+func (inst *baseCommonIDFactory) TryParse(s string) (CommonID, error) {
 	s = strings.TrimSpace(s)
 	s = strings.ToLower(s)
 	data, err := util.ParseHexString(s)
@@ -285,26 +296,26 @@ func (inst *commonIDFactory) TryParse(s string) (HashID, error) {
 	if wantSize != haveSize {
 		return nil, fmt.Errorf("bad id size, have:%v want: %v", haveSize, wantSize)
 	}
-	id := &commonID{factory: inst, data: data}
+	id := &baseCommonID{factory: inst, data: data}
 	return id, nil
 }
 
 /////////////////////////////////////////////////////
 
-type commonID struct {
+type baseCommonID struct {
 	data    []byte
-	factory *commonIDFactory
+	factory *baseCommonIDFactory
 }
 
-func (inst *commonID) _Impl() HashID {
+func (inst *baseCommonID) _Impl() CommonID {
 	return inst
 }
 
-func (inst *commonID) GetFactory() IdentityFactory {
+func (inst *baseCommonID) GetFactory() IdentityFactory {
 	return inst.factory
 }
 
-func (inst *commonID) GetByte(index int) byte {
+func (inst *baseCommonID) GetByte(index int) byte {
 	data := inst.data
 	size := len(data)
 	if 0 <= index && index < size {
@@ -313,7 +324,7 @@ func (inst *commonID) GetByte(index int) byte {
 	return 0
 }
 
-func (inst *commonID) Bytes() []byte {
+func (inst *baseCommonID) Bytes() []byte {
 	size := inst.factory.size.SizeInBytes()
 	src := inst.data
 	dst := make([]byte, size)
@@ -321,10 +332,18 @@ func (inst *commonID) Bytes() []byte {
 	return dst
 }
 
-func (inst *commonID) String() string {
+func (inst *baseCommonID) String() string {
 	return util.StringifyBytes(inst.data)
 }
 
-func (inst *commonID) Size() HashSize {
+func (inst *baseCommonID) Size() HashSize {
 	return inst.factory.size
+}
+
+func (inst *baseCommonID) OID() ObjectID {
+	return inst
+}
+
+func (inst *baseCommonID) PID() PackID {
+	return inst
 }

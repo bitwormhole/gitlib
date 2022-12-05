@@ -86,15 +86,17 @@ func (inst *PackHolder) load() error {
 
 	pool := session.GetReaderPool()
 	digest := session.GetRepository().Digest()
-	pathIdx := p.GetIndexFile()
-	pathPack := p.GetEntityFile()
+	compre := session.GetRepository().Compression()
+	pathIdx := p.GetDotIdx()
+	pathPack := p.GetDotPack()
 
 	// for .idx
 	idx, err := pack.NewIdx(&pack.File{
-		Pool:   pool,
-		Path:   pathIdx,
-		Type:   pack.FileTypeIdx,
-		Digest: digest,
+		Pool:        pool,
+		Path:        pathIdx,
+		Type:        pack.FileTypeIdx,
+		Digest:      digest,
+		Compression: compre,
 	})
 	if err != nil {
 		return err
@@ -102,10 +104,11 @@ func (inst *PackHolder) load() error {
 
 	// for .pack
 	ent, err := pack.NewPack(&pack.File{
-		Pool:   pool,
-		Path:   pathPack,
-		Type:   pack.FileTypePack,
-		Digest: digest,
+		Pool:        pool,
+		Path:        pathPack,
+		Type:        pack.FileTypePack,
+		Digest:      digest,
+		Compression: compre,
 	})
 	if err != nil {
 		return err

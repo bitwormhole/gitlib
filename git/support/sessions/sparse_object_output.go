@@ -15,7 +15,7 @@ type plainSparseObjectSaver struct {
 	session store.Session
 }
 
-func (inst *plainSparseObjectSaver) readObject(so store.SparseObject) (*git.Object, error) {
+func (inst *plainSparseObjectSaver) readObjectMeta(so store.SparseObject) (*git.Object, error) {
 	spo := inst.session.GetSparseObjects()
 	obj, in, err := spo.ReadSparseObject(so)
 	if err != nil {
@@ -47,7 +47,7 @@ func (inst *plainSparseObjectSaver) Save(o *git.Object, data io.Reader) (*git.Ob
 	if wantID != nil {
 		old := repo.Objects().GetSparseObject(wantID)
 		if old.Exists() {
-			return inst.readObject(old)
+			return inst.readObjectMeta(old)
 		}
 	}
 

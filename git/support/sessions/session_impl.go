@@ -17,8 +17,8 @@ type sessionImpl struct {
 
 	closelist []io.Closer
 	pool      afs.ReaderPool
-	packDao   store.PackDAO
-	sparseDao store.SparseObjectLS
+	packDao   store.Packs
+	sparseDao store.SparseObjects
 
 	tempFiles tempFileFactory
 }
@@ -183,23 +183,13 @@ func (inst *sessionImpl) ReadObject(id git.ObjectID) (*git.Object, io.ReadCloser
 	return inst.findAndReadObjectInPacks(id)
 }
 
-func (inst *sessionImpl) findAndReadObjectInPacks(id git.ObjectID) (*git.Object, io.ReadCloser, error) {
-	// find in packs
-	pii := &git.PackIndexItem{OID: id}
+func (inst *sessionImpl) findAndReadObjectInPacks(want git.ObjectID) (*git.Object, io.ReadCloser, error) {
 	packs := inst.GetPacks()
-	pii, err := packs.FindPackObject(pii)
+	pobj, err := packs.FindPackObject(want)
 	if err != nil {
 		return nil, nil, err
 	}
-	in, err := packs.ReadPackObject(pii)
-	if err != nil {
-		return nil, nil, err
-	}
-	return &git.Object{
-		ID:     pii.OID,
-		Type:   pii.Type,
-		Length: pii.Length,
-	}, in, nil
+	return packs.ReadPackObject(pobj)
 }
 
 func (inst *sessionImpl) WriteObject(o *git.Object, data io.Reader) (*git.Object, error) {
@@ -207,7 +197,7 @@ func (inst *sessionImpl) WriteObject(o *git.Object, data io.Reader) (*git.Object
 	return spo.WriteSparseObject(o, data)
 }
 
-func (inst *sessionImpl) GetPacks() store.PackDAO {
+func (inst *sessionImpl) GetPacks() store.Packs {
 	dao1 := inst.packDao
 	if dao1 != nil {
 		return dao1
@@ -220,7 +210,7 @@ func (inst *sessionImpl) GetPacks() store.PackDAO {
 	return dao1
 }
 
-func (inst *sessionImpl) GetSparseObjects() store.SparseObjectLS {
+func (inst *sessionImpl) GetSparseObjects() store.SparseObjects {
 	dao1 := inst.sparseDao
 	if dao1 != nil {
 		return dao1

@@ -22,8 +22,8 @@ func (inst *packImporter) Import(p *store.ImportPackParams) (*store.ImportPackRe
 
 	pid := r1.ID
 	pack := r1.Pack
-	idxDst := pack.GetIndexFile()
-	packDst := pack.GetEntityFile()
+	idxDst := pack.GetDotIdx()
+	packDst := pack.GetDotPack()
 	idxSrc := p.IdxFile
 	packSrc := p.PackFile
 	errlist := make([]error, 0)

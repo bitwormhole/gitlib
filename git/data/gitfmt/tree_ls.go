@@ -93,7 +93,7 @@ func (inst *treeReader) readItemHead(dst *git.TreeItem) error {
 	if i0 < i1 && i1 < i2 && i2 < end {
 		mode := data[i0:i1]
 		name := data[i1+1 : i2]
-		dst.Mode = strings.TrimSpace(string(mode))
+		dst.Mode = inst.parseItemMode(mode)
 		dst.Name = string(name)
 	} else {
 		return fmt.Errorf("bad tree item head")
@@ -102,6 +102,12 @@ func (inst *treeReader) readItemHead(dst *git.TreeItem) error {
 	inst.pos = i2 + 1
 	inst.idSize = 20 // 20(bytes) = 160(bits)
 	return nil
+}
+
+func (inst *treeReader) parseItemMode(data []byte) git.TreeItemMode {
+	str := string(data)
+	str = strings.TrimSpace(str)
+	return git.TreeItemMode(str)
 }
 
 func (inst *treeReader) readItemID(dst *git.TreeItem) error {

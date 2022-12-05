@@ -43,9 +43,9 @@ type Session interface {
 
 	WriteObject(o *git.Object, data io.Reader) (*git.Object, error)
 
-	GetSparseObjects() SparseObjectLS
+	GetSparseObjects() SparseObjects
 
-	GetPacks() PackDAO
+	GetPacks() Packs
 
 	LoadText(id git.ObjectID) (string, *git.Object, error)
 	LoadBinary(id git.ObjectID) ([]byte, *git.Object, error)

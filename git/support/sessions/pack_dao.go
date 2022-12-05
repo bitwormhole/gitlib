@@ -14,7 +14,7 @@ type packDaoImpl struct {
 	cache   PackCache
 }
 
-func (inst *packDaoImpl) _Impl() store.PackDAO {
+func (inst *packDaoImpl) _Impl() store.Packs {
 	return inst
 }
 
@@ -27,18 +27,30 @@ func (inst *packDaoImpl) Close() error {
 	return nil
 }
 
-func (inst *packDaoImpl) FindPackObject(o *git.PackIndexItem) (*git.PackIndexItem, error) {
+func (inst *packDaoImpl) FindPackObject(oid git.ObjectID) (store.PackObject, error) {
+	return inst.find(nil, oid)
+}
+
+func (inst *packDaoImpl) FindPackObjectInPack(pid git.PackID, oid git.ObjectID) (store.PackObject, error) {
+	return inst.find(pid, oid)
+}
+
+// pid 是可选的, oid 必须有
+func (inst *packDaoImpl) find(pid git.PackID, oid git.ObjectID) (store.PackObject, error) {
+
+	if oid == nil {
+		return nil, fmt.Errorf("required param:oid is nil")
+	}
 
 	q := &PackQuery{
-		PID:     o.PID,
-		OID:     o.OID,
+		PID:     pid,
+		OID:     oid,
 		Session: inst.session,
 	}
 
 	ok := inst.cache.Query(q)
 	item := q.ResultItem
 	if !ok || item == nil {
-		oid := o.OID
 		oidstr := "nil"
 		if oid != nil {
 			oidstr = oid.String()
@@ -46,49 +58,40 @@ func (inst *packDaoImpl) FindPackObject(o *git.PackIndexItem) (*git.PackIndexIte
 		return nil, fmt.Errorf("no wanted item [object.id:%v]", oidstr)
 	}
 
-	return item, nil
+	pid = item.PID
+	result := inst.session.GetRepository().Objects().GetPack(pid).GetObject(oid)
+	return result, nil
 }
 
-func (inst *packDaoImpl) ReadPackObject(pii *git.PackIndexItem) (io.ReadCloser, error) {
-	if pii == nil {
-		return nil, fmt.Errorf("param is nil")
+func (inst *packDaoImpl) ReadPackObject(po store.PackObject) (*git.Object, io.ReadCloser, error) {
+	if po == nil {
+		return nil, nil, fmt.Errorf("param is nil")
 	}
-	pid := pii.PID
+	pid := po.Container().GetID()
 	if pid == nil {
-		return nil, fmt.Errorf("pid is nil")
+		return nil, nil, fmt.Errorf("pid is nil")
 	}
 	q := &PackQuery{PID: pid}
 	ok := inst.cache.Query(q)
 	if !ok {
-		return nil, fmt.Errorf("no pack with id:%v", pid.String())
+		return nil, nil, fmt.Errorf("no pack with id:%v", pid.String())
 	}
 	holder := q.ResultHolder
-	pool := inst.session.GetReaderPool()
-	file := holder.pack.GetEntityFile()
-	in1, err := pool.OpenReader(file, nil)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		if in1 != nil {
-			in1.Close()
-		}
-	}()
 	readerbuilder := packEntityReaderBuilder{
-		input:   in1,
-		file:    file,
-		index:   pii,
 		session: inst.session,
+		pack:    holder.entity,
+		want:    q.ResultItem,
 	}
-	in2, err := readerbuilder.open()
+	hx, in2, err := readerbuilder.open()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	pii.Type = readerbuilder.entityType.ToObjectType()
-	pii.PackedType = readerbuilder.entityType
-	pii.Length = readerbuilder.entityLength
-	in1 = nil
-	return in2, nil
+	resultObject := &git.Object{
+		ID:     po.GetID(),
+		Type:   hx.Type.ToObjectType(),
+		Length: hx.Size,
+	}
+	return resultObject, in2, nil
 }
 
 func (inst *packDaoImpl) CheckPack(pid git.PackID, flags pack.CheckFlag) error {

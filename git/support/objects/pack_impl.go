@@ -22,11 +22,11 @@ func (inst *packImpl) GetID() git.PackID {
 	return inst.id
 }
 
-func (inst *packImpl) GetIndexFile() afs.Path {
+func (inst *packImpl) GetDotIdx() afs.Path {
 	return inst.packIndexFile
 }
 
-func (inst *packImpl) GetEntityFile() afs.Path {
+func (inst *packImpl) GetDotPack() afs.Path {
 	return inst.packEntityFile
 }
 

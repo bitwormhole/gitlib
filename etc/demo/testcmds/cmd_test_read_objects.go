@@ -1,6 +1,8 @@
 package testcmds
 
 import (
+	"strings"
+
 	"bitwormhole.com/starter/cli"
 	"github.com/bitwormhole/gitlib/git"
 	"github.com/bitwormhole/gitlib/git/store"
@@ -99,5 +101,63 @@ func (inst *TestReadObjects) scanCommit(commit *git.Commit, session store.Sessio
 
 	vlog.Warn("scan commit ", commit.ID.String())
 
+	item := &git.TreeItem{
+		ID:   commit.Tree,
+		Name: "[ROOT]",
+		Mode: git.TreeItemModeFolder,
+	}
+
+	err := inst.scanTree(item, session, 0)
+	if err != nil {
+		vlog.Error(err)
+	}
+
 	return nil
+}
+
+func (inst *TestReadObjects) scanTree(item *git.TreeItem, session store.Session, depth int) error {
+
+	tab := inst.makeTabString(depth)
+	treeid := item.ID
+	vlog.Warn("scan tree ", treeid.String(), tab, item.Name)
+
+	tree, err := session.LoadTree(treeid)
+	if err != nil {
+		return err
+	}
+
+	items := tree.Items
+	for _, item := range items {
+		if item.IsFolder() {
+			err = inst.scanTree(item, session, depth+1)
+			if err != nil {
+				return err
+			}
+		} else if item.IsFile() {
+			err = inst.scanBlob(item, session, depth+1)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (inst *TestReadObjects) scanBlob(item *git.TreeItem, session store.Session, depth int) error {
+
+	oid := item.ID
+	vlog.Warn("scan blob ", oid.String())
+
+	return nil
+}
+
+func (inst *TestReadObjects) makeTabString(depth int) string {
+	builder := strings.Builder{}
+	builder.WriteString(" ...")
+	for i := 0; i < depth; i++ {
+		builder.WriteString("....")
+	}
+	builder.WriteString(" ")
+	return builder.String()
 }

@@ -32,9 +32,9 @@ type ImportPackResult struct {
 type Pack interface {
 	GetID() git.PackID
 
-	GetIndexFile() afs.Path
+	GetDotIdx() afs.Path
 
-	GetEntityFile() afs.Path
+	GetDotPack() afs.Path
 
 	GetObject(oid git.ObjectID) PackObject
 
@@ -77,14 +77,16 @@ type PackReadCloser interface {
 	GetPack() PackFile
 }
 
-// PackDAO 读写包对象
-type PackDAO interface {
+// Packs 读写包对象
+type Packs interface {
 
 	// query
 
-	FindPackObject(o *git.PackIndexItem) (*git.PackIndexItem, error)
+	FindPackObject(oid git.ObjectID) (PackObject, error)
 
-	ReadPackObject(o *git.PackIndexItem) (io.ReadCloser, error)
+	FindPackObjectInPack(pid git.PackID, oid git.ObjectID) (PackObject, error)
+
+	ReadPackObject(o PackObject) (*git.Object, io.ReadCloser, error)
 
 	CheckPack(pid git.PackID, flags pack.CheckFlag) error
 

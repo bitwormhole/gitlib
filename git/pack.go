@@ -26,6 +26,35 @@ type PackIndex struct {
 	Items []*PackIndexItem
 }
 
+// PackedObjectHeader ...
+type PackedObjectHeader struct {
+	Type PackedObjectType
+	Size int64
+}
+
+// PackedObjectHeaderEx ...
+type PackedObjectHeaderEx struct {
+	PackedObjectHeader
+
+	PID    PackID
+	OID    ObjectID
+	Offset int64
+
+	DeltaRef    ObjectID
+	DeltaOffset int64
+
+	// // for debug
+	// DeltaOffsetAbs int64 //
+}
+
+// GetDeltaParentOffset  计算 delta-parent 的绝对位置
+func (inst *PackedObjectHeaderEx) GetDeltaParentOffset() int64 {
+	if inst.Type == PackedDeltaOFS {
+		return inst.Offset - inst.DeltaOffset
+	}
+	return 0
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 // PackIdxFanOut ...
