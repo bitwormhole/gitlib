@@ -37,27 +37,36 @@ func autoGenConfig(cb application.ConfigBuilder) error {
 		return err
 	}
 
-	// component: com1-testcmds0x82bca1.TestReadObjects
+	// component: com1-testcmds0x82bca1.TestPackDeltaObjects
 	cominfobuilder.Next()
-	cominfobuilder.ID("com1-testcmds0x82bca1.TestReadObjects").Class("cli-handler-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com1-testcmds0x82bca1.TestPackDeltaObjects").Class("cli-handler-registry").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComTestPackDeltaObjects{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com2-testcmds0x82bca1.TestReadObjects
+	cominfobuilder.Next()
+	cominfobuilder.ID("com2-testcmds0x82bca1.TestReadObjects").Class("cli-handler-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComTestReadObjects{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com2-testcmds0x82bca1.TestReadPackIdx
+	// component: com3-testcmds0x82bca1.TestReadPackIdx
 	cominfobuilder.Next()
-	cominfobuilder.ID("com2-testcmds0x82bca1.TestReadPackIdx").Class("cli-handler-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com3-testcmds0x82bca1.TestReadPackIdx").Class("cli-handler-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComTestReadPackIdx{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com3-demo0x52dcb1.TestPoint
+	// component: com4-demo0x52dcb1.TestPoint
 	cominfobuilder.Next()
-	cominfobuilder.ID("com3-demo0x52dcb1.TestPoint").Class("life").Aliases("").Scope("")
+	cominfobuilder.ID("com4-demo0x52dcb1.TestPoint").Class("life").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComTestPoint{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
@@ -156,7 +165,92 @@ func (inst * comFactory4pComTestListObjectsInPack) getterForFieldLASelector (con
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComTestReadObjects : the factory of component: com1-testcmds0x82bca1.TestReadObjects
+// comFactory4pComTestPackDeltaObjects : the factory of component: com1-testcmds0x82bca1.TestPackDeltaObjects
+type comFactory4pComTestPackDeltaObjects struct {
+
+    mPrototype * testcmds0x82bca1.TestPackDeltaObjects
+
+	
+	mWDSelector config.InjectionSelector
+	mLASelector config.InjectionSelector
+
+}
+
+func (inst * comFactory4pComTestPackDeltaObjects) init() application.ComponentFactory {
+
+	
+	inst.mWDSelector = config.NewInjectionSelector("${test.repo.path}",nil)
+	inst.mLASelector = config.NewInjectionSelector("#git-lib-agent",nil)
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComTestPackDeltaObjects) newObject() * testcmds0x82bca1.TestPackDeltaObjects {
+	return & testcmds0x82bca1.TestPackDeltaObjects {}
+}
+
+func (inst * comFactory4pComTestPackDeltaObjects) castObject(instance application.ComponentInstance) * testcmds0x82bca1.TestPackDeltaObjects {
+	return instance.Get().(*testcmds0x82bca1.TestPackDeltaObjects)
+}
+
+func (inst * comFactory4pComTestPackDeltaObjects) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComTestPackDeltaObjects) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComTestPackDeltaObjects) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComTestPackDeltaObjects) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComTestPackDeltaObjects) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComTestPackDeltaObjects) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	
+	obj := inst.castObject(instance)
+	obj.WD = inst.getterForFieldWDSelector(context)
+	obj.LA = inst.getterForFieldLASelector(context)
+	return context.LastError()
+}
+
+//getterForFieldWDSelector
+func (inst * comFactory4pComTestPackDeltaObjects) getterForFieldWDSelector (context application.InstanceContext) string {
+    return inst.mWDSelector.GetString(context)
+}
+
+//getterForFieldLASelector
+func (inst * comFactory4pComTestPackDeltaObjects) getterForFieldLASelector (context application.InstanceContext) store0x8467b3.LibAgent {
+
+	o1 := inst.mLASelector.GetOne(context)
+	o2, ok := o1.(store0x8467b3.LibAgent)
+	if !ok {
+		eb := &util.ErrorBuilder{}
+		eb.Message("bad cast")
+		eb.Set("com", "com1-testcmds0x82bca1.TestPackDeltaObjects")
+		eb.Set("field", "LA")
+		eb.Set("type1", "?")
+		eb.Set("type2", "store0x8467b3.LibAgent")
+		context.HandleError(eb.Create())
+		return nil
+	}
+	return o2
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComTestReadObjects : the factory of component: com2-testcmds0x82bca1.TestReadObjects
 type comFactory4pComTestReadObjects struct {
 
     mPrototype * testcmds0x82bca1.TestReadObjects
@@ -227,7 +321,7 @@ func (inst * comFactory4pComTestReadObjects) getterForFieldLASelector (context a
 	if !ok {
 		eb := &util.ErrorBuilder{}
 		eb.Message("bad cast")
-		eb.Set("com", "com1-testcmds0x82bca1.TestReadObjects")
+		eb.Set("com", "com2-testcmds0x82bca1.TestReadObjects")
 		eb.Set("field", "LA")
 		eb.Set("type1", "?")
 		eb.Set("type2", "store0x8467b3.LibAgent")
@@ -241,7 +335,7 @@ func (inst * comFactory4pComTestReadObjects) getterForFieldLASelector (context a
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComTestReadPackIdx : the factory of component: com2-testcmds0x82bca1.TestReadPackIdx
+// comFactory4pComTestReadPackIdx : the factory of component: com3-testcmds0x82bca1.TestReadPackIdx
 type comFactory4pComTestReadPackIdx struct {
 
     mPrototype * testcmds0x82bca1.TestReadPackIdx
@@ -312,7 +406,7 @@ func (inst * comFactory4pComTestReadPackIdx) getterForFieldLASelector (context a
 	if !ok {
 		eb := &util.ErrorBuilder{}
 		eb.Message("bad cast")
-		eb.Set("com", "com2-testcmds0x82bca1.TestReadPackIdx")
+		eb.Set("com", "com3-testcmds0x82bca1.TestReadPackIdx")
 		eb.Set("field", "LA")
 		eb.Set("type1", "?")
 		eb.Set("type2", "store0x8467b3.LibAgent")
@@ -326,14 +420,15 @@ func (inst * comFactory4pComTestReadPackIdx) getterForFieldLASelector (context a
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComTestPoint : the factory of component: com3-demo0x52dcb1.TestPoint
+// comFactory4pComTestPoint : the factory of component: com4-demo0x52dcb1.TestPoint
 type comFactory4pComTestPoint struct {
 
     mPrototype * demo0x52dcb1.TestPoint
 
 	
+	mContextSelector config.InjectionSelector
 	mAgentSelector config.InjectionSelector
-	mCommandSelector config.InjectionSelector
+	mCmdKeySelector config.InjectionSelector
 	mWDSelector config.InjectionSelector
 
 }
@@ -341,8 +436,9 @@ type comFactory4pComTestPoint struct {
 func (inst * comFactory4pComTestPoint) init() application.ComponentFactory {
 
 	
+	inst.mContextSelector = config.NewInjectionSelector("context",nil)
 	inst.mAgentSelector = config.NewInjectionSelector("#git-lib-agent",nil)
-	inst.mCommandSelector = config.NewInjectionSelector("${test.gitlib.command}",nil)
+	inst.mCmdKeySelector = config.NewInjectionSelector("${test.gitlib.command}",nil)
 	inst.mWDSelector = config.NewInjectionSelector("${test.repo.path}",nil)
 
 
@@ -381,10 +477,16 @@ func (inst * comFactory4pComTestPoint) Destroy(instance application.ComponentIns
 func (inst * comFactory4pComTestPoint) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
 	
 	obj := inst.castObject(instance)
+	obj.Context = inst.getterForFieldContextSelector(context)
 	obj.Agent = inst.getterForFieldAgentSelector(context)
-	obj.Command = inst.getterForFieldCommandSelector(context)
+	obj.CmdKey = inst.getterForFieldCmdKeySelector(context)
 	obj.WD = inst.getterForFieldWDSelector(context)
 	return context.LastError()
+}
+
+//getterForFieldContextSelector
+func (inst * comFactory4pComTestPoint) getterForFieldContextSelector (context application.InstanceContext) application.Context {
+    return context.Context()
 }
 
 //getterForFieldAgentSelector
@@ -395,7 +497,7 @@ func (inst * comFactory4pComTestPoint) getterForFieldAgentSelector (context appl
 	if !ok {
 		eb := &util.ErrorBuilder{}
 		eb.Message("bad cast")
-		eb.Set("com", "com3-demo0x52dcb1.TestPoint")
+		eb.Set("com", "com4-demo0x52dcb1.TestPoint")
 		eb.Set("field", "Agent")
 		eb.Set("type1", "?")
 		eb.Set("type2", "store0x8467b3.LibAgent")
@@ -405,9 +507,9 @@ func (inst * comFactory4pComTestPoint) getterForFieldAgentSelector (context appl
 	return o2
 }
 
-//getterForFieldCommandSelector
-func (inst * comFactory4pComTestPoint) getterForFieldCommandSelector (context application.InstanceContext) string {
-    return inst.mCommandSelector.GetString(context)
+//getterForFieldCmdKeySelector
+func (inst * comFactory4pComTestPoint) getterForFieldCmdKeySelector (context application.InstanceContext) string {
+    return inst.mCmdKeySelector.GetString(context)
 }
 
 //getterForFieldWDSelector

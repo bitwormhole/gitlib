@@ -2,27 +2,45 @@ package gitlib
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/starter"
 )
 
-// New 初始化git模块
-func New(cfg *store.ContextConfiguration) store.Lib {
+var theLib store.Lib
 
-	if cfg == nil {
-		cfg = GetDefaultConfiguration()
+// GetLib 函数用来取Lib对象
+func GetLib() store.Lib {
+	lib := theLib
+	if lib != nil {
+		return lib
 	}
-
-	storeContext, err := cfg.Factory.Create(cfg)
+	lib, err := createNewLib()
 	if err != nil {
 		panic(err)
 	}
-
-	lib := storeContext.Lib
-	if lib == nil {
-		panic("lib is nil")
-	}
+	theLib = lib
 	return lib
+}
+
+func createNewLib() (store.Lib, error) {
+	mod := Module()
+	i := starter.InitApp()
+	i.UseMain(mod)
+	rt, err := i.RunEx()
+	if err != nil {
+		panic(err)
+	}
+	o, err := rt.Context().GetComponent("#git-lib-agent")
+	if err != nil {
+		return nil, err
+	}
+	agent, ok := o.(store.LibAgent)
+	if !ok {
+		return nil, fmt.Errorf("it's not a store.LibAgent")
+	}
+	return agent.GetLib()
 }
 
 // Bind ...

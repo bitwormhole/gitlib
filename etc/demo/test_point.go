@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"bitwormhole.com/starter/cli"
+	"bitwormhole.com/starter/vlog"
 	"github.com/bitwormhole/gitlib/git/store"
 	"github.com/bitwormhole/starter/application"
 	"github.com/bitwormhole/starter/markup"
@@ -13,9 +14,10 @@ import (
 type TestPoint struct {
 	markup.Component `class:"life"`
 
-	Agent   store.LibAgent `inject:"#git-lib-agent"`
-	Command string         `inject:"${test.gitlib.command}"`
-	WD      string         `inject:"${test.repo.path}"`
+	Context application.Context `inject:"context"`
+	Agent   store.LibAgent      `inject:"#git-lib-agent"`
+	CmdKey  string              `inject:"${test.gitlib.command}"` // use 'command.n' to get content
+	WD      string              `inject:"${test.repo.path}"`
 }
 
 func (inst *TestPoint) _Impl() application.LifeRegistry {
@@ -41,12 +43,24 @@ func (inst *TestPoint) start() error {
 	ctx = lib.Bind(ctx)
 	ctx = cli2.Bind(ctx)
 
-	cmd := inst.Command
 	wd := inst.WD
+	cmd, err := inst.getCommand()
+	if err != nil {
+		return err
+	}
+
+	vlog.Info("do test with command: ", cmd)
+	vlog.Info("                  wd: ", wd)
 
 	return cli2.GetClient().Run(&cli.Task{
 		Context: ctx,
 		Command: cmd,
 		WD:      wd,
 	})
+}
+
+func (inst *TestPoint) getCommand() (string, error) {
+	key := "command." + inst.CmdKey
+	ctx := inst.Context
+	return ctx.GetProperties().GetPropertyRequired(key)
 }

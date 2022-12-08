@@ -1,6 +1,9 @@
 package testcmds
 
 import (
+	"bytes"
+	"fmt"
+	"io"
 	"strings"
 
 	"bitwormhole.com/starter/cli"
@@ -147,7 +150,38 @@ func (inst *TestReadObjects) scanTree(item *git.TreeItem, session store.Session,
 func (inst *TestReadObjects) scanBlob(item *git.TreeItem, session store.Session, depth int) error {
 
 	oid := item.ID
-	vlog.Warn("scan blob ", oid.String())
+	vlog.Debug("scan blob ", oid.String())
+
+	info, in, err := session.ReadObject(item.ID)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		in.Close()
+	}()
+
+	t := info.Type
+	l := info.Length
+	h := fmt.Sprintf("%v %v.", t, l)
+	head := []byte(h)
+	head[len(head)-1] = 0
+
+	hash := session.GetRepository().Digest().New()
+	hash.Write(head)
+
+	cb, err := io.Copy(hash, in)
+	if err != nil {
+		return err
+	}
+	if cb != l {
+		return fmt.Errorf("bad length, want:%v have:%v", l, cb)
+	}
+
+	sum1 := oid.Bytes()
+	sum2 := hash.Sum(nil)
+	if !bytes.Equal(sum1, sum2) {
+		return fmt.Errorf("bad sum, want:%v have:%v", sum1, sum2)
+	}
 
 	return nil
 }

@@ -68,19 +68,18 @@ func (inst *packDaoImpl) ReadPackObject(po store.PackObject) (*git.Object, io.Re
 		return nil, nil, fmt.Errorf("param is nil")
 	}
 	pid := po.Container().GetID()
+	oid := po.GetID()
 	if pid == nil {
 		return nil, nil, fmt.Errorf("pid is nil")
 	}
-	q := &PackQuery{PID: pid}
-	ok := inst.cache.Query(q)
-	if !ok {
-		return nil, nil, fmt.Errorf("no pack with id:%v", pid.String())
+	if oid == nil {
+		return nil, nil, fmt.Errorf("oid is nil")
 	}
-	holder := q.ResultHolder
 	readerbuilder := packEntityReaderBuilder{
 		session: inst.session,
-		pack:    holder.entity,
-		want:    q.ResultItem,
+		wantPID: pid,
+		wantOID: oid,
+		pc:      inst.cache,
 	}
 	hx, in2, err := readerbuilder.open()
 	if err != nil {
@@ -110,7 +109,7 @@ func (inst *packDaoImpl) CheckPack(pid git.PackID, flags pack.CheckFlag) error {
 	}
 
 	idx := holder.idx
-	ent := holder.entity
+	ent := holder.pack
 
 	err := idx.Check(flags)
 	if err != nil {

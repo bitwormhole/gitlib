@@ -472,6 +472,22 @@ func (inst *entity7bitsBuffer) parseSize() int64 {
 }
 
 func (inst *entity7bitsBuffer) parseDeltaOffset() (int64, error) {
+	return inst.parseGitVLQ()
+}
+
+func (inst *entity7bitsBuffer) parseSimple7bitsInt() (int64, error) {
+	const (
+		mask7b = 0x7f
+	)
+	num := int64(0)
+	for i := inst.length - 1; i >= 0; i-- {
+		n := inst.data[i]
+		num = (num << 7) | (int64(n) & mask7b)
+	}
+	return num, nil
+}
+
+func (inst *entity7bitsBuffer) parseGitVLQ() (int64, error) {
 	// as Git-VLQ formatted int
 	const (
 		maskContinue = uint8(128) // 1000 000
@@ -495,6 +511,26 @@ func (inst *entity7bitsBuffer) parseDeltaOffset() (int64, error) {
 		v = (v << lengthBits) + int64(c&maskLength)
 	}
 	return v, nil
+}
+
+// ReadGitVLQ ... 读取 git 格式的变长整数
+func ReadGitVLQ(in io.Reader) (int64, error) {
+	b := entity7bitsBuffer{}
+	err := b.load(in)
+	if err != nil {
+		return 0, err
+	}
+	return b.parseGitVLQ()
+}
+
+// ReadSimple7bitsInt ... 读取 git 格式的变长整数
+func ReadSimple7bitsInt(in io.Reader) (int64, error) {
+	b := entity7bitsBuffer{}
+	err := b.load(in)
+	if err != nil {
+		return 0, err
+	}
+	return b.parseSimple7bitsInt()
 }
 
 ////////////////////////////////////////////////////////////////////////////////

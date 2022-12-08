@@ -18,10 +18,10 @@ type PackQuerySN int64
 type PackHolder struct {
 	key     PackHolderKey
 	pid     git.PackID
-	pack    store.Pack
+	packRef store.Pack
 	session store.Session
 	idx     pack.Idx
-	entity  pack.Pack
+	pack    pack.Pack
 	hitAt   PackQuerySN
 }
 
@@ -75,14 +75,14 @@ func (inst *PackHolder) init(p store.Pack, session store.Session) error {
 	inst.session = session
 	inst.pid = pid
 	inst.key = PackHolderKey(pid.String())
-	inst.pack = p
+	inst.packRef = p
 	return nil
 }
 
 func (inst *PackHolder) load() error {
 
 	session := inst.session
-	p := inst.pack
+	p := inst.packRef
 
 	pool := session.GetReaderPool()
 	digest := session.GetRepository().Digest()
@@ -116,6 +116,6 @@ func (inst *PackHolder) load() error {
 
 	// done
 	inst.idx = idx
-	inst.entity = ent
+	inst.pack = ent
 	return nil
 }

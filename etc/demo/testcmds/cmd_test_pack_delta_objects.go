@@ -3,6 +3,7 @@ package testcmds
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"sort"
 	"strings"
 
@@ -14,13 +15,13 @@ import (
 	"github.com/bitwormhole/starter/markup"
 )
 
-type tagListObjectsInPackItem struct {
-	i git.PackIndexItem
-	p git.PackedObjectHeaderEx
-}
+// type tagListObjectsInPackItem struct {
+// 	i git.PackIndexItem
+// 	p git.PackedObjectHeaderEx
+// }
 
-// TestListObjectsInPack ...
-type TestListObjectsInPack struct {
+// TestPackDeltaObjects ...
+type TestPackDeltaObjects struct {
 	markup.Component `class:"cli-handler-registry"`
 
 	WD string         `inject:"${test.repo.path}"`
@@ -30,20 +31,20 @@ type TestListObjectsInPack struct {
 	countRead int64
 }
 
-func (inst *TestListObjectsInPack) _Impl() cli.HandlerRegistry {
+func (inst *TestPackDeltaObjects) _Impl() cli.HandlerRegistry {
 	return inst
 }
 
 // GetHandlers ...
-func (inst *TestListObjectsInPack) GetHandlers() []*cli.HandlerRegistration {
+func (inst *TestPackDeltaObjects) GetHandlers() []*cli.HandlerRegistration {
 	hr := &cli.HandlerRegistration{
-		Name:    "test-list-objects-in-pack",
+		Name:    "test-pack-delta-objects",
 		Handler: inst.run,
 	}
 	return []*cli.HandlerRegistration{hr}
 }
 
-func (inst *TestListObjectsInPack) run(task *cli.Task) error {
+func (inst *TestPackDeltaObjects) run(task *cli.Task) error {
 
 	lib, err := inst.LA.GetLib()
 	if err != nil {
@@ -70,12 +71,10 @@ func (inst *TestListObjectsInPack) run(task *cli.Task) error {
 		}
 	}
 
-	inst.log(session)
-
 	return nil
 }
 
-func (inst *TestListObjectsInPack) loadObjectsInPack(pid git.PackID, session store.Session) error {
+func (inst *TestPackDeltaObjects) loadObjectsInPack(pid git.PackID, session store.Session) error {
 
 	vlog.Info("print objects info in pack:", pid.String())
 
@@ -102,11 +101,12 @@ func (inst *TestListObjectsInPack) loadObjectsInPack(pid git.PackID, session sto
 	}
 
 	inst.sort()
+	inst.log(session)
 
 	return nil
 }
 
-func (inst *TestListObjectsInPack) readObjectInfo(pack pack.Pack, item *git.PackIndexItem) (*git.PackedObjectHeaderEx, error) {
+func (inst *TestPackDeltaObjects) readObjectInfo(pack pack.Pack, item *git.PackIndexItem) (*git.PackedObjectHeaderEx, error) {
 	hx, in, err := pack.OpenObjectReader(item, nil)
 	if err != nil {
 		return nil, err
@@ -136,7 +136,7 @@ func (inst *TestListObjectsInPack) readObjectInfo(pack pack.Pack, item *git.Pack
 	return hx, nil
 }
 
-func (inst *TestListObjectsInPack) log(session store.Session) {
+func (inst *TestPackDeltaObjects) log(session store.Session) {
 
 	sb := strings.Builder{}
 	for i, item := range inst.all {
@@ -157,7 +157,17 @@ func (inst *TestListObjectsInPack) log(session store.Session) {
 			sb.WriteString(fmt.Sprintf(" deltaOffset_abs:%v", abs))
 
 		} else if item.p.Type == git.PackedDeltaRef {
+
 		} else if item.p.Type == git.PackedCommit {
+			_, err := session.GetPacks().FindPackObject(item.i.OID)
+			if err != nil {
+				vlog.Error(err)
+			}
+		}
+
+		err := inst.parseDeltaRawContent(item, session)
+		if err != nil {
+			vlog.Error(err)
 		}
 
 		fmt.Println(sb.String())
@@ -166,14 +176,50 @@ func (inst *TestListObjectsInPack) log(session store.Session) {
 	fmt.Printf("count-read: %v bytes\n", inst.countRead)
 }
 
-func (inst *TestListObjectsInPack) add(itemIdx *git.PackIndexItem, itemPack *git.PackedObjectHeaderEx) {
+func (inst *TestPackDeltaObjects) parseDeltaRawContent(item *tagListObjectsInPackItem, session store.Session) error {
+
+	pid := item.p.PID
+	// oid := item.p.OID
+	pool := session.GetReaderPool()
+	repo := session.GetRepository()
+	p1 := repo.Objects().GetPack(pid)
+
+	p2, err := pack.NewPack(&pack.File{
+		Compression: repo.Compression(),
+		Digest:      repo.Digest(),
+		Path:        p1.GetDotPack(), //  EntityFile(),
+		Pool:        pool,
+		Type:        pack.FileTypePack,
+	})
+	if err != nil {
+		return err
+	}
+
+	for i := 5; i > 0; i-- {
+		hx, in, err := p2.OpenObjectReader(&item.i, nil)
+		if err != nil {
+			return err
+		}
+		defer func() {
+			in.Close()
+		}()
+		vlog.Debug("offset:", hx.Offset)
+		data, _ := ioutil.ReadAll(in)
+		count := len(data)
+		inst.countRead += int64(count)
+	}
+
+	return nil
+}
+
+func (inst *TestPackDeltaObjects) add(itemIdx *git.PackIndexItem, itemPack *git.PackedObjectHeaderEx) {
 	item := &tagListObjectsInPackItem{}
 	item.i = *itemIdx
 	item.p = *itemPack
 	inst.all = append(inst.all, item)
 }
 
-func (inst *TestListObjectsInPack) openPack(p store.Pack, session store.Session) (pack.Idx, pack.Pack, error) {
+func (inst *TestPackDeltaObjects) openPack(p store.Pack, session store.Session) (pack.Idx, pack.Pack, error) {
 
 	pool := session.GetReaderPool()
 	repo := session.GetRepository()
@@ -205,18 +251,18 @@ func (inst *TestListObjectsInPack) openPack(p store.Pack, session store.Session)
 	return idx, pk, nil
 }
 
-func (inst *TestListObjectsInPack) sort() {
+func (inst *TestPackDeltaObjects) sort() {
 	sort.Sort(inst)
 }
-func (inst *TestListObjectsInPack) Len() int {
+func (inst *TestPackDeltaObjects) Len() int {
 	return len(inst.all)
 }
-func (inst *TestListObjectsInPack) Less(i1, i2 int) bool {
+func (inst *TestPackDeltaObjects) Less(i1, i2 int) bool {
 	o1 := inst.all[i1]
 	o2 := inst.all[i2]
 	return o1.i.Index < o2.i.Index
 }
-func (inst *TestListObjectsInPack) Swap(i1, i2 int) {
+func (inst *TestPackDeltaObjects) Swap(i1, i2 int) {
 	o1 := inst.all[i1]
 	o2 := inst.all[i2]
 	inst.all[i1] = o2

@@ -1,8 +1,9 @@
 package lib
 
 import (
+	"fmt"
+
 	"bitwormhole.com/starter/cli"
-	"github.com/bitwormhole/gitlib"
 	"github.com/bitwormhole/gitlib/git/store"
 	"github.com/bitwormhole/gitlib/git/support"
 	"github.com/bitwormhole/starter/application"
@@ -61,7 +62,17 @@ func (inst *GitlibAgent) loadLib() (store.Lib, error) {
 	cfg.CLIConfig = nil
 	cfg.UseCLI = true
 
-	lib := gitlib.New(cfg)
+	/////////////////////////////////////////////////
+	// lib := gitlib.New(cfg)
+
+	storeContext, err := cfg.Factory.Create(cfg)
+	if err != nil {
+		return nil, err
+	}
+	lib := storeContext.Lib
+	if lib == nil {
+		return nil, fmt.Errorf("lib is nil")
+	}
 	return lib, nil
 }
 
