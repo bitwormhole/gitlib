@@ -7,6 +7,5 @@ type RemoteRefsLoader struct {
 
 // Load ...
 func (inst *RemoteRefsLoader) Load() error {
-
 	return nil
 }

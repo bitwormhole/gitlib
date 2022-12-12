@@ -7,6 +7,7 @@ package gitlibdemo
 import (
 	demo0x52dcb1 "github.com/bitwormhole/gitlib/etc/demo"
 	testcmds0x82bca1 "github.com/bitwormhole/gitlib/etc/demo/testcmds"
+	servers0xb5845d "github.com/bitwormhole/gitlib/git/network/servers"
 	store0x8467b3 "github.com/bitwormhole/gitlib/git/store"
 	application "github.com/bitwormhole/starter/application"
 	config "github.com/bitwormhole/starter/application/config"
@@ -64,9 +65,18 @@ func autoGenConfig(cb application.ConfigBuilder) error {
 		return err
 	}
 
-	// component: com4-demo0x52dcb1.TestPoint
+	// component: com4-testcmds0x82bca1.TestServerAPI
 	cominfobuilder.Next()
-	cominfobuilder.ID("com4-demo0x52dcb1.TestPoint").Class("life").Aliases("").Scope("")
+	cominfobuilder.ID("com4-testcmds0x82bca1.TestServerAPI").Class("cli-handler-registry").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComTestServerAPI{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com5-demo0x52dcb1.TestPoint
+	cominfobuilder.Next()
+	cominfobuilder.ID("com5-demo0x52dcb1.TestPoint").Class("life").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComTestPoint{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
@@ -420,7 +430,113 @@ func (inst * comFactory4pComTestReadPackIdx) getterForFieldLASelector (context a
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComTestPoint : the factory of component: com4-demo0x52dcb1.TestPoint
+// comFactory4pComTestServerAPI : the factory of component: com4-testcmds0x82bca1.TestServerAPI
+type comFactory4pComTestServerAPI struct {
+
+    mPrototype * testcmds0x82bca1.TestServerAPI
+
+	
+	mWDSelector config.InjectionSelector
+	mLASelector config.InjectionSelector
+	mMainServerSelector config.InjectionSelector
+
+}
+
+func (inst * comFactory4pComTestServerAPI) init() application.ComponentFactory {
+
+	
+	inst.mWDSelector = config.NewInjectionSelector("${test.repo.path}",nil)
+	inst.mLASelector = config.NewInjectionSelector("#git-lib-agent",nil)
+	inst.mMainServerSelector = config.NewInjectionSelector("#git-main-server",nil)
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComTestServerAPI) newObject() * testcmds0x82bca1.TestServerAPI {
+	return & testcmds0x82bca1.TestServerAPI {}
+}
+
+func (inst * comFactory4pComTestServerAPI) castObject(instance application.ComponentInstance) * testcmds0x82bca1.TestServerAPI {
+	return instance.Get().(*testcmds0x82bca1.TestServerAPI)
+}
+
+func (inst * comFactory4pComTestServerAPI) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComTestServerAPI) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComTestServerAPI) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComTestServerAPI) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComTestServerAPI) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComTestServerAPI) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	
+	obj := inst.castObject(instance)
+	obj.WD = inst.getterForFieldWDSelector(context)
+	obj.LA = inst.getterForFieldLASelector(context)
+	obj.MainServer = inst.getterForFieldMainServerSelector(context)
+	return context.LastError()
+}
+
+//getterForFieldWDSelector
+func (inst * comFactory4pComTestServerAPI) getterForFieldWDSelector (context application.InstanceContext) string {
+    return inst.mWDSelector.GetString(context)
+}
+
+//getterForFieldLASelector
+func (inst * comFactory4pComTestServerAPI) getterForFieldLASelector (context application.InstanceContext) store0x8467b3.LibAgent {
+
+	o1 := inst.mLASelector.GetOne(context)
+	o2, ok := o1.(store0x8467b3.LibAgent)
+	if !ok {
+		eb := &util.ErrorBuilder{}
+		eb.Message("bad cast")
+		eb.Set("com", "com4-testcmds0x82bca1.TestServerAPI")
+		eb.Set("field", "LA")
+		eb.Set("type1", "?")
+		eb.Set("type2", "store0x8467b3.LibAgent")
+		context.HandleError(eb.Create())
+		return nil
+	}
+	return o2
+}
+
+//getterForFieldMainServerSelector
+func (inst * comFactory4pComTestServerAPI) getterForFieldMainServerSelector (context application.InstanceContext) servers0xb5845d.MainServer {
+
+	o1 := inst.mMainServerSelector.GetOne(context)
+	o2, ok := o1.(servers0xb5845d.MainServer)
+	if !ok {
+		eb := &util.ErrorBuilder{}
+		eb.Message("bad cast")
+		eb.Set("com", "com4-testcmds0x82bca1.TestServerAPI")
+		eb.Set("field", "MainServer")
+		eb.Set("type1", "?")
+		eb.Set("type2", "servers0xb5845d.MainServer")
+		context.HandleError(eb.Create())
+		return nil
+	}
+	return o2
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComTestPoint : the factory of component: com5-demo0x52dcb1.TestPoint
 type comFactory4pComTestPoint struct {
 
     mPrototype * demo0x52dcb1.TestPoint
@@ -497,7 +613,7 @@ func (inst * comFactory4pComTestPoint) getterForFieldAgentSelector (context appl
 	if !ok {
 		eb := &util.ErrorBuilder{}
 		eb.Message("bad cast")
-		eb.Set("com", "com4-demo0x52dcb1.TestPoint")
+		eb.Set("com", "com5-demo0x52dcb1.TestPoint")
 		eb.Set("field", "Agent")
 		eb.Set("type1", "?")
 		eb.Set("type2", "store0x8467b3.LibAgent")

@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"bitwormhole.com/starter/afs"
-	"github.com/bitwormhole/gitlib/git"
 	"github.com/bitwormhole/gitlib/git/gitconfig"
 	"github.com/bitwormhole/gitlib/git/network/pktline"
 	"github.com/bitwormhole/gitlib/git/store"
@@ -19,22 +18,20 @@ type Context struct {
 	Path       afs.Path
 	Connection pktline.Connection
 
-	Actions Actions
+	// Actions Actions
 
 	// collections
 	Branches map[string]*gitconfig.Branch // all
 	Remotes  map[string]*gitconfig.Remote // all
 	RnB      []*gitconfig.RemoteAndBranch
+	Intents  []*Intent
 
 	// current
-	RemoteName    string
-	URL           string
+	Intent        Intent
 	RawRemote     gitconfig.Remote
 	RawBranch     gitconfig.Branch
 	FetchTemplate gitconfig.FetchRefspecTemplate
-	MergeRef      git.ReferenceName // like 'refs/heads/main'
-	FetchRef      git.ReferenceName // like 'refs/remotes/origin/main'
-	RemoteRef     git.ReferenceName // like 'refs/heads/main'
+	RemoteName    string
 }
 
 // Init ...
@@ -84,6 +81,7 @@ func (inst *Context) OpenSession() (store.Session, error) {
 func (inst *Context) OpenConnection(params *pktline.ConnParams) (pktline.Connection, error) {
 
 	conn := inst.Connection
+	intent := &inst.Intent
 	if conn != nil {
 		return conn, nil
 	}
@@ -95,7 +93,7 @@ func (inst *Context) OpenConnection(params *pktline.ConnParams) (pktline.Connect
 		params.Service = pktline.ServiceGitUploadPack
 	}
 	if params.URL == "" {
-		params.URL = inst.URL
+		params.URL = intent.URL
 	}
 	if params.Method == "" {
 		params.Method = http.MethodGet

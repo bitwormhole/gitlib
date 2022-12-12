@@ -8,8 +8,13 @@ import (
 	cli0xf7c71e "bitwormhole.com/starter/cli"
 	lib0x4595be "github.com/bitwormhole/gitlib/etc/lib"
 	git0x229c8a "github.com/bitwormhole/gitlib/git"
+	clients0x465781 "github.com/bitwormhole/gitlib/git/network/clients"
+	http0xe484f4 "github.com/bitwormhole/gitlib/git/network/http"
 	pktline0xd37953 "github.com/bitwormhole/gitlib/git/network/pktline"
+	servers0xb5845d "github.com/bitwormhole/gitlib/git/network/servers"
 	store0x8467b3 "github.com/bitwormhole/gitlib/git/store"
+	http4git0x537f63 "github.com/bitwormhole/gitlib/git/support/net/http4git"
+	services0x887aef "github.com/bitwormhole/gitlib/git/support/services"
 	application "github.com/bitwormhole/starter/application"
 	config "github.com/bitwormhole/starter/application/config"
 	lang "github.com/bitwormhole/starter/lang"
@@ -30,126 +35,180 @@ func autoGenConfig(cb application.ConfigBuilder) error {
 	cominfobuilder := config.ComInfo()
 	nop(err,cominfobuilder)
 
-	// component: com0-lib0x4595be.ConfigAlgorithms
+	// component: git-main-client
 	cominfobuilder.Next()
-	cominfobuilder.ID("com0-lib0x4595be.ConfigAlgorithms").Class("git-context-configurer").Aliases("").Scope("")
+	cominfobuilder.ID("git-main-client").Class("").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComMainClientImpl{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com1-http0xe484f4.GitClient
+	cominfobuilder.Next()
+	cominfobuilder.ID("com1-http0xe484f4.GitClient").Class("git-client-registry").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComGitClient{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: git-main-server
+	cominfobuilder.Next()
+	cominfobuilder.ID("git-main-server").Class("").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComMainServerImpl{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com3-http4git0x537f63.HTTPGitConnector
+	cominfobuilder.Next()
+	cominfobuilder.ID("com3-http4git0x537f63.HTTPGitConnector").Class("pktline-connector-registry").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComHTTPGitConnector{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com4-services0x887aef.GitFetchService
+	cominfobuilder.Next()
+	cominfobuilder.ID("com4-services0x887aef.GitFetchService").Class("git-instruction-registry").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComGitFetchService{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com5-services0x887aef.GitPushService
+	cominfobuilder.Next()
+	cominfobuilder.ID("com5-services0x887aef.GitPushService").Class("git-instruction-registry").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComGitPushService{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com6-lib0x4595be.ConfigAlgorithms
+	cominfobuilder.Next()
+	cominfobuilder.ID("com6-lib0x4595be.ConfigAlgorithms").Class("git-context-configurer").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigAlgorithms{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com1-lib0x4595be.TheSHA1
+	// component: com7-lib0x4595be.TheSHA1
 	cominfobuilder.Next()
-	cominfobuilder.ID("com1-lib0x4595be.TheSHA1").Class("git-algorithm-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com7-lib0x4595be.TheSHA1").Class("git-algorithm-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComTheSHA1{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com2-lib0x4595be.TheSHA256
+	// component: com8-lib0x4595be.TheSHA256
 	cominfobuilder.Next()
-	cominfobuilder.ID("com2-lib0x4595be.TheSHA256").Class("git-algorithm-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com8-lib0x4595be.TheSHA256").Class("git-algorithm-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComTheSHA256{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com3-lib0x4595be.TheSHA512
+	// component: com9-lib0x4595be.TheSHA512
 	cominfobuilder.Next()
-	cominfobuilder.ID("com3-lib0x4595be.TheSHA512").Class("git-algorithm-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com9-lib0x4595be.TheSHA512").Class("git-algorithm-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComTheSHA512{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com4-lib0x4595be.TheMD5
+	// component: com10-lib0x4595be.TheMD5
 	cominfobuilder.Next()
-	cominfobuilder.ID("com4-lib0x4595be.TheMD5").Class("git-algorithm-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com10-lib0x4595be.TheMD5").Class("git-algorithm-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComTheMD5{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com5-lib0x4595be.TheDeflate
+	// component: com11-lib0x4595be.TheDeflate
 	cominfobuilder.Next()
-	cominfobuilder.ID("com5-lib0x4595be.TheDeflate").Class("git-algorithm-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com11-lib0x4595be.TheDeflate").Class("git-algorithm-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComTheDeflate{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com6-lib0x4595be.ThePlain
+	// component: com12-lib0x4595be.ThePlain
 	cominfobuilder.Next()
-	cominfobuilder.ID("com6-lib0x4595be.ThePlain").Class("git-algorithm-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com12-lib0x4595be.ThePlain").Class("git-algorithm-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComThePlain{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com7-lib0x4595be.ConfigCommands
+	// component: com13-lib0x4595be.ConfigCommands
 	cominfobuilder.Next()
-	cominfobuilder.ID("com7-lib0x4595be.ConfigCommands").Class("cli-handler-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com13-lib0x4595be.ConfigCommands").Class("cli-handler-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigCommands{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com8-lib0x4595be.ConfigConnectors
+	// component: com14-lib0x4595be.ConfigConnectors
 	cominfobuilder.Next()
-	cominfobuilder.ID("com8-lib0x4595be.ConfigConnectors").Class("git-context-configurer").Aliases("").Scope("")
+	cominfobuilder.ID("com14-lib0x4595be.ConfigConnectors").Class("git-context-configurer").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigConnectors{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com9-lib0x4595be.HTTPGitConnectorReg
+	// component: com15-lib0x4595be.HTTPGitConnectorReg
 	cominfobuilder.Next()
-	cominfobuilder.ID("com9-lib0x4595be.HTTPGitConnectorReg").Class("pktline-connector-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com15-lib0x4595be.HTTPGitConnectorReg").Class("pktline-connector-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComHTTPGitConnectorReg{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com10-lib0x4595be.ConfigContextBase
+	// component: com16-lib0x4595be.ConfigContextBase
 	cominfobuilder.Next()
-	cominfobuilder.ID("com10-lib0x4595be.ConfigContextBase").Class("git-context-configurer").Aliases("").Scope("")
+	cominfobuilder.ID("com16-lib0x4595be.ConfigContextBase").Class("git-context-configurer").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigContextBase{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com11-lib0x4595be.ConfigContextWithInstructions
+	// component: com17-lib0x4595be.ConfigContextWithInstructions
 	cominfobuilder.Next()
-	cominfobuilder.ID("com11-lib0x4595be.ConfigContextWithInstructions").Class("git-context-configurer").Aliases("").Scope("")
+	cominfobuilder.ID("com17-lib0x4595be.ConfigContextWithInstructions").Class("git-context-configurer").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigContextWithInstructions{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com12-lib0x4595be.ConfigCore
+	// component: com18-lib0x4595be.ConfigCore
 	cominfobuilder.Next()
-	cominfobuilder.ID("com12-lib0x4595be.ConfigCore").Class("git-core-configurer").Aliases("").Scope("")
+	cominfobuilder.ID("com18-lib0x4595be.ConfigCore").Class("git-core-configurer").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigCore{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com13-lib0x4595be.ConfigInstructions
+	// component: com19-lib0x4595be.ConfigInstructions
 	cominfobuilder.Next()
-	cominfobuilder.ID("com13-lib0x4595be.ConfigInstructions").Class("git-instruction-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com19-lib0x4595be.ConfigInstructions").Class("git-instruction-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigInstructions{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
@@ -172,7 +231,413 @@ func autoGenConfig(cb application.ConfigBuilder) error {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigAlgorithms : the factory of component: com0-lib0x4595be.ConfigAlgorithms
+// comFactory4pComMainClientImpl : the factory of component: git-main-client
+type comFactory4pComMainClientImpl struct {
+
+    mPrototype * clients0x465781.MainClientImpl
+
+	
+	mClientRegistryListSelector config.InjectionSelector
+
+}
+
+func (inst * comFactory4pComMainClientImpl) init() application.ComponentFactory {
+
+	
+	inst.mClientRegistryListSelector = config.NewInjectionSelector(".git-client-registry",nil)
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComMainClientImpl) newObject() * clients0x465781.MainClientImpl {
+	return & clients0x465781.MainClientImpl {}
+}
+
+func (inst * comFactory4pComMainClientImpl) castObject(instance application.ComponentInstance) * clients0x465781.MainClientImpl {
+	return instance.Get().(*clients0x465781.MainClientImpl)
+}
+
+func (inst * comFactory4pComMainClientImpl) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComMainClientImpl) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComMainClientImpl) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComMainClientImpl) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComMainClientImpl) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComMainClientImpl) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	
+	obj := inst.castObject(instance)
+	obj.ClientRegistryList = inst.getterForFieldClientRegistryListSelector(context)
+	return context.LastError()
+}
+
+//getterForFieldClientRegistryListSelector
+func (inst * comFactory4pComMainClientImpl) getterForFieldClientRegistryListSelector (context application.InstanceContext) []clients0x465781.ClientRegistry {
+	list1 := inst.mClientRegistryListSelector.GetList(context)
+	list2 := make([]clients0x465781.ClientRegistry, 0, len(list1))
+	for _, item1 := range list1 {
+		item2, ok := item1.(clients0x465781.ClientRegistry)
+		if ok {
+			list2 = append(list2, item2)
+		}
+	}
+	return list2
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComGitClient : the factory of component: com1-http0xe484f4.GitClient
+type comFactory4pComGitClient struct {
+
+    mPrototype * http0xe484f4.GitClient
+
+	
+
+}
+
+func (inst * comFactory4pComGitClient) init() application.ComponentFactory {
+
+	
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComGitClient) newObject() * http0xe484f4.GitClient {
+	return & http0xe484f4.GitClient {}
+}
+
+func (inst * comFactory4pComGitClient) castObject(instance application.ComponentInstance) * http0xe484f4.GitClient {
+	return instance.Get().(*http0xe484f4.GitClient)
+}
+
+func (inst * comFactory4pComGitClient) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComGitClient) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComGitClient) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComGitClient) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComGitClient) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComGitClient) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	return nil
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComMainServerImpl : the factory of component: git-main-server
+type comFactory4pComMainServerImpl struct {
+
+    mPrototype * servers0xb5845d.MainServerImpl
+
+	
+	mServerRegistryListSelector config.InjectionSelector
+
+}
+
+func (inst * comFactory4pComMainServerImpl) init() application.ComponentFactory {
+
+	
+	inst.mServerRegistryListSelector = config.NewInjectionSelector(".git-server-registry",nil)
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComMainServerImpl) newObject() * servers0xb5845d.MainServerImpl {
+	return & servers0xb5845d.MainServerImpl {}
+}
+
+func (inst * comFactory4pComMainServerImpl) castObject(instance application.ComponentInstance) * servers0xb5845d.MainServerImpl {
+	return instance.Get().(*servers0xb5845d.MainServerImpl)
+}
+
+func (inst * comFactory4pComMainServerImpl) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComMainServerImpl) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComMainServerImpl) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComMainServerImpl) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComMainServerImpl) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComMainServerImpl) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	
+	obj := inst.castObject(instance)
+	obj.ServerRegistryList = inst.getterForFieldServerRegistryListSelector(context)
+	return context.LastError()
+}
+
+//getterForFieldServerRegistryListSelector
+func (inst * comFactory4pComMainServerImpl) getterForFieldServerRegistryListSelector (context application.InstanceContext) []servers0xb5845d.ServerRegistry {
+	list1 := inst.mServerRegistryListSelector.GetList(context)
+	list2 := make([]servers0xb5845d.ServerRegistry, 0, len(list1))
+	for _, item1 := range list1 {
+		item2, ok := item1.(servers0xb5845d.ServerRegistry)
+		if ok {
+			list2 = append(list2, item2)
+		}
+	}
+	return list2
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComHTTPGitConnector : the factory of component: com3-http4git0x537f63.HTTPGitConnector
+type comFactory4pComHTTPGitConnector struct {
+
+    mPrototype * http4git0x537f63.HTTPGitConnector
+
+	
+
+}
+
+func (inst * comFactory4pComHTTPGitConnector) init() application.ComponentFactory {
+
+	
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComHTTPGitConnector) newObject() * http4git0x537f63.HTTPGitConnector {
+	return & http4git0x537f63.HTTPGitConnector {}
+}
+
+func (inst * comFactory4pComHTTPGitConnector) castObject(instance application.ComponentInstance) * http4git0x537f63.HTTPGitConnector {
+	return instance.Get().(*http4git0x537f63.HTTPGitConnector)
+}
+
+func (inst * comFactory4pComHTTPGitConnector) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComHTTPGitConnector) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComHTTPGitConnector) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComHTTPGitConnector) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComHTTPGitConnector) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComHTTPGitConnector) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	return nil
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComGitFetchService : the factory of component: com4-services0x887aef.GitFetchService
+type comFactory4pComGitFetchService struct {
+
+    mPrototype * services0x887aef.GitFetchService
+
+	
+	mMainClientSelector config.InjectionSelector
+
+}
+
+func (inst * comFactory4pComGitFetchService) init() application.ComponentFactory {
+
+	
+	inst.mMainClientSelector = config.NewInjectionSelector("#git-main-client",nil)
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComGitFetchService) newObject() * services0x887aef.GitFetchService {
+	return & services0x887aef.GitFetchService {}
+}
+
+func (inst * comFactory4pComGitFetchService) castObject(instance application.ComponentInstance) * services0x887aef.GitFetchService {
+	return instance.Get().(*services0x887aef.GitFetchService)
+}
+
+func (inst * comFactory4pComGitFetchService) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComGitFetchService) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComGitFetchService) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComGitFetchService) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComGitFetchService) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComGitFetchService) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	
+	obj := inst.castObject(instance)
+	obj.MainClient = inst.getterForFieldMainClientSelector(context)
+	return context.LastError()
+}
+
+//getterForFieldMainClientSelector
+func (inst * comFactory4pComGitFetchService) getterForFieldMainClientSelector (context application.InstanceContext) clients0x465781.MainClient {
+
+	o1 := inst.mMainClientSelector.GetOne(context)
+	o2, ok := o1.(clients0x465781.MainClient)
+	if !ok {
+		eb := &util.ErrorBuilder{}
+		eb.Message("bad cast")
+		eb.Set("com", "com4-services0x887aef.GitFetchService")
+		eb.Set("field", "MainClient")
+		eb.Set("type1", "?")
+		eb.Set("type2", "clients0x465781.MainClient")
+		context.HandleError(eb.Create())
+		return nil
+	}
+	return o2
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComGitPushService : the factory of component: com5-services0x887aef.GitPushService
+type comFactory4pComGitPushService struct {
+
+    mPrototype * services0x887aef.GitPushService
+
+	
+	mMainClientSelector config.InjectionSelector
+
+}
+
+func (inst * comFactory4pComGitPushService) init() application.ComponentFactory {
+
+	
+	inst.mMainClientSelector = config.NewInjectionSelector("#git-main-client",nil)
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComGitPushService) newObject() * services0x887aef.GitPushService {
+	return & services0x887aef.GitPushService {}
+}
+
+func (inst * comFactory4pComGitPushService) castObject(instance application.ComponentInstance) * services0x887aef.GitPushService {
+	return instance.Get().(*services0x887aef.GitPushService)
+}
+
+func (inst * comFactory4pComGitPushService) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComGitPushService) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComGitPushService) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComGitPushService) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComGitPushService) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComGitPushService) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	
+	obj := inst.castObject(instance)
+	obj.MainClient = inst.getterForFieldMainClientSelector(context)
+	return context.LastError()
+}
+
+//getterForFieldMainClientSelector
+func (inst * comFactory4pComGitPushService) getterForFieldMainClientSelector (context application.InstanceContext) clients0x465781.MainClient {
+
+	o1 := inst.mMainClientSelector.GetOne(context)
+	o2, ok := o1.(clients0x465781.MainClient)
+	if !ok {
+		eb := &util.ErrorBuilder{}
+		eb.Message("bad cast")
+		eb.Set("com", "com5-services0x887aef.GitPushService")
+		eb.Set("field", "MainClient")
+		eb.Set("type1", "?")
+		eb.Set("type2", "clients0x465781.MainClient")
+		context.HandleError(eb.Create())
+		return nil
+	}
+	return o2
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComConfigAlgorithms : the factory of component: com6-lib0x4595be.ConfigAlgorithms
 type comFactory4pComConfigAlgorithms struct {
 
     mPrototype * lib0x4595be.ConfigAlgorithms
@@ -244,7 +709,7 @@ func (inst * comFactory4pComConfigAlgorithms) getterForFieldAlgorithmsSelector (
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComTheSHA1 : the factory of component: com1-lib0x4595be.TheSHA1
+// comFactory4pComTheSHA1 : the factory of component: com7-lib0x4595be.TheSHA1
 type comFactory4pComTheSHA1 struct {
 
     mPrototype * lib0x4595be.TheSHA1
@@ -298,7 +763,7 @@ func (inst * comFactory4pComTheSHA1) Inject(instance application.ComponentInstan
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComTheSHA256 : the factory of component: com2-lib0x4595be.TheSHA256
+// comFactory4pComTheSHA256 : the factory of component: com8-lib0x4595be.TheSHA256
 type comFactory4pComTheSHA256 struct {
 
     mPrototype * lib0x4595be.TheSHA256
@@ -352,7 +817,7 @@ func (inst * comFactory4pComTheSHA256) Inject(instance application.ComponentInst
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComTheSHA512 : the factory of component: com3-lib0x4595be.TheSHA512
+// comFactory4pComTheSHA512 : the factory of component: com9-lib0x4595be.TheSHA512
 type comFactory4pComTheSHA512 struct {
 
     mPrototype * lib0x4595be.TheSHA512
@@ -406,7 +871,7 @@ func (inst * comFactory4pComTheSHA512) Inject(instance application.ComponentInst
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComTheMD5 : the factory of component: com4-lib0x4595be.TheMD5
+// comFactory4pComTheMD5 : the factory of component: com10-lib0x4595be.TheMD5
 type comFactory4pComTheMD5 struct {
 
     mPrototype * lib0x4595be.TheMD5
@@ -460,7 +925,7 @@ func (inst * comFactory4pComTheMD5) Inject(instance application.ComponentInstanc
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComTheDeflate : the factory of component: com5-lib0x4595be.TheDeflate
+// comFactory4pComTheDeflate : the factory of component: com11-lib0x4595be.TheDeflate
 type comFactory4pComTheDeflate struct {
 
     mPrototype * lib0x4595be.TheDeflate
@@ -514,7 +979,7 @@ func (inst * comFactory4pComTheDeflate) Inject(instance application.ComponentIns
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComThePlain : the factory of component: com6-lib0x4595be.ThePlain
+// comFactory4pComThePlain : the factory of component: com12-lib0x4595be.ThePlain
 type comFactory4pComThePlain struct {
 
     mPrototype * lib0x4595be.ThePlain
@@ -568,7 +1033,7 @@ func (inst * comFactory4pComThePlain) Inject(instance application.ComponentInsta
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigCommands : the factory of component: com7-lib0x4595be.ConfigCommands
+// comFactory4pComConfigCommands : the factory of component: com13-lib0x4595be.ConfigCommands
 type comFactory4pComConfigCommands struct {
 
     mPrototype * lib0x4595be.ConfigCommands
@@ -622,7 +1087,7 @@ func (inst * comFactory4pComConfigCommands) Inject(instance application.Componen
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigConnectors : the factory of component: com8-lib0x4595be.ConfigConnectors
+// comFactory4pComConfigConnectors : the factory of component: com14-lib0x4595be.ConfigConnectors
 type comFactory4pComConfigConnectors struct {
 
     mPrototype * lib0x4595be.ConfigConnectors
@@ -694,7 +1159,7 @@ func (inst * comFactory4pComConfigConnectors) getterForFieldConnectorsSelector (
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComHTTPGitConnectorReg : the factory of component: com9-lib0x4595be.HTTPGitConnectorReg
+// comFactory4pComHTTPGitConnectorReg : the factory of component: com15-lib0x4595be.HTTPGitConnectorReg
 type comFactory4pComHTTPGitConnectorReg struct {
 
     mPrototype * lib0x4595be.HTTPGitConnectorReg
@@ -748,7 +1213,7 @@ func (inst * comFactory4pComHTTPGitConnectorReg) Inject(instance application.Com
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigContextBase : the factory of component: com10-lib0x4595be.ConfigContextBase
+// comFactory4pComConfigContextBase : the factory of component: com16-lib0x4595be.ConfigContextBase
 type comFactory4pComConfigContextBase struct {
 
     mPrototype * lib0x4595be.ConfigContextBase
@@ -802,7 +1267,7 @@ func (inst * comFactory4pComConfigContextBase) Inject(instance application.Compo
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigContextWithInstructions : the factory of component: com11-lib0x4595be.ConfigContextWithInstructions
+// comFactory4pComConfigContextWithInstructions : the factory of component: com17-lib0x4595be.ConfigContextWithInstructions
 type comFactory4pComConfigContextWithInstructions struct {
 
     mPrototype * lib0x4595be.ConfigContextWithInstructions
@@ -874,7 +1339,7 @@ func (inst * comFactory4pComConfigContextWithInstructions) getterForFieldInstruc
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigCore : the factory of component: com12-lib0x4595be.ConfigCore
+// comFactory4pComConfigCore : the factory of component: com18-lib0x4595be.ConfigCore
 type comFactory4pComConfigCore struct {
 
     mPrototype * lib0x4595be.ConfigCore
@@ -928,7 +1393,7 @@ func (inst * comFactory4pComConfigCore) Inject(instance application.ComponentIns
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigInstructions : the factory of component: com13-lib0x4595be.ConfigInstructions
+// comFactory4pComConfigInstructions : the factory of component: com19-lib0x4595be.ConfigInstructions
 type comFactory4pComConfigInstructions struct {
 
     mPrototype * lib0x4595be.ConfigInstructions

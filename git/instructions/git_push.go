@@ -12,7 +12,27 @@ type Push struct {
 
 	Service PushService
 
-	// Path string
+	All                   bool
+	Mirror                bool
+	Tags                  bool
+	FollowTags            bool
+	Atomic                bool
+	DryRun                bool
+	ReceivePack           string
+	Repo                  string
+	Force                 bool
+	Delete                bool
+	Prune                 bool
+	Verbose               bool
+	SetUpstream           bool
+	PushOption            string
+	Signed                bool
+	SignedValue           string
+	NoSigned              bool
+	ForceWithLease        string
+	ForceIfIncludes       bool
+	NoVerify              bool
+	RepositoryRefspecList []string
 }
 
 // Run ...

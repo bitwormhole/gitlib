@@ -9,10 +9,14 @@ import (
 	"github.com/bitwormhole/gitlib/git/network/clients"
 	"github.com/bitwormhole/gitlib/git/network/pktline"
 	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/starter/markup"
 )
 
 // GitFetchService ...
 type GitFetchService struct {
+	markup.Component `class:"git-instruction-registry"`
+
+	MainClient clients.MainClient `inject:"#git-main-client"`
 }
 
 func (inst *GitFetchService) _Impl() (store.ServiceRegistry, instructions.FetchService) {
@@ -36,13 +40,14 @@ func (inst *GitFetchService) Name() string {
 
 // Run ...
 func (inst *GitFetchService) Run(task *instructions.Fetch) error {
-	t2 := innerGitFetchTask{instruction: task}
+	t2 := innerGitFetchTask{parent: inst, instruction: task}
 	return t2.run()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 type innerGitFetchTask struct {
+	parent      *GitFetchService
 	instruction *instructions.Fetch
 	targets     []*gitconfig.RemoteAndBranch
 }
@@ -74,8 +79,8 @@ func (inst *innerGitFetchTask) forLocal(cc *clients.Context) error {
 	cc.Session = session
 
 	// load remote & branch
-	remoteConfigLoader := cc.Actions.LoadRemoteConfig(cc)
-	err = remoteConfigLoader.Load()
+	actions := GetActions()
+	err = actions.LoadRemoteConfig(cc).Load()
 	if err != nil {
 		return err
 	}
@@ -85,17 +90,20 @@ func (inst *innerGitFetchTask) forLocal(cc *clients.Context) error {
 		return err
 	}
 
+	return inst.forRemotes(cc)
+}
+
+func (inst *innerGitFetchTask) forRemotes(cc *clients.Context) error {
 	// for remotes
 	remotes := cc.Remotes
 	for _, remote := range remotes {
 		cc.RawRemote = *remote
-		cc.URL = remote.URL
+		cc.Intent.URL = remote.URL
 		err := inst.forRemote(cc)
 		if err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
@@ -108,16 +116,12 @@ func (inst *innerGitFetchTask) forRemote(cc *clients.Context) error {
 	if err != nil {
 		return err
 	}
-	defer func() { conn.Close() }()
+	defer func() {
+		conn.Close()
+	}()
 	cc.Connection = conn
 
-	advLoader := cc.Actions.LoadAdvertisement(cc)
-	err = advLoader.Load()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return inst.parent.MainClient.Execute(cc)
 }
 
 func (inst *innerGitFetchTask) forBranch(cc *clients.Context) error {

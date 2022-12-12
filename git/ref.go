@@ -75,4 +75,10 @@ func (v ReferenceName) Normalize() ReferenceName {
 	return v.NormalizeWithType("heads")
 }
 
+// IsWildcard ...
+func (v ReferenceName) IsWildcard() bool {
+	str := string(v)
+	return strings.ContainsRune(str, '*')
+}
+
 ////////////////////////////////////////////////////////////////////////////////

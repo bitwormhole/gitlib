@@ -6,6 +6,7 @@ package gitlibdemo
 import (
 	demo0x52dcb1 "github.com/bitwormhole/gitlib/etc/demo"
 	testcmds0x82bca1 "github.com/bitwormhole/gitlib/etc/demo/testcmds"
+	servers0xb5845d "github.com/bitwormhole/gitlib/git/network/servers"
 	store0x8467b3 "github.com/bitwormhole/gitlib/git/store"
 	application0x67f6c5 "github.com/bitwormhole/starter/application"
 	markup0x23084a "github.com/bitwormhole/starter/markup"
@@ -40,6 +41,15 @@ type pComTestReadPackIdx struct {
 	 markup0x23084a.Component `class:"cli-handler-registry"`
 	WD string `inject:"${test.repo.path}"`
 	LA store0x8467b3.LibAgent `inject:"#git-lib-agent"`
+}
+
+
+type pComTestServerAPI struct {
+	instance *testcmds0x82bca1.TestServerAPI
+	 markup0x23084a.Component `class:"cli-handler-registry"`
+	WD string `inject:"${test.repo.path}"`
+	LA store0x8467b3.LibAgent `inject:"#git-lib-agent"`
+	MainServer servers0xb5845d.MainServer `inject:"#git-main-server"`
 }
 
 
