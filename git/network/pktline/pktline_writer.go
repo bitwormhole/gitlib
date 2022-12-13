@@ -94,8 +94,8 @@ func (inst *outputWriterCloser) Write(p *Packet) error {
 	builder := bytes.Buffer{}
 	builder.Write([]byte{0, 0, 0, 0})
 	builder.WriteString(head)
-	builder.WriteByte(0)
 	if body != nil {
+		builder.WriteByte(0)
 		builder.Write(body)
 	}
 
