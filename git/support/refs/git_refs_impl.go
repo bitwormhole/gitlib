@@ -13,7 +13,7 @@ type GitRefsImpl struct {
 	Core *store.Core
 
 	//cache
-	path afs.Path
+	cachedPath afs.Path
 }
 
 func (inst *GitRefsImpl) _Impl() store.Refs {
@@ -22,12 +22,12 @@ func (inst *GitRefsImpl) _Impl() store.Refs {
 
 // Path ...
 func (inst *GitRefsImpl) Path() afs.Path {
-	p := inst.path
+	p := inst.cachedPath
 	if p != nil {
 		return p
 	}
 	p = inst.Core.Layout.Refs()
-	inst.path = p
+	inst.cachedPath = p
 	return p
 }
 
@@ -47,5 +47,6 @@ func (inst *GitRefsImpl) GetRef(name git.ReferenceName) store.Ref {
 // List ...
 func (inst *GitRefsImpl) List() []git.ReferenceName {
 	f := finder{}
-	return f.find(inst.path)
+	path := inst.Path()
+	return f.find(path)
 }
