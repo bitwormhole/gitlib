@@ -3,7 +3,6 @@ package pktline
 import (
 	"fmt"
 	"io"
-	"time"
 )
 
 // Reader ...
@@ -129,19 +128,13 @@ func (inst *inputReaderCloser) Read() (*Packet, error) {
 
 func (inst *inputReaderCloser) readFrom(src io.Reader, buf []byte) error {
 	want := len(buf)
-	have := 0
-	for have < want {
-		n, err := src.Read(buf[have:])
-		if n > 0 {
-			have += n
-		} else {
-			time.Sleep(time.Millisecond)
-		}
-		if err != nil {
-			return err
-		}
+	have, err := io.ReadFull(src, buf)
+	if want == have {
+		return nil
+	} else if err == nil {
+		err = fmt.Errorf("bad read size, want:%v have:%v", want, have)
 	}
-	return nil
+	return err
 }
 
 func (inst *inputReaderCloser) getInt16(buf []byte) (int, error) {
