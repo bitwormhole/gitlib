@@ -12,6 +12,11 @@ type Writer interface {
 	Write(p *Packet) error
 }
 
+// WriterRaw ...
+type WriterRaw interface {
+	GetWriter() io.Writer
+}
+
 // WriterCloser ...
 type WriterCloser interface {
 	io.Closer
@@ -35,8 +40,12 @@ type outputWriterCloser struct {
 	enableAutoClose bool
 }
 
-func (inst *outputWriterCloser) _Impl() WriterCloser {
-	return inst
+func (inst *outputWriterCloser) _Impl() (WriterCloser, WriterRaw) {
+	return inst, inst
+}
+
+func (inst *outputWriterCloser) GetWriter() io.Writer {
+	return inst.out
 }
 
 // Close ...

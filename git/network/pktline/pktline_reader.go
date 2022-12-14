@@ -11,6 +11,11 @@ type Reader interface {
 	Read() (*Packet, error)
 }
 
+// ReaderRaw ...
+type ReaderRaw interface {
+	GetReader() io.Reader
+}
+
 // ReaderCloser ...
 type ReaderCloser interface {
 	Reader
@@ -34,8 +39,12 @@ type inputReaderCloser struct {
 	enableAutoClose bool
 }
 
-func (inst *inputReaderCloser) _Impl() ReaderCloser {
-	return inst
+func (inst *inputReaderCloser) _Impl() (ReaderCloser, ReaderRaw) {
+	return inst, inst
+}
+
+func (inst *inputReaderCloser) GetReader() io.Reader {
+	return inst.in
 }
 
 // Close ...

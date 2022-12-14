@@ -47,3 +47,19 @@ func TestReaderWriter(t *testing.T) {
 
 	t.Logf("%v", len(packs2))
 }
+
+func TestReaderRaw(t *testing.T) {
+	buf := &bytes.Buffer{}
+	r1 := NewReaderCloser(buf, false)
+	raw := r1.(ReaderRaw)
+	r2 := raw.GetReader()
+	r2.Read([]byte{0, 1, 2, 3})
+}
+
+func TestWriterRaw(t *testing.T) {
+	buf := &bytes.Buffer{}
+	w1 := NewWriterCloser(buf, false)
+	raw := w1.(WriterRaw)
+	w2 := raw.GetWriter()
+	w2.Write([]byte{0, 1, 2, 3})
+}
