@@ -13,8 +13,8 @@ import (
 
 const (
 	theModuleName     = "github.com/bitwormhole/gitlib"
-	theModuleVersion  = "v0.0.11"
-	theModuleRevision = 11
+	theModuleVersion  = "v0.0.12"
+	theModuleRevision = 12
 
 	theModuleResPath     = "src/main/resources"
 	theModuleTestResPath = "src/test/resources"
