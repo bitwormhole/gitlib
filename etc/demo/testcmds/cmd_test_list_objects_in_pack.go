@@ -92,13 +92,13 @@ func (inst *TestListObjectsInPack) loadObjectsInPack(pid git.PackID, session sto
 		return err
 	}
 
-	for _, item := range all {
-		// hx, err := pack.ReadObjectHeader(item, nil)
-		hx, err := inst.readObjectInfo(pack, item)
+	for _, item1 := range all {
+		item2 := pack.IndexToHeader(item1)
+		hx, err := inst.readObjectInfo(pack, item2)
 		if err != nil {
 			return err
 		}
-		inst.add(item, hx)
+		inst.add(item1, hx)
 	}
 
 	inst.sort()
@@ -106,7 +106,7 @@ func (inst *TestListObjectsInPack) loadObjectsInPack(pid git.PackID, session sto
 	return nil
 }
 
-func (inst *TestListObjectsInPack) readObjectInfo(pack pack.Pack, item *git.PackIndexItem) (*git.PackedObjectHeaderEx, error) {
+func (inst *TestListObjectsInPack) readObjectInfo(pack pack.Pack, item *git.PackedObjectHeaderEx) (*git.PackedObjectHeaderEx, error) {
 	hx, in, err := pack.OpenObjectReader(item, nil)
 	if err != nil {
 		return nil, err
@@ -214,7 +214,7 @@ func (inst *TestListObjectsInPack) Len() int {
 func (inst *TestListObjectsInPack) Less(i1, i2 int) bool {
 	o1 := inst.all[i1]
 	o2 := inst.all[i2]
-	return o1.i.Index < o2.i.Index
+	return o1.i.Offset < o2.i.Offset
 }
 func (inst *TestListObjectsInPack) Swap(i1, i2 int) {
 	o1 := inst.all[i1]

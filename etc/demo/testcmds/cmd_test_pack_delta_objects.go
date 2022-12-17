@@ -91,13 +91,13 @@ func (inst *TestPackDeltaObjects) loadObjectsInPack(pid git.PackID, session stor
 		return err
 	}
 
-	for _, item := range all {
-		// hx, err := pack.ReadObjectHeader(item, nil)
-		hx, err := inst.readObjectInfo(pack, item)
+	for _, item1 := range all {
+		item2 := pack.IndexToHeader(item1)
+		hx, err := inst.readObjectInfo(pack, item2)
 		if err != nil {
 			return err
 		}
-		inst.add(item, hx)
+		inst.add(item1, hx)
 	}
 
 	inst.sort()
@@ -106,7 +106,7 @@ func (inst *TestPackDeltaObjects) loadObjectsInPack(pid git.PackID, session stor
 	return nil
 }
 
-func (inst *TestPackDeltaObjects) readObjectInfo(pack pack.Pack, item *git.PackIndexItem) (*git.PackedObjectHeaderEx, error) {
+func (inst *TestPackDeltaObjects) readObjectInfo(pack pack.Pack, item *git.PackedObjectHeaderEx) (*git.PackedObjectHeaderEx, error) {
 	hx, in, err := pack.OpenObjectReader(item, nil)
 	if err != nil {
 		return nil, err
@@ -196,7 +196,7 @@ func (inst *TestPackDeltaObjects) parseDeltaRawContent(item *tagListObjectsInPac
 	}
 
 	for i := 5; i > 0; i-- {
-		hx, in, err := p2.OpenObjectReader(&item.i, nil)
+		hx, in, err := p2.OpenObjectReader(&item.p, nil)
 		if err != nil {
 			return err
 		}

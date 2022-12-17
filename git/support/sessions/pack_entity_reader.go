@@ -29,10 +29,10 @@ type packEntitySource interface {
 ////////////////////////////////////////////////////////////////////////////////
 
 type packEntityDeltaSource struct {
-	context    *packEntityContext
-	parent     packEntitySource
-	pack       pack.Pack
-	item       git.PackIndexItem
+	context *packEntityContext
+	parent  packEntitySource
+	pack    pack.Pack
+	// item       git.PackIndexItem
 	head       git.PackedObjectHeaderEx
 	sizeBefore int64
 	sizeAfter  int64
@@ -141,7 +141,7 @@ func (inst *packEntityDeltaSource) apply(di *DeltaInstruction, basedata []byte, 
 }
 
 func (inst *packEntityDeltaSource) openMySource() (io.ReadCloser, error) {
-	item := &inst.item
+	item := &inst.head
 	hx, in, err := inst.pack.OpenObjectReader(item, nil)
 	if err != nil {
 		return nil, err
@@ -210,8 +210,8 @@ func (inst *packEntityDeltaReader) Close() error {
 type packEntityBaseSource struct {
 	context *packEntityContext
 	pack    pack.Pack
-	item    git.PackIndexItem
-	head    git.PackedObjectHeaderEx
+	// item    git.PackIndexItem
+	head git.PackedObjectHeaderEx
 }
 
 func (inst *packEntityBaseSource) _Impl() packEntitySource {
@@ -227,7 +227,7 @@ func (inst *packEntityBaseSource) test() error {
 }
 
 func (inst *packEntityBaseSource) writeTo(dst io.Writer) (int64, error) {
-	item := &inst.item
+	item := &inst.head
 	_, src, err := inst.pack.OpenObjectReader(item, nil)
 	if err != nil {
 		return 0, err
@@ -272,7 +272,7 @@ type packEntityInfo struct {
 	idx     pack.Idx
 	pack    pack.Pack
 	head    *git.PackedObjectHeaderEx
-	item    *git.PackIndexItem
+	// item    *git.PackIndexItem
 }
 
 func (inst *packEntityInfo) isBaseObject() bool {
@@ -320,9 +320,8 @@ func (inst *packEntityInfo) loadParentForDeltaOFS() (*packEntityInfo, error) {
 		pack:    inst.pack,
 		idx:     inst.idx,
 		head:    nil,
-		item:    nil,
 	}
-	item := &git.PackIndexItem{
+	item := &git.PackedObjectHeaderEx{
 		Offset: parentOffset,
 	}
 	hx, err := parent.pack.ReadObjectHeader(item, nil)
@@ -330,7 +329,7 @@ func (inst *packEntityInfo) loadParentForDeltaOFS() (*packEntityInfo, error) {
 		return nil, err
 	}
 	parent.head = hx
-	parent.item = item
+	// parent.item = item
 	return parent, nil
 }
 
@@ -381,7 +380,7 @@ func (inst *packEntityReaderBuilder) open() (*git.PackedObjectHeaderEx, io.ReadC
 }
 
 func (inst *packEntityReaderBuilder) openAsSimpleObject(info *packEntityInfo) (*git.PackedObjectHeaderEx, io.ReadCloser, error) {
-	item := info.item
+	item := info.head
 	return info.pack.OpenObjectReader(item, nil)
 }
 
@@ -425,8 +424,8 @@ func (inst *packEntityReaderBuilder) makeSourceChain(list []*packEntityInfo) (pa
 			src := &packEntityBaseSource{
 				context: info.context,
 				pack:    info.pack,
-				item:    *info.item,
-				head:    *info.head,
+				// item:    *info.item,
+				head: *info.head,
 			}
 			chain = src
 		} else {
@@ -434,8 +433,8 @@ func (inst *packEntityReaderBuilder) makeSourceChain(list []*packEntityInfo) (pa
 				parent:  chain,
 				context: info.context,
 				pack:    info.pack,
-				item:    *info.item,
-				head:    *info.head,
+				// item:    *info.item,
+				head: *info.head,
 			}
 			chain = src
 		}
@@ -498,8 +497,10 @@ func (inst *packEntityReaderBuilder) loadLeafEntity() (*packEntityInfo, error) {
 	}
 	pid = q.PID
 
+	pack := q.ResultHolder.pack
 	item := q.ResultItem
-	hx, err := q.ResultHolder.pack.ReadObjectHeader(item, nil)
+	head := pack.IndexToHeader(item)
+	hx, err := pack.ReadObjectHeader(head, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -514,8 +515,8 @@ func (inst *packEntityReaderBuilder) loadLeafEntity() (*packEntityInfo, error) {
 		oid:     oid,
 		pack:    q.ResultHolder.pack,
 		idx:     q.ResultHolder.idx,
-		item:    item,
-		head:    hx,
+		// item:    item,
+		head: hx,
 	}
 	return leaf, nil
 }

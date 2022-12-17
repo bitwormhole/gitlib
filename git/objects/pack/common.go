@@ -12,9 +12,13 @@ type commonReader struct {
 	buffer4b [4]byte
 }
 
+func (inst *commonReader) readFull(in io.Reader, p []byte) (int, error) {
+	return io.ReadFull(in, p)
+}
+
 func (inst *commonReader) read4Bytes(in io.Reader) ([4]byte, error) {
 	buf := inst.buffer4b[:]
-	n, err := in.Read(buf)
+	n, err := inst.readFull(in, buf)
 	if n == len(buf) && err == nil {
 		return inst.buffer4b, nil
 	}
@@ -31,7 +35,7 @@ func (inst *commonReader) read4Bytes(in io.Reader) ([4]byte, error) {
 func (inst *commonReader) readUInt32(in io.Reader) (uint32, error) {
 	value := uint32(0)
 	buf := inst.buffer4b[:]
-	n, err := in.Read(buf)
+	n, err := inst.readFull(in, buf) // in.Read(buf)
 	if n == len(buf) {
 		for _, b := range buf {
 			value = (value << 8) | (0x00ff & uint32(b))
@@ -43,7 +47,7 @@ func (inst *commonReader) readUInt32(in io.Reader) (uint32, error) {
 func (inst *commonReader) readUInt64(in io.Reader) (uint64, error) {
 	value := uint64(0)
 	buf := inst.buffer8b[:]
-	n, err := in.Read(buf)
+	n, err := inst.readFull(in, buf) // in.Read(buf)
 	if n == len(buf) {
 		for _, b := range buf {
 			value = (value << 8) | (0x00ff & uint64(b))
@@ -84,7 +88,7 @@ func (inst *commonReader) readObjectID(in io.Reader, size git.HashSize) (git.Obj
 func (inst *commonReader) readHexID(in io.Reader, size git.HashSize) ([]byte, error) {
 	sizeInBytes := size.SizeInBytes()
 	buf := make([]byte, sizeInBytes)
-	n, err := in.Read(buf)
+	n, err := inst.readFull(in, buf) // in.Read(buf)
 	if err != nil {
 		return nil, err
 	}

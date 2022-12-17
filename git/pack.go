@@ -2,12 +2,14 @@ package git
 
 // PackIndexItem ...
 type PackIndexItem struct {
+	OID    ObjectID
+	Offset int64 // the offset in pack file
+	CRC32  uint32
+
+	// ext
 	PID        PackID
-	OID        ObjectID
 	Exists     bool
 	Index      int64 // the index in idx table
-	Offset     int64 // the offset in pack file
-	CRC32      uint32
 	Length     int64
 	Type       ObjectType
 	PackedType PackedObjectType // in-pack entity

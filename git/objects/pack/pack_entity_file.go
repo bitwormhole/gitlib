@@ -15,12 +15,16 @@ type Pack interface {
 	Reload() error
 	Check(flags CheckFlag) error
 	GetPackID() git.PackID
+	Scan() ([]*git.PackedObjectHeaderEx, error)
 
 	// 如果 pool 参数为 nil, 则使用内部的 pool 提供数据来源
-	OpenObjectReader(item *git.PackIndexItem, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, io.ReadCloser, error)
+	OpenObjectReader(item *git.PackedObjectHeaderEx, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, io.ReadCloser, error)
 
 	// 如果 pool 参数为 nil, 则使用内部的 pool 提供数据来源
-	ReadObjectHeader(item *git.PackIndexItem, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, error)
+	ReadObjectHeader(item *git.PackedObjectHeaderEx, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, error)
+
+	// 把 PackIndexItem 转换为 PackedObjectHeaderEx
+	IndexToHeader(item *git.PackIndexItem) *git.PackedObjectHeaderEx
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -200,7 +204,7 @@ func (inst *EntityFile) Reload() error {
 	return inst.Check(CheckSize | CheckHead)
 }
 
-func (inst *EntityFile) openRawReader(item *git.PackIndexItem, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, io.ReadCloser, error) {
+func (inst *EntityFile) openRawReader(item *git.PackedObjectHeaderEx, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, io.ReadCloser, error) {
 
 	if pool == nil {
 		pool = inst.file.Pool
@@ -241,8 +245,19 @@ func (inst *EntityFile) openRawReader(item *git.PackIndexItem, pool afs.ReaderPo
 	return hx, stream, nil
 }
 
+// IndexToHeader ...
+func (inst *EntityFile) IndexToHeader(src *git.PackIndexItem) *git.PackedObjectHeaderEx {
+	dst := &git.PackedObjectHeaderEx{}
+	dst.OID = src.OID
+	dst.PID = src.PID
+	dst.Offset = src.Offset
+	dst.Type = src.PackedType
+	dst.Size = src.Length
+	return dst
+}
+
 // OpenObjectReader ...
-func (inst *EntityFile) OpenObjectReader(item *git.PackIndexItem, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, io.ReadCloser, error) {
+func (inst *EntityFile) OpenObjectReader(item *git.PackedObjectHeaderEx, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, io.ReadCloser, error) {
 	hx, in1, err := inst.openRawReader(item, pool)
 	if err != nil {
 		return nil, nil, err
@@ -266,7 +281,7 @@ func (inst *EntityFile) OpenObjectReader(item *git.PackIndexItem, pool afs.Reade
 }
 
 // ReadObjectHeader ...
-func (inst *EntityFile) ReadObjectHeader(item *git.PackIndexItem, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, error) {
+func (inst *EntityFile) ReadObjectHeader(item *git.PackedObjectHeaderEx, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, error) {
 	hx, in, err := inst.openRawReader(item, pool)
 	if err != nil {
 		return nil, err
@@ -283,27 +298,14 @@ func (inst *EntityFile) ReadObjectHeader(item *git.PackIndexItem, pool afs.Reade
 	return hx, nil
 }
 
-// func (inst *EntityFile) tryReadBodyPlainData(raw io.Reader, hx *git.PackedObjectHeaderEx) error {
-
-// 	in, err := inst.file.Compression.NewReader(raw)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer func() {
-// 		in.Close()
-// 	}()
-
-// 	bin, err := ioutil.ReadAll(in)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	cb := len(bin)
-// 	t := hx.Type.ToObjectType().String()
-// 	vlog.Debug("read block in pack with size: ", cb, " type:", t)
-
-// 	return nil
-// }
+// Scan ...
+func (inst *EntityFile) Scan() ([]*git.PackedObjectHeaderEx, error) {
+	ctx := &idxBuilderContext{}
+	ctx.compression = inst.file.Compression
+	file := inst.file.Path
+	reader := &packObjectOffsetScanner{context: ctx}
+	return reader.scan(file)
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -344,7 +346,7 @@ func (inst *entityReader) Close() error {
 
 type entityHeaderReader struct{}
 
-func (inst *entityHeaderReader) seek(item *git.PackIndexItem, in io.ReadSeeker) error {
+func (inst *entityHeaderReader) seek(item *git.PackedObjectHeaderEx, in io.ReadSeeker) error {
 	pos1 := item.Offset
 	pos2, err := in.Seek(pos1, io.SeekStart)
 	if err != nil {
@@ -356,7 +358,7 @@ func (inst *entityHeaderReader) seek(item *git.PackIndexItem, in io.ReadSeeker) 
 	return nil
 }
 
-func (inst *entityHeaderReader) readHeader(item *git.PackIndexItem, in io.ReadSeeker) (*git.PackedObjectHeaderEx, error) {
+func (inst *entityHeaderReader) readHeader(item *git.PackedObjectHeaderEx, in io.Reader) (*git.PackedObjectHeaderEx, error) {
 
 	hx := &git.PackedObjectHeaderEx{}
 	hx.OID = item.OID
@@ -381,7 +383,7 @@ func (inst *entityHeaderReader) readHeader(item *git.PackIndexItem, in io.ReadSe
 	return hx, nil
 }
 
-func (inst *entityHeaderReader) readHeaderBase(hx *git.PackedObjectHeaderEx, in io.ReadSeeker) error {
+func (inst *entityHeaderReader) readHeaderBase(hx *git.PackedObjectHeaderEx, in io.Reader) error {
 	buffer := entity7bitsBuffer{}
 	err := buffer.load(in)
 	if err != nil {
@@ -392,7 +394,7 @@ func (inst *entityHeaderReader) readHeaderBase(hx *git.PackedObjectHeaderEx, in 
 	return nil
 }
 
-func (inst *entityHeaderReader) readHeaderDeltaOFS(hx *git.PackedObjectHeaderEx, in io.ReadSeeker) error {
+func (inst *entityHeaderReader) readHeaderDeltaOFS(hx *git.PackedObjectHeaderEx, in io.Reader) error {
 	buffer := entity7bitsBuffer{}
 	err := buffer.load(in)
 	if err != nil {
@@ -406,7 +408,7 @@ func (inst *entityHeaderReader) readHeaderDeltaOFS(hx *git.PackedObjectHeaderEx,
 	return nil
 }
 
-func (inst *entityHeaderReader) readHeaderDeltaRef(hx *git.PackedObjectHeaderEx, in io.ReadSeeker) error {
+func (inst *entityHeaderReader) readHeaderDeltaRef(hx *git.PackedObjectHeaderEx, in io.Reader) error {
 	pid := hx.PID
 	idsize := pid.Size()
 	cb1 := idsize.SizeInBytes()
