@@ -9,6 +9,7 @@ import (
 	"bitwormhole.com/starter/afs"
 	"github.com/bitwormhole/gitlib/git"
 	"github.com/bitwormhole/gitlib/git/data/gitfmt"
+	"github.com/bitwormhole/gitlib/git/objects"
 	"github.com/bitwormhole/gitlib/git/store"
 )
 
@@ -19,6 +20,7 @@ type sessionImpl struct {
 	pool      afs.ReaderPool
 	packDao   store.Packs
 	sparseDao store.SparseObjects
+	objctx    *objects.Context
 
 	tempFiles tempFileFactory
 }
@@ -79,6 +81,28 @@ func (inst *sessionImpl) GetLayout() store.RepositoryLayout {
 }
 
 // objects
+
+func (inst *sessionImpl) loadObjectContext() *objects.Context {
+	repo := inst.GetRepository()
+	ctx := &objects.Context{}
+	ctx.Compression = repo.Compression()
+	ctx.Digest = repo.Digest()
+	ctx.Pool = inst.GetReaderPool()
+	// todo ...
+	ctx.AllObjects = nil
+	ctx.SparseObjects = nil
+	ctx.PackedObjects = nil
+	return ctx
+}
+
+func (inst *sessionImpl) GetObjectContext() *objects.Context {
+	ctx := inst.objctx
+	if ctx == nil {
+		ctx = inst.loadObjectContext()
+		inst.objctx = ctx
+	}
+	return ctx
+}
 
 func (inst *sessionImpl) LoadText(id git.ObjectID) (string, *git.Object, error) {
 	bin, o, err := inst.LoadBinary(id)

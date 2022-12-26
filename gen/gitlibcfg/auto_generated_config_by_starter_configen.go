@@ -134,81 +134,90 @@ func autoGenConfig(cb application.ConfigBuilder) error {
 		return err
 	}
 
-	// component: com11-lib0x4595be.TheDeflate
+	// component: com11-lib0x4595be.TheCRC32
 	cominfobuilder.Next()
-	cominfobuilder.ID("com11-lib0x4595be.TheDeflate").Class("git-algorithm-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com11-lib0x4595be.TheCRC32").Class("git-algorithm-registry").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComTheCRC32{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com12-lib0x4595be.TheDeflate
+	cominfobuilder.Next()
+	cominfobuilder.ID("com12-lib0x4595be.TheDeflate").Class("git-algorithm-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComTheDeflate{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com12-lib0x4595be.ThePlain
+	// component: com13-lib0x4595be.ThePlain
 	cominfobuilder.Next()
-	cominfobuilder.ID("com12-lib0x4595be.ThePlain").Class("git-algorithm-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com13-lib0x4595be.ThePlain").Class("git-algorithm-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComThePlain{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com13-lib0x4595be.ConfigCommands
+	// component: com14-lib0x4595be.ConfigCommands
 	cominfobuilder.Next()
-	cominfobuilder.ID("com13-lib0x4595be.ConfigCommands").Class("cli-handler-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com14-lib0x4595be.ConfigCommands").Class("cli-handler-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigCommands{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com14-lib0x4595be.ConfigConnectors
+	// component: com15-lib0x4595be.ConfigConnectors
 	cominfobuilder.Next()
-	cominfobuilder.ID("com14-lib0x4595be.ConfigConnectors").Class("git-context-configurer").Aliases("").Scope("")
+	cominfobuilder.ID("com15-lib0x4595be.ConfigConnectors").Class("git-context-configurer").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigConnectors{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com15-lib0x4595be.HTTPGitConnectorReg
+	// component: com16-lib0x4595be.HTTPGitConnectorReg
 	cominfobuilder.Next()
-	cominfobuilder.ID("com15-lib0x4595be.HTTPGitConnectorReg").Class("pktline-connector-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com16-lib0x4595be.HTTPGitConnectorReg").Class("pktline-connector-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComHTTPGitConnectorReg{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com16-lib0x4595be.ConfigContextBase
+	// component: com17-lib0x4595be.ConfigContextBase
 	cominfobuilder.Next()
-	cominfobuilder.ID("com16-lib0x4595be.ConfigContextBase").Class("git-context-configurer").Aliases("").Scope("")
+	cominfobuilder.ID("com17-lib0x4595be.ConfigContextBase").Class("git-context-configurer").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigContextBase{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com17-lib0x4595be.ConfigContextWithInstructions
+	// component: com18-lib0x4595be.ConfigContextWithInstructions
 	cominfobuilder.Next()
-	cominfobuilder.ID("com17-lib0x4595be.ConfigContextWithInstructions").Class("git-context-configurer").Aliases("").Scope("")
+	cominfobuilder.ID("com18-lib0x4595be.ConfigContextWithInstructions").Class("git-context-configurer").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigContextWithInstructions{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com18-lib0x4595be.ConfigCore
+	// component: com19-lib0x4595be.ConfigCore
 	cominfobuilder.Next()
-	cominfobuilder.ID("com18-lib0x4595be.ConfigCore").Class("git-core-configurer").Aliases("").Scope("")
+	cominfobuilder.ID("com19-lib0x4595be.ConfigCore").Class("git-core-configurer").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigCore{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
 		return err
 	}
 
-	// component: com19-lib0x4595be.ConfigInstructions
+	// component: com20-lib0x4595be.ConfigInstructions
 	cominfobuilder.Next()
-	cominfobuilder.ID("com19-lib0x4595be.ConfigInstructions").Class("git-instruction-registry").Aliases("").Scope("")
+	cominfobuilder.ID("com20-lib0x4595be.ConfigInstructions").Class("git-instruction-registry").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComConfigInstructions{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
@@ -925,7 +934,61 @@ func (inst * comFactory4pComTheMD5) Inject(instance application.ComponentInstanc
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComTheDeflate : the factory of component: com11-lib0x4595be.TheDeflate
+// comFactory4pComTheCRC32 : the factory of component: com11-lib0x4595be.TheCRC32
+type comFactory4pComTheCRC32 struct {
+
+    mPrototype * lib0x4595be.TheCRC32
+
+	
+
+}
+
+func (inst * comFactory4pComTheCRC32) init() application.ComponentFactory {
+
+	
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComTheCRC32) newObject() * lib0x4595be.TheCRC32 {
+	return & lib0x4595be.TheCRC32 {}
+}
+
+func (inst * comFactory4pComTheCRC32) castObject(instance application.ComponentInstance) * lib0x4595be.TheCRC32 {
+	return instance.Get().(*lib0x4595be.TheCRC32)
+}
+
+func (inst * comFactory4pComTheCRC32) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComTheCRC32) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComTheCRC32) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComTheCRC32) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComTheCRC32) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComTheCRC32) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	return nil
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComTheDeflate : the factory of component: com12-lib0x4595be.TheDeflate
 type comFactory4pComTheDeflate struct {
 
     mPrototype * lib0x4595be.TheDeflate
@@ -979,7 +1042,7 @@ func (inst * comFactory4pComTheDeflate) Inject(instance application.ComponentIns
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComThePlain : the factory of component: com12-lib0x4595be.ThePlain
+// comFactory4pComThePlain : the factory of component: com13-lib0x4595be.ThePlain
 type comFactory4pComThePlain struct {
 
     mPrototype * lib0x4595be.ThePlain
@@ -1033,7 +1096,7 @@ func (inst * comFactory4pComThePlain) Inject(instance application.ComponentInsta
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigCommands : the factory of component: com13-lib0x4595be.ConfigCommands
+// comFactory4pComConfigCommands : the factory of component: com14-lib0x4595be.ConfigCommands
 type comFactory4pComConfigCommands struct {
 
     mPrototype * lib0x4595be.ConfigCommands
@@ -1087,7 +1150,7 @@ func (inst * comFactory4pComConfigCommands) Inject(instance application.Componen
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigConnectors : the factory of component: com14-lib0x4595be.ConfigConnectors
+// comFactory4pComConfigConnectors : the factory of component: com15-lib0x4595be.ConfigConnectors
 type comFactory4pComConfigConnectors struct {
 
     mPrototype * lib0x4595be.ConfigConnectors
@@ -1159,7 +1222,7 @@ func (inst * comFactory4pComConfigConnectors) getterForFieldConnectorsSelector (
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComHTTPGitConnectorReg : the factory of component: com15-lib0x4595be.HTTPGitConnectorReg
+// comFactory4pComHTTPGitConnectorReg : the factory of component: com16-lib0x4595be.HTTPGitConnectorReg
 type comFactory4pComHTTPGitConnectorReg struct {
 
     mPrototype * lib0x4595be.HTTPGitConnectorReg
@@ -1213,7 +1276,7 @@ func (inst * comFactory4pComHTTPGitConnectorReg) Inject(instance application.Com
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigContextBase : the factory of component: com16-lib0x4595be.ConfigContextBase
+// comFactory4pComConfigContextBase : the factory of component: com17-lib0x4595be.ConfigContextBase
 type comFactory4pComConfigContextBase struct {
 
     mPrototype * lib0x4595be.ConfigContextBase
@@ -1267,7 +1330,7 @@ func (inst * comFactory4pComConfigContextBase) Inject(instance application.Compo
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigContextWithInstructions : the factory of component: com17-lib0x4595be.ConfigContextWithInstructions
+// comFactory4pComConfigContextWithInstructions : the factory of component: com18-lib0x4595be.ConfigContextWithInstructions
 type comFactory4pComConfigContextWithInstructions struct {
 
     mPrototype * lib0x4595be.ConfigContextWithInstructions
@@ -1339,7 +1402,7 @@ func (inst * comFactory4pComConfigContextWithInstructions) getterForFieldInstruc
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigCore : the factory of component: com18-lib0x4595be.ConfigCore
+// comFactory4pComConfigCore : the factory of component: com19-lib0x4595be.ConfigCore
 type comFactory4pComConfigCore struct {
 
     mPrototype * lib0x4595be.ConfigCore
@@ -1393,7 +1456,7 @@ func (inst * comFactory4pComConfigCore) Inject(instance application.ComponentIns
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComConfigInstructions : the factory of component: com19-lib0x4595be.ConfigInstructions
+// comFactory4pComConfigInstructions : the factory of component: com20-lib0x4595be.ConfigInstructions
 type comFactory4pComConfigInstructions struct {
 
     mPrototype * lib0x4595be.ConfigInstructions

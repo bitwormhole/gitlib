@@ -1,4 +1,4 @@
-package sessions
+package pack
 
 import (
 	"bytes"
@@ -7,14 +7,12 @@ import (
 
 	"bitwormhole.com/starter/vlog"
 	"github.com/bitwormhole/gitlib/git"
-	"github.com/bitwormhole/gitlib/git/objects/pack"
-	"github.com/bitwormhole/gitlib/git/store"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
 
 type packEntityContext struct {
-	session store.Session
+	// session store.Session
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -31,7 +29,7 @@ type packEntitySource interface {
 type packEntityDeltaSource struct {
 	context *packEntityContext
 	parent  packEntitySource
-	pack    pack.Pack
+	pack    Pack
 	// item       git.PackIndexItem
 	head       git.PackedObjectHeaderEx
 	sizeBefore int64
@@ -142,7 +140,7 @@ func (inst *packEntityDeltaSource) apply(di *DeltaInstruction, basedata []byte, 
 
 func (inst *packEntityDeltaSource) openMySource() (io.ReadCloser, error) {
 	item := &inst.head
-	hx, in, err := inst.pack.OpenObjectReader(item, nil)
+	hx, in, err := inst.pack.OpenSimpleObjectReader(item, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +161,7 @@ func (inst *packEntityDeltaSource) openMySource() (io.ReadCloser, error) {
 	the2size := [2]int64{}
 	count := len(the2size)
 	for i := 0; i < count; i++ {
-		n, err := pack.ReadSimple7bitsInt(in)
+		n, err := ReadSimple7bitsInt(in)
 		if err != nil {
 			return nil, err
 		}
@@ -209,7 +207,7 @@ func (inst *packEntityDeltaReader) Close() error {
 
 type packEntityBaseSource struct {
 	context *packEntityContext
-	pack    pack.Pack
+	pack    Pack
 	// item    git.PackIndexItem
 	head git.PackedObjectHeaderEx
 }
@@ -228,7 +226,7 @@ func (inst *packEntityBaseSource) test() error {
 
 func (inst *packEntityBaseSource) writeTo(dst io.Writer) (int64, error) {
 	item := &inst.head
-	_, src, err := inst.pack.OpenObjectReader(item, nil)
+	_, src, err := inst.pack.OpenSimpleObjectReader(item, nil)
 	if err != nil {
 		return 0, err
 	}
@@ -269,8 +267,8 @@ type packEntityInfo struct {
 	context *packEntityContext
 	pid     git.PackID
 	oid     git.ObjectID
-	idx     pack.Idx
-	pack    pack.Pack
+	idx     Idx
+	pack    Pack
 	head    *git.PackedObjectHeaderEx
 	// item    *git.PackIndexItem
 }
@@ -324,7 +322,7 @@ func (inst *packEntityInfo) loadParentForDeltaOFS() (*packEntityInfo, error) {
 	item := &git.PackedObjectHeaderEx{
 		Offset: parentOffset,
 	}
-	hx, err := parent.pack.ReadObjectHeader(item, nil)
+	hx, err := parent.pack.ReadSimpleObjectHeader(item, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -359,13 +357,15 @@ func (inst *packEntityReader) Close() error {
 ////////////////////////////////////////////////////////////////////////////////
 
 type packEntityReaderBuilder struct {
-	session store.Session
-	wantPID git.PackID
-	wantOID git.ObjectID
-	pc      PackCache
+	// session store.Session
+	// wantPID git.PackID
+	// wantOID git.ObjectID
 
-	// pack    pack.Pack
+	// pc      PackCache
 	// want *git.PackIndexItem
+
+	pack Pack
+	head git.PackedObjectHeaderEx
 }
 
 func (inst *packEntityReaderBuilder) open() (*git.PackedObjectHeaderEx, io.ReadCloser, error) {
@@ -381,7 +381,7 @@ func (inst *packEntityReaderBuilder) open() (*git.PackedObjectHeaderEx, io.ReadC
 
 func (inst *packEntityReaderBuilder) openAsSimpleObject(info *packEntityInfo) (*git.PackedObjectHeaderEx, io.ReadCloser, error) {
 	item := info.head
-	return info.pack.OpenObjectReader(item, nil)
+	return info.pack.OpenSimpleObjectReader(item, nil)
 }
 
 func (inst *packEntityReaderBuilder) openAsDeltaChainObject(leaf *packEntityInfo) (*git.PackedObjectHeaderEx, io.ReadCloser, error) {
@@ -476,50 +476,71 @@ func (inst *packEntityReaderBuilder) makeMainHeader(list []*packEntityInfo, fian
 
 func (inst *packEntityReaderBuilder) loadLeafEntity() (*packEntityInfo, error) {
 
-	oid := inst.wantOID
-	pid := inst.wantPID
-	session := inst.session
-	if oid == nil {
-		return nil, fmt.Errorf("wanted oid is nil")
-	}
-	q := &PackQuery{
-		Session: session,
-		PID:     pid,
-		OID:     oid,
-	}
-	ok := inst.pc.Query(q)
-	if !ok {
-		err := q.Error
-		if err == nil {
-			err = fmt.Errorf("cannot find wanted object")
-		}
-		return nil, err
-	}
-	pid = q.PID
-
-	pack := q.ResultHolder.pack
-	item := q.ResultItem
-	head := pack.IndexToHeader(item)
-	hx, err := pack.ReadObjectHeader(head, nil)
+	hx := &inst.head
+	hx, err := inst.pack.ReadSimpleObjectHeader(hx, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	ctx := &packEntityContext{
-		session: session,
-	}
-
 	leaf := &packEntityInfo{
-		context: ctx,
-		pid:     pid,
-		oid:     oid,
-		pack:    q.ResultHolder.pack,
-		idx:     q.ResultHolder.idx,
+		// context: ctx,
+		// pid:     pid,
+		// oid:     oid,
+		// idx:     q.ResultHolder.idx,
 		// item:    item,
+
+		pack: inst.pack,
 		head: hx,
 	}
 	return leaf, nil
 }
+
+// func (inst *packEntityReaderBuilder) loadLeafEntity_old() (*packEntityInfo, error) {
+
+// 	oid := inst.wantOID
+// 	pid := inst.wantPID
+// 	session := inst.session
+// 	if oid == nil {
+// 		return nil, fmt.Errorf("wanted oid is nil")
+// 	}
+// 	q := &PackQuery{
+// 		Session: session,
+// 		PID:     pid,
+// 		OID:     oid,
+// 	}
+// 	ok := inst.pc.Query(q)
+// 	if !ok {
+// 		err := q.Error
+// 		if err == nil {
+// 			err = fmt.Errorf("cannot find wanted object")
+// 		}
+// 		return nil, err
+// 	}
+// 	pid = q.PID
+
+// 	pack := q.ResultHolder.pack
+// 	item := q.ResultItem
+// 	head := pack.IndexToHeader(item)
+// 	hx, err := pack.ReadObjectHeader(head, nil)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	ctx := &packEntityContext{
+// 		// session: session,
+// 	}
+
+// 	leaf := &packEntityInfo{
+// 		context: ctx,
+// 		pid:     pid,
+// 		oid:     oid,
+// 		pack:    q.ResultHolder.pack,
+// 		idx:     q.ResultHolder.idx,
+// 		// item:    item,
+// 		head: hx,
+// 	}
+// 	return leaf, nil
+// }
 
 func (inst *packEntityReaderBuilder) loadEntityList(leaf *packEntityInfo) ([]*packEntityInfo, error) {
 	list := make([]*packEntityInfo, 0)

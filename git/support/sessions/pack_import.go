@@ -106,13 +106,12 @@ func (inst *packImporter) checkImportPack(p *store.ImportPackParams) (*store.Imp
 }
 
 func (inst *packImporter) checkPackIdxFile(file afs.Path) (git.PackID, error) {
-	digest := inst.session.GetRepository().Digest()
-	pool := inst.session.GetReaderPool()
+	objCtx := inst.session.GetObjectContext()
+	packCtx := objCtx.NewPackContext(nil)
 	idx, err := pack.NewIdx(&pack.File{
-		Digest: digest,
-		Path:   file,
-		Pool:   pool,
-		Type:   pack.FileTypeIdx,
+		Context: packCtx,
+		Path:    file,
+		Type:    pack.FileTypeIdx,
 	})
 	if err != nil {
 		return nil, err
@@ -129,13 +128,12 @@ func (inst *packImporter) checkPackIdxFile(file afs.Path) (git.PackID, error) {
 }
 
 func (inst *packImporter) checkPackFile(file afs.Path) (git.PackID, error) {
-	digest := inst.session.GetRepository().Digest()
-	pool := inst.session.GetReaderPool()
+	objCtx := inst.session.GetObjectContext()
+	packCtx := objCtx.NewPackContext(nil)
 	pp, err := pack.NewPack(&pack.File{
-		Digest: digest,
-		Path:   file,
-		Pool:   pool,
-		Type:   pack.FileTypePack,
+		Context: packCtx,
+		Path:    file,
+		Type:    pack.FileTypePack,
 	})
 	if err != nil {
 		return nil, err

@@ -5,23 +5,22 @@ import (
 	"io"
 
 	"bitwormhole.com/starter/afs"
-	"github.com/bitwormhole/gitlib/git"
+	"github.com/bitwormhole/gitlib/git/objects"
 )
 
 // File ...
 type File struct {
-	Digest      git.Digest
-	Compression git.Compression
-	Pool        afs.ReaderPool
-	Path        afs.Path
-	Type        FileType
+	Context *objects.PackContext
+	Type    FileType
+	Path    afs.Path
 }
 
 // OpenReader ...
 func (inst *File) OpenReader() (io.ReadSeekCloser, error) {
-	pool := inst.Pool
+	ctx := inst.Context.Parent
+	pool := ctx.Pool
 	file := inst.Path
-	digest := inst.Digest
+	digest := ctx.Digest
 	if digest == nil {
 		return nil, fmt.Errorf("digest is nil")
 	}
@@ -52,10 +51,9 @@ func (inst *File) Clone() *File {
 	dst := &File{}
 	src := inst
 
+	dst.Context = src.Context
 	dst.Path = src.Path
 	dst.Type = src.Type
-	dst.Pool = src.Pool
-	dst.Digest = src.Digest
 
 	return dst
 }

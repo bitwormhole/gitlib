@@ -20,6 +20,14 @@ type pComTestGenIdxForPack struct {
 }
 
 
+type pComTestPackIdxCRC32 struct {
+	instance *testcmds0x82bca1.TestPackIdxCRC32
+	 markup0x23084a.Component `class:"cli-handler-registry"`
+	WD string `inject:"${test.repo.path}"`
+	LA store0x8467b3.LibAgent `inject:"#git-lib-agent"`
+}
+
+
 type pComTestListObjectsInPack struct {
 	instance *testcmds0x82bca1.TestListObjectsInPack
 	 markup0x23084a.Component `class:"cli-handler-registry"`

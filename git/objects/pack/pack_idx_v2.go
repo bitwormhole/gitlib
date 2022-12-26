@@ -165,7 +165,7 @@ func (inst *idxFileV2) checkHead() error {
 func (inst *idxFileV2) checkSize() error {
 
 	file := inst.file.Path
-	digest := inst.file.Digest
+	digest := inst.file.Context.Parent.Digest
 	// pool := inst.file.Pool
 
 	// check size
@@ -303,7 +303,8 @@ func (inst *idxFileV2dao) init(parent *idxFileV2) {
 
 	total := parent.total
 	pos := int64(0)
-	idsize := parent.file.Digest.Size()
+	digest := parent.file.Context.Parent.Digest
+	idsize := digest.Size()
 
 	// magic uint32
 	// version uint32
@@ -338,7 +339,8 @@ func (inst *idxFileV2dao) do(fn func() error) error {
 	}
 
 	f := inst.parent.file
-	in, err := f.Pool.OpenReader(f.Path, nil)
+	pool := f.Context.Parent.Pool
+	in, err := pool.OpenReader(f.Path, nil)
 	if err != nil {
 		return err
 	}

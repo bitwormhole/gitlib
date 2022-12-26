@@ -50,7 +50,7 @@ func (inst *packSumChecker) check(file *File) error {
 
 func (inst *packSumChecker) prepare(f *File) error {
 
-	digest := f.Digest
+	digest := f.Context.Parent.Digest
 	hashSize := digest.Size()
 	file := f.Path
 	fileSize := file.GetInfo().Length()

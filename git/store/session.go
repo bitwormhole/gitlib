@@ -5,6 +5,7 @@ import (
 
 	"bitwormhole.com/starter/afs"
 	"github.com/bitwormhole/gitlib/git"
+	"github.com/bitwormhole/gitlib/git/objects"
 )
 
 // Session ...
@@ -31,6 +32,8 @@ type Session interface {
 	NewReaderPool(size int) afs.ReaderPool
 
 	GetReaderPool() afs.ReaderPool
+
+	GetObjectContext() *objects.Context
 
 	/////////////////////////////////////////////////
 

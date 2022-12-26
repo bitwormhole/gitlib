@@ -17,6 +17,9 @@ type Pack interface {
 	GetPackID() git.PackID
 	Scan() ([]*git.PackedObjectHeaderEx, error)
 
+	OpenSimpleObjectReader(item *git.PackedObjectHeaderEx, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, io.ReadCloser, error)
+	ReadSimpleObjectHeader(item *git.PackedObjectHeaderEx, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, error)
+
 	// 如果 pool 参数为 nil, 则使用内部的 pool 提供数据来源
 	OpenObjectReader(item *git.PackedObjectHeaderEx, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, io.ReadCloser, error)
 
@@ -25,6 +28,20 @@ type Pack interface {
 
 	// 把 PackIndexItem 转换为 PackedObjectHeaderEx
 	IndexToHeader(item *git.PackIndexItem) *git.PackedObjectHeaderEx
+}
+
+// ComplexPack 表示一个 pack-*.pack 文件, 支持对象重建
+type ComplexPack interface {
+	Pack
+
+	// 打开 in-pack 对象读者，如果是 delta 对象，执行重建
+	OpenComplexObjectReader(item *git.PackedObjectHeaderEx, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, io.ReadCloser, error)
+
+	// 读取 in-pack 对象头，如果是 delta 对象，执行重建
+	ReadComplexObjectHeader(item *git.PackedObjectHeaderEx, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, error)
+
+	// 生成 .idx 文件
+	MakeIdx(idxFile afs.Path) error
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -41,6 +58,19 @@ func NewPack(file *File) (Pack, error) {
 		return nil, err
 	}
 	return p, nil
+}
+
+// NewComplexPack ...
+func NewComplexPack(file *File) (ComplexPack, error) {
+	inner, err := NewPack(file)
+	if err != nil {
+		return nil, err
+	}
+	facade := &packExWrapper{
+		inner: inner,
+		file:  file,
+	}
+	return facade, nil
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -207,7 +237,7 @@ func (inst *EntityFile) Reload() error {
 func (inst *EntityFile) openRawReader(item *git.PackedObjectHeaderEx, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, io.ReadCloser, error) {
 
 	if pool == nil {
-		pool = inst.file.Pool
+		pool = inst.file.Context.Parent.Pool
 	}
 
 	if pool == nil {
@@ -256,8 +286,8 @@ func (inst *EntityFile) IndexToHeader(src *git.PackIndexItem) *git.PackedObjectH
 	return dst
 }
 
-// OpenObjectReader ...
-func (inst *EntityFile) OpenObjectReader(item *git.PackedObjectHeaderEx, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, io.ReadCloser, error) {
+// OpenSimpleObjectReader ...
+func (inst *EntityFile) OpenSimpleObjectReader(item *git.PackedObjectHeaderEx, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, io.ReadCloser, error) {
 	hx, in1, err := inst.openRawReader(item, pool)
 	if err != nil {
 		return nil, nil, err
@@ -268,7 +298,8 @@ func (inst *EntityFile) OpenObjectReader(item *git.PackedObjectHeaderEx, pool af
 		}
 	}()
 	// unzip
-	in2, err := inst.file.Compression.NewReader(in1)
+	compre := inst.file.Context.Parent.Compression
+	in2, err := compre.NewReader(in1)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -280,8 +311,8 @@ func (inst *EntityFile) OpenObjectReader(item *git.PackedObjectHeaderEx, pool af
 	return hx, in3, nil
 }
 
-// ReadObjectHeader ...
-func (inst *EntityFile) ReadObjectHeader(item *git.PackedObjectHeaderEx, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, error) {
+// ReadSimpleObjectHeader ...
+func (inst *EntityFile) ReadSimpleObjectHeader(item *git.PackedObjectHeaderEx, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, error) {
 	hx, in, err := inst.openRawReader(item, pool)
 	if err != nil {
 		return nil, err
@@ -300,11 +331,20 @@ func (inst *EntityFile) ReadObjectHeader(item *git.PackedObjectHeaderEx, pool af
 
 // Scan ...
 func (inst *EntityFile) Scan() ([]*git.PackedObjectHeaderEx, error) {
-	ctx := &idxBuilderContext{}
-	ctx.compression = inst.file.Compression
+	ctx := inst.file.Context.Parent
 	file := inst.file.Path
 	reader := &packObjectOffsetScanner{context: ctx}
 	return reader.scan(file)
+}
+
+// OpenObjectReader ...
+func (inst *EntityFile) OpenObjectReader(item *git.PackedObjectHeaderEx, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, io.ReadCloser, error) {
+	return inst.OpenSimpleObjectReader(item, pool)
+}
+
+// ReadObjectHeader ...
+func (inst *EntityFile) ReadObjectHeader(item *git.PackedObjectHeaderEx, pool afs.ReaderPool) (*git.PackedObjectHeaderEx, error) {
+	return inst.ReadSimpleObjectHeader(item, pool)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -358,12 +398,19 @@ func (inst *entityHeaderReader) seek(item *git.PackedObjectHeaderEx, in io.ReadS
 	return nil
 }
 
+func (inst *entityHeaderReader) getPosition(in io.ReadSeeker) int64 {
+	n, err := in.Seek(0, io.SeekCurrent)
+	if err != nil {
+		n = 0
+	}
+	return n
+}
+
 func (inst *entityHeaderReader) readHeader(item *git.PackedObjectHeaderEx, in io.Reader) (*git.PackedObjectHeaderEx, error) {
 
 	hx := &git.PackedObjectHeaderEx{}
 	hx.OID = item.OID
 	hx.PID = item.PID
-	hx.Offset = item.Offset
 
 	err := inst.readHeaderBase(hx, in)
 	if err != nil {
@@ -380,6 +427,7 @@ func (inst *entityHeaderReader) readHeader(item *git.PackedObjectHeaderEx, in io
 		return nil, err
 	}
 
+	hx.Offset = item.Offset
 	return hx, nil
 }
 

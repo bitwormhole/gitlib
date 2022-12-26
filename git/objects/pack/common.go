@@ -100,9 +100,10 @@ func (inst *commonReader) readHexID(in io.Reader, size git.HashSize) ([]byte, er
 
 func (inst *commonReader) readPackFileTail(f *File) (git.PackID, git.PackID, error) {
 
+	ctx := f.Context.Parent
 	file := f.Path
-	digest := f.Digest
-	pool := f.Pool
+	digest := ctx.Digest
+	pool := ctx.Pool
 
 	// check size
 	idSize1 := digest.Size()
@@ -143,3 +144,49 @@ func (inst *commonReader) readPackFileTail(f *File) (git.PackID, git.PackID, err
 
 	return pid1, pid2, nil
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+type commonWriter struct {
+	buffer8b [8]byte
+	buffer4b [4]byte
+}
+
+func (inst *commonWriter) writeInt64(n int64, dst io.Writer) error {
+	value := n
+	data := inst.buffer8b[:]
+	size := len(data)
+	for i := size - 1; i >= 0; i-- {
+		data[i] = byte(value & 0x00ff)
+		value >>= 8
+	}
+	return inst.writeBytes(data, dst)
+}
+
+func (inst *commonWriter) writeUInt32(n uint32, dst io.Writer) error {
+	value := n
+	data := inst.buffer4b[:]
+	size := len(data)
+	for i := size - 1; i >= 0; i-- {
+		data[i] = byte(value & 0x00ff)
+		value >>= 8
+	}
+	return inst.writeBytes(data, dst)
+}
+
+func (inst *commonWriter) writeBytes(p []byte, dst io.Writer) error {
+	if p == nil || dst == nil {
+		return fmt.Errorf("param is nil")
+	}
+	have, err := dst.Write(p)
+	if err != nil {
+		return err
+	}
+	want := len(p)
+	if have != want {
+		return fmt.Errorf("bad writing-data size")
+	}
+	return nil
+}
+
+////////////////////////////////////////////////////////////////////////////////

@@ -56,6 +56,12 @@ type TheMD5 struct {
 	algorithms.DigestMD5
 }
 
+// TheCRC32 ...
+type TheCRC32 struct {
+	markup.Component `class:"git-algorithm-registry"`
+	algorithms.DigestCRC32
+}
+
 // TheDeflate  ...
 type TheDeflate struct {
 	markup.Component `class:"git-algorithm-registry"`

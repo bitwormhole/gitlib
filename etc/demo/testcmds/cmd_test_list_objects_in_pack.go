@@ -147,6 +147,7 @@ func (inst *TestListObjectsInPack) log(session store.Session) {
 		sb.WriteString(fmt.Sprintf(" index:%v", item.i.Index))
 		sb.WriteString(fmt.Sprintf(" offset:%v", item.i.Offset))
 		sb.WriteString(fmt.Sprintf(" length:%v", item.p.Size))
+		sb.WriteString(fmt.Sprintf(" crc32:%v", item.i.CRC32))
 		// sb.WriteString(fmt.Sprintf(" length-real:%v", item.p.RealSize))
 
 		sb.WriteString(fmt.Sprintf(" type:%v", item.p.Type.ToObjectType().String()))
@@ -175,28 +176,23 @@ func (inst *TestListObjectsInPack) add(itemIdx *git.PackIndexItem, itemPack *git
 
 func (inst *TestListObjectsInPack) openPack(p store.Pack, session store.Session) (pack.Idx, pack.Pack, error) {
 
-	pool := session.GetReaderPool()
-	repo := session.GetRepository()
-	compr := repo.Compression()
-	digest := repo.Digest()
+	pid := p.GetID()
+	objCtx := session.GetObjectContext()
+	packCtx := objCtx.NewPackContext(pid)
 
 	idx, err := pack.NewIdx(&pack.File{
-		Compression: compr,
-		Digest:      digest,
-		Path:        p.GetDotIdx(), //IndexFile(),
-		Pool:        pool,
-		Type:        pack.FileTypeIdx,
+		Context: packCtx,
+		Path:    p.GetDotIdx(), //IndexFile(),
+		Type:    pack.FileTypeIdx,
 	})
 	if err != nil {
 		return nil, nil, err
 	}
 
 	pk, err := pack.NewPack(&pack.File{
-		Compression: compr,
-		Digest:      digest,
-		Path:        p.GetDotPack(), // EntityFile(),
-		Pool:        pool,
-		Type:        pack.FileTypePack,
+		Context: packCtx,
+		Path:    p.GetDotPack(), // EntityFile(),
+		Type:    pack.FileTypePack,
 	})
 	if err != nil {
 		return nil, nil, err
@@ -214,7 +210,8 @@ func (inst *TestListObjectsInPack) Len() int {
 func (inst *TestListObjectsInPack) Less(i1, i2 int) bool {
 	o1 := inst.all[i1]
 	o2 := inst.all[i2]
-	return o1.i.Offset < o2.i.Offset
+	// return o1.i.Offset < o2.i.Offset
+	return o1.i.Index < o2.i.Index
 }
 func (inst *TestListObjectsInPack) Swap(i1, i2 int) {
 	o1 := inst.all[i1]

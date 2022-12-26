@@ -38,9 +38,14 @@ type PackedObjectHeader struct {
 type PackedObjectHeaderEx struct {
 	PackedObjectHeader
 
-	PID    PackID
-	OID    ObjectID
-	Offset int64
+	PID PackID
+	OID ObjectID
+
+	Offset int64 // head(type+length)
+	// Offset1 int64 //  end(type+length)
+	// Offset2 int64 // head(raw_data)
+	// Offset3 int64 //  end(raw_data)
+	CRC32 int64 // = idx.item[n].crc32
 
 	DeltaRef    ObjectID
 	DeltaOffset int64

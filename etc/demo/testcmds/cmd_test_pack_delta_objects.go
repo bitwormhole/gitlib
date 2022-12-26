@@ -180,16 +180,16 @@ func (inst *TestPackDeltaObjects) parseDeltaRawContent(item *tagListObjectsInPac
 
 	pid := item.p.PID
 	// oid := item.p.OID
-	pool := session.GetReaderPool()
 	repo := session.GetRepository()
 	p1 := repo.Objects().GetPack(pid)
 
+	objCtx := session.GetObjectContext()
+	packCtx := objCtx.NewPackContext(pid)
+
 	p2, err := pack.NewPack(&pack.File{
-		Compression: repo.Compression(),
-		Digest:      repo.Digest(),
-		Path:        p1.GetDotPack(), //  EntityFile(),
-		Pool:        pool,
-		Type:        pack.FileTypePack,
+		Context: packCtx,
+		Path:    p1.GetDotPack(), //  EntityFile(),
+		Type:    pack.FileTypePack,
 	})
 	if err != nil {
 		return err
@@ -221,28 +221,23 @@ func (inst *TestPackDeltaObjects) add(itemIdx *git.PackIndexItem, itemPack *git.
 
 func (inst *TestPackDeltaObjects) openPack(p store.Pack, session store.Session) (pack.Idx, pack.Pack, error) {
 
-	pool := session.GetReaderPool()
-	repo := session.GetRepository()
-	compr := repo.Compression()
-	digest := repo.Digest()
+	pid := p.GetID()
+	objCtx := session.GetObjectContext()
+	packCtx := objCtx.NewPackContext(pid)
 
 	idx, err := pack.NewIdx(&pack.File{
-		Compression: compr,
-		Digest:      digest,
-		Path:        p.GetDotIdx(), //IndexFile(),
-		Pool:        pool,
-		Type:        pack.FileTypeIdx,
+		Context: packCtx,
+		Path:    p.GetDotIdx(), //IndexFile(),
+		Type:    pack.FileTypeIdx,
 	})
 	if err != nil {
 		return nil, nil, err
 	}
 
 	pk, err := pack.NewPack(&pack.File{
-		Compression: compr,
-		Digest:      digest,
-		Path:        p.GetDotPack(), // EntityFile(),
-		Pool:        pool,
-		Type:        pack.FileTypePack,
+		Context: packCtx,
+		Path:    p.GetDotPack(), // EntityFile(),
+		Type:    pack.FileTypePack,
 	})
 	if err != nil {
 		return nil, nil, err

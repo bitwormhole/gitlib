@@ -43,6 +43,12 @@ type pComTheMD5 struct {
 }
 
 
+type pComTheCRC32 struct {
+	instance *lib0x4595be.TheCRC32
+	 markup0x23084a.Component `class:"git-algorithm-registry"`
+}
+
+
 type pComTheDeflate struct {
 	instance *lib0x4595be.TheDeflate
 	 markup0x23084a.Component `class:"git-algorithm-registry"`
