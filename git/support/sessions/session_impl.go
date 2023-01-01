@@ -189,6 +189,14 @@ func (inst *sessionImpl) LoadHEAD(h store.HEAD) (*git.HEAD, error) {
 	return gitfmt.ParseHEAD(text)
 }
 
+func (inst *sessionImpl) SaveHEAD(h *git.HEAD) error {
+	name := h.Name
+	repo := inst.GetRepository()
+	head := repo.HEAD()
+	text := "ref: " + name.String()
+	return head.Path().GetIO().WriteText(text, nil)
+}
+
 // LoadRef ...
 func (inst *sessionImpl) LoadRef(r store.Ref) (*git.Ref, error) {
 	text, err := r.Path().GetIO().ReadText(nil)
@@ -196,6 +204,15 @@ func (inst *sessionImpl) LoadRef(r store.Ref) (*git.Ref, error) {
 		return nil, err
 	}
 	return gitfmt.ParseRef(text)
+}
+
+func (inst *sessionImpl) SaveRef(r *git.Ref) error {
+	name := r.Name
+	value := r.ID
+	repo := inst.GetRepository()
+	ref := repo.Refs().GetRef(name)
+	text := value.String()
+	return ref.Path().GetIO().WriteText(text, nil)
 }
 
 func (inst *sessionImpl) ReadObject(id git.ObjectID) (*git.Object, io.ReadCloser, error) {

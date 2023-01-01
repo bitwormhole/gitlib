@@ -60,9 +60,11 @@ type Session interface {
 
 	// refs
 	LoadRef(r Ref) (*git.Ref, error)
+	SaveRef(r *git.Ref) error
 
 	// HEAD
 	LoadHEAD(head HEAD) (*git.HEAD, error)
+	SaveHEAD(h *git.HEAD) error
 }
 
 // SessionFactory ...
