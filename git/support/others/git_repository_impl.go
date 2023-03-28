@@ -44,6 +44,16 @@ func (inst *GitRepositoryImpl) Objects() store.Objects {
 	return inst.Core.Objects
 }
 
+// Worktrees ...
+func (inst *GitRepositoryImpl) Worktrees() store.Worktrees {
+	return inst.Core.Worktrees
+}
+
+// Submodules ...
+func (inst *GitRepositoryImpl) Submodules() store.Submodules {
+	return inst.Core.Submodules
+}
+
 // Digest ...
 func (inst *GitRepositoryImpl) Digest() git.Digest {
 	return inst.Core.Digest

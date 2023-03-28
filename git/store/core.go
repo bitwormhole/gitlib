@@ -25,7 +25,11 @@ type Core struct {
 
 	Repository RepositoryProfile
 
-	Workspace Workspace
+	Workspace Workspace // aka the default worktree
+
+	Worktrees Worktrees
+
+	Submodules Submodules
 
 	SessionFactory SessionFactory
 

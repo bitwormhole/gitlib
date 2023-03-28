@@ -9,6 +9,8 @@ import (
 	"github.com/bitwormhole/gitlib/git/support/others"
 	"github.com/bitwormhole/gitlib/git/support/refs"
 	"github.com/bitwormhole/gitlib/git/support/sessions"
+	"github.com/bitwormhole/gitlib/git/support/submodules"
+	"github.com/bitwormhole/gitlib/git/support/worktrees"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -40,6 +42,8 @@ func (inst *BaseCoreConfigurer) Configure(c *store.Core) error {
 	c.Workspace = &others.GitWorkspaceImpl{Core: c}
 	c.Head = &others.GitHeadImpl{Core: c}
 	c.Index = &index.GitIndexImpl{Core: c}
+	c.Worktrees = &worktrees.Facade{Core: c}
+	c.Submodules = &submodules.Facade{Core: c}
 	c.SessionFactory = &sessions.Factory{}
 
 	c.Digest = nil

@@ -37,6 +37,7 @@ func (inst *RepositoryLoaderImpl) Load(l store.RepositoryLayout) (store.Reposito
 	return repo, nil
 }
 
+// LoadWithPath ...
 func (inst *RepositoryLoaderImpl) LoadWithPath(path afs.Path) (store.Repository, error) {
 	locator := inst.Context.Lib.RepositoryLocator()
 	layout, err := locator.Locate(path)

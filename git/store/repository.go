@@ -19,6 +19,10 @@ type RepositoryProfile interface {
 
 	Objects() Objects
 
+	Worktrees() Worktrees
+
+	Submodules() Submodules
+
 	Digest() git.Digest           // default="SHA-1"
 	Compression() git.Compression // default="DEFLATE"
 	PathMapping() git.PathMapping // default="xx/xxxx"

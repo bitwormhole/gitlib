@@ -92,9 +92,27 @@ func autoGenConfig(cb application.ConfigBuilder) error {
 		return err
 	}
 
-	// component: com7-demo0x52dcb1.TestPoint
+	// component: com7-testcmds0x82bca1.TestSubmodulesCURD
 	cominfobuilder.Next()
-	cominfobuilder.ID("com7-demo0x52dcb1.TestPoint").Class("life").Aliases("").Scope("")
+	cominfobuilder.ID("com7-testcmds0x82bca1.TestSubmodulesCURD").Class("cli-handler-registry").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComTestSubmodulesCURD{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com8-testcmds0x82bca1.TestWorktreesCURD
+	cominfobuilder.Next()
+	cominfobuilder.ID("com8-testcmds0x82bca1.TestWorktreesCURD").Class("cli-handler-registry").Aliases("").Scope("")
+	cominfobuilder.Factory((&comFactory4pComTestWorktreesCURD{}).init())
+	err = cominfobuilder.CreateTo(cb)
+	if err != nil {
+		return err
+	}
+
+	// component: com9-demo0x52dcb1.TestPoint
+	cominfobuilder.Next()
+	cominfobuilder.ID("com9-demo0x52dcb1.TestPoint").Class("life").Aliases("").Scope("")
 	cominfobuilder.Factory((&comFactory4pComTestPoint{}).init())
 	err = cominfobuilder.CreateTo(cb)
 	if err != nil {
@@ -724,7 +742,177 @@ func (inst * comFactory4pComTestServerAPI) getterForFieldMainServerSelector (con
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// comFactory4pComTestPoint : the factory of component: com7-demo0x52dcb1.TestPoint
+// comFactory4pComTestSubmodulesCURD : the factory of component: com7-testcmds0x82bca1.TestSubmodulesCURD
+type comFactory4pComTestSubmodulesCURD struct {
+
+    mPrototype * testcmds0x82bca1.TestSubmodulesCURD
+
+	
+	mWDSelector config.InjectionSelector
+	mLASelector config.InjectionSelector
+
+}
+
+func (inst * comFactory4pComTestSubmodulesCURD) init() application.ComponentFactory {
+
+	
+	inst.mWDSelector = config.NewInjectionSelector("${test.repo.path}",nil)
+	inst.mLASelector = config.NewInjectionSelector("#git-lib-agent",nil)
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComTestSubmodulesCURD) newObject() * testcmds0x82bca1.TestSubmodulesCURD {
+	return & testcmds0x82bca1.TestSubmodulesCURD {}
+}
+
+func (inst * comFactory4pComTestSubmodulesCURD) castObject(instance application.ComponentInstance) * testcmds0x82bca1.TestSubmodulesCURD {
+	return instance.Get().(*testcmds0x82bca1.TestSubmodulesCURD)
+}
+
+func (inst * comFactory4pComTestSubmodulesCURD) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComTestSubmodulesCURD) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComTestSubmodulesCURD) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComTestSubmodulesCURD) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComTestSubmodulesCURD) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComTestSubmodulesCURD) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	
+	obj := inst.castObject(instance)
+	obj.WD = inst.getterForFieldWDSelector(context)
+	obj.LA = inst.getterForFieldLASelector(context)
+	return context.LastError()
+}
+
+//getterForFieldWDSelector
+func (inst * comFactory4pComTestSubmodulesCURD) getterForFieldWDSelector (context application.InstanceContext) string {
+    return inst.mWDSelector.GetString(context)
+}
+
+//getterForFieldLASelector
+func (inst * comFactory4pComTestSubmodulesCURD) getterForFieldLASelector (context application.InstanceContext) store0x8467b3.LibAgent {
+
+	o1 := inst.mLASelector.GetOne(context)
+	o2, ok := o1.(store0x8467b3.LibAgent)
+	if !ok {
+		eb := &util.ErrorBuilder{}
+		eb.Message("bad cast")
+		eb.Set("com", "com7-testcmds0x82bca1.TestSubmodulesCURD")
+		eb.Set("field", "LA")
+		eb.Set("type1", "?")
+		eb.Set("type2", "store0x8467b3.LibAgent")
+		context.HandleError(eb.Create())
+		return nil
+	}
+	return o2
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComTestWorktreesCURD : the factory of component: com8-testcmds0x82bca1.TestWorktreesCURD
+type comFactory4pComTestWorktreesCURD struct {
+
+    mPrototype * testcmds0x82bca1.TestWorktreesCURD
+
+	
+	mWDSelector config.InjectionSelector
+	mLASelector config.InjectionSelector
+
+}
+
+func (inst * comFactory4pComTestWorktreesCURD) init() application.ComponentFactory {
+
+	
+	inst.mWDSelector = config.NewInjectionSelector("${test.repo.path}",nil)
+	inst.mLASelector = config.NewInjectionSelector("#git-lib-agent",nil)
+
+
+	inst.mPrototype = inst.newObject()
+    return inst
+}
+
+func (inst * comFactory4pComTestWorktreesCURD) newObject() * testcmds0x82bca1.TestWorktreesCURD {
+	return & testcmds0x82bca1.TestWorktreesCURD {}
+}
+
+func (inst * comFactory4pComTestWorktreesCURD) castObject(instance application.ComponentInstance) * testcmds0x82bca1.TestWorktreesCURD {
+	return instance.Get().(*testcmds0x82bca1.TestWorktreesCURD)
+}
+
+func (inst * comFactory4pComTestWorktreesCURD) GetPrototype() lang.Object {
+	return inst.mPrototype
+}
+
+func (inst * comFactory4pComTestWorktreesCURD) NewInstance() application.ComponentInstance {
+	return config.SimpleInstance(inst, inst.newObject())
+}
+
+func (inst * comFactory4pComTestWorktreesCURD) AfterService() application.ComponentAfterService {
+	return inst
+}
+
+func (inst * comFactory4pComTestWorktreesCURD) Init(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComTestWorktreesCURD) Destroy(instance application.ComponentInstance) error {
+	return nil
+}
+
+func (inst * comFactory4pComTestWorktreesCURD) Inject(instance application.ComponentInstance, context application.InstanceContext) error {
+	
+	obj := inst.castObject(instance)
+	obj.WD = inst.getterForFieldWDSelector(context)
+	obj.LA = inst.getterForFieldLASelector(context)
+	return context.LastError()
+}
+
+//getterForFieldWDSelector
+func (inst * comFactory4pComTestWorktreesCURD) getterForFieldWDSelector (context application.InstanceContext) string {
+    return inst.mWDSelector.GetString(context)
+}
+
+//getterForFieldLASelector
+func (inst * comFactory4pComTestWorktreesCURD) getterForFieldLASelector (context application.InstanceContext) store0x8467b3.LibAgent {
+
+	o1 := inst.mLASelector.GetOne(context)
+	o2, ok := o1.(store0x8467b3.LibAgent)
+	if !ok {
+		eb := &util.ErrorBuilder{}
+		eb.Message("bad cast")
+		eb.Set("com", "com8-testcmds0x82bca1.TestWorktreesCURD")
+		eb.Set("field", "LA")
+		eb.Set("type1", "?")
+		eb.Set("type2", "store0x8467b3.LibAgent")
+		context.HandleError(eb.Create())
+		return nil
+	}
+	return o2
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+// comFactory4pComTestPoint : the factory of component: com9-demo0x52dcb1.TestPoint
 type comFactory4pComTestPoint struct {
 
     mPrototype * demo0x52dcb1.TestPoint
@@ -801,7 +989,7 @@ func (inst * comFactory4pComTestPoint) getterForFieldAgentSelector (context appl
 	if !ok {
 		eb := &util.ErrorBuilder{}
 		eb.Message("bad cast")
-		eb.Set("com", "com7-demo0x52dcb1.TestPoint")
+		eb.Set("com", "com9-demo0x52dcb1.TestPoint")
 		eb.Set("field", "Agent")
 		eb.Set("type1", "?")
 		eb.Set("type2", "store0x8467b3.LibAgent")

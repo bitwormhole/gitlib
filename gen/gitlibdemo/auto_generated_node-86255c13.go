@@ -69,6 +69,22 @@ type pComTestServerAPI struct {
 }
 
 
+type pComTestSubmodulesCURD struct {
+	instance *testcmds0x82bca1.TestSubmodulesCURD
+	 markup0x23084a.Component `class:"cli-handler-registry"`
+	WD string `inject:"${test.repo.path}"`
+	LA store0x8467b3.LibAgent `inject:"#git-lib-agent"`
+}
+
+
+type pComTestWorktreesCURD struct {
+	instance *testcmds0x82bca1.TestWorktreesCURD
+	 markup0x23084a.Component `class:"cli-handler-registry"`
+	WD string `inject:"${test.repo.path}"`
+	LA store0x8467b3.LibAgent `inject:"#git-lib-agent"`
+}
+
+
 type pComTestPoint struct {
 	instance *demo0x52dcb1.TestPoint
 	 markup0x23084a.Component `class:"life"`
