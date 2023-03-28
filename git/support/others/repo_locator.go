@@ -2,6 +2,7 @@ package others
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"bitwormhole.com/starter/afs"
@@ -45,16 +46,14 @@ func (inst *RepositoryLocatorImpl) Locate(wd afs.Path) (store.RepositoryLayout, 
 }
 
 func (inst *RepositoryLocatorImpl) findDotGit(b *store.LayoutBuilder) error {
-	const name = ".git"
 	wd := b.WD
-	for p := wd; p != nil; p = p.GetParent() {
-		dotgit := p.GetChild(name)
-		if dotgit.Exists() {
-			b.DotGit = dotgit
-			return nil
-		}
+	l := lookup{}
+	result := l.findFileOrDir(".git", wd)
+	b.DotGit = result
+	if result == nil {
+		return errors.New("no repository found in path " + wd.GetPath())
 	}
-	return errors.New("no repository found in path " + wd.GetPath())
+	return nil
 }
 
 func (inst *RepositoryLocatorImpl) loadDotGit(b *store.LayoutBuilder) error {
@@ -83,13 +82,11 @@ func (inst *RepositoryLocatorImpl) loadDotGit(b *store.LayoutBuilder) error {
 		href := strings.TrimSpace(text[len(prefix):])
 		if strings.HasPrefix(href, ".") {
 			// submodule
-			point := dotgit.GetChild(href)
-			b.SubmodulePoint = point
+			point := dotgit.GetParent().GetChild(href)
 			return inst.loadSubmodule(b, point)
 		}
 		// worktree
 		point := dotgit.GetFS().NewPath(href)
-		b.WorktreePoint = point
 		return inst.loadWorktree(b, point)
 	}
 
@@ -97,21 +94,19 @@ func (inst *RepositoryLocatorImpl) loadDotGit(b *store.LayoutBuilder) error {
 }
 
 func (inst *RepositoryLocatorImpl) loadSubmodule(b *store.LayoutBuilder, point afs.Path) error {
-
 	if !point.IsDirectory() {
 		return errors.New("bad submodule, path=" + point.GetPath())
 	}
-
-	return errors.New("no impl: loadSubmodule")
+	b.SubmodulePoint = point
+	return inst.handleSubmodulePre(b)
 }
 
 func (inst *RepositoryLocatorImpl) loadWorktree(b *store.LayoutBuilder, point afs.Path) error {
-
 	if !point.IsDirectory() {
 		return errors.New("bad worktree, path=" + point.GetPath())
 	}
-
-	return errors.New("no impl: loadWorktree")
+	b.WorktreePoint = point
+	return inst.handleWorktreePre(b)
 }
 
 func (inst *RepositoryLocatorImpl) initOtherDirs(b *store.LayoutBuilder) error {
@@ -127,13 +122,10 @@ func (inst *RepositoryLocatorImpl) initOtherDirs(b *store.LayoutBuilder) error {
 	submodule := b.SubmodulePoint
 
 	if submodule != nil {
-		// todo ...
+		return inst.handleSubmodulePost(b)
+	} else if worktree != nil {
+		return inst.handleWorktreePost(b)
 	}
-
-	if worktree != nil {
-		// todo ...
-	}
-
 	return nil
 }
 
@@ -189,4 +181,100 @@ func (inst *RepositoryLocatorImpl) checkDir(parent afs.Path, child string) int {
 		return 1
 	}
 	return 0
+}
+
+func (inst *RepositoryLocatorImpl) handleWorktreePre(b *store.LayoutBuilder) error {
+
+	l := lookup{}
+	point := b.WorktreePoint
+	config := l.findFile("config", point)
+
+	if config == nil {
+		return fmt.Errorf("cannot find git repository with worktree point: " + point.GetPath())
+	}
+
+	b.Repository = config.GetParent()
+	return nil
+}
+
+func (inst *RepositoryLocatorImpl) handleWorktreePost(b *store.LayoutBuilder) error {
+
+	l := lookup{}
+	point := b.WorktreePoint
+	head := l.findFile("HEAD", point)
+	index := l.findFile("index", point)
+
+	if head == nil || index == nil {
+		return fmt.Errorf("bad git worktree at " + point.GetPath())
+	}
+
+	// re-write:
+	b.HEAD = head
+	b.Index = index
+	return nil
+}
+
+func (inst *RepositoryLocatorImpl) handleSubmodulePre(b *store.LayoutBuilder) error {
+
+	l := lookup{}
+	point := b.SubmodulePoint
+	config := l.findFile("config", point)
+
+	if config == nil {
+		return fmt.Errorf("cannot find git repository with submodule point: " + point.GetPath())
+	}
+
+	b.Repository = config.GetParent()
+	return nil
+}
+
+func (inst *RepositoryLocatorImpl) handleSubmodulePost(b *store.LayoutBuilder) error {
+
+	// re-write:
+	// b.HEAD = nil
+	// b.Index = nil
+
+	return nil
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+type lookup struct {
+}
+
+func (inst *lookup) findFile(name string, from afs.Path) afs.Path {
+	return inst.findWithWant(name, from, true, false)
+}
+
+func (inst *lookup) findDir(name string, from afs.Path) afs.Path {
+	return inst.findWithWant(name, from, false, true)
+}
+
+func (inst *lookup) findFileOrDir(name string, from afs.Path) afs.Path {
+	return inst.findWithWant(name, from, true, true)
+}
+
+func (inst *lookup) findWithWant(name string, from afs.Path, wantFile bool, wantDir bool) afs.Path {
+	if name == "" {
+		return nil
+	}
+	for p := from; p != nil; p = p.GetParent() {
+		tar := p.GetChild(name)
+		if wantFile && wantDir {
+			if tar.Exists() {
+				return tar
+			}
+		} else if wantFile {
+			if tar.IsFile() {
+				return tar
+			}
+		} else if wantDir {
+			if tar.IsDirectory() {
+				return tar
+			}
+		} else {
+			return nil
+		}
+	}
+	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"bitwormhole.com/starter/cli"
 	"github.com/bitwormhole/gitlib/git/store"
 	"github.com/bitwormhole/starter/markup"
+	"github.com/bitwormhole/starter/vlog"
 )
 
 // TestSubmodulesCURD ...
@@ -28,6 +29,27 @@ func (inst *TestSubmodulesCURD) GetHandlers() []*cli.HandlerRegistration {
 }
 
 func (inst *TestSubmodulesCURD) run(task *cli.Task) error {
+
+	lib, err := inst.LA.GetLib()
+	if err != nil {
+		return err
+	}
+
+	wd := lib.FS().NewPath(inst.WD)
+	layout, err := lib.RepositoryLocator().Locate(wd)
+	if err != nil {
+		return err
+	}
+
+	repo, err := lib.RepositoryLoader().Load(layout)
+	if err != nil {
+		return err
+	}
+
+	list := repo.Submodules().List()
+	for _, wt := range list {
+		vlog.Info("find submodule: ", wt.Name())
+	}
 
 	return nil
 }

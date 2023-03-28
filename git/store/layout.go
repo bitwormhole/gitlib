@@ -18,6 +18,10 @@ type RepositoryLayout interface {
 	HEAD() afs.Path
 	Objects() afs.Path
 	Refs() afs.Path
+
+	IsBare() bool
+	IsSubmodule() bool
+	IsWorktree() bool
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,6 +60,10 @@ func (inst *LayoutBuilder) Create() RepositoryLayout {
 	res.workspace = inst.Workspace
 	res.wd = inst.WD
 
+	res.isBare = inst.Workspace == nil
+	res.isSubmodule = inst.SubmodulePoint != nil
+	res.isWorktree = inst.WorktreePoint != nil
+
 	return res
 }
 
@@ -71,10 +79,26 @@ type innerLayout struct {
 	head      afs.Path
 	objects   afs.Path
 	refs      afs.Path
+
+	isBare      bool
+	isWorktree  bool
+	isSubmodule bool
 }
 
 func (inst *innerLayout) _Impl() RepositoryLayout {
 	return inst
+}
+
+func (inst *innerLayout) IsBare() bool {
+	return inst.isBare
+}
+
+func (inst *innerLayout) IsSubmodule() bool {
+	return inst.isSubmodule
+}
+
+func (inst *innerLayout) IsWorktree() bool {
+	return inst.isWorktree
 }
 
 func (inst *innerLayout) Workspace() afs.Path {
