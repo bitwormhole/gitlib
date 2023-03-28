@@ -39,7 +39,7 @@ func (inst *BaseCoreConfigurer) Configure(c *store.Core) error {
 	c.Objects = &objects.GitObjectsImpl{Core: c}
 	c.Refs = &refs.GitRefsImpl{Core: c}
 	c.Repository = &others.GitRepositoryImpl{Core: c}
-	c.Workspace = &others.GitWorkspaceImpl{Core: c}
+	c.Workspace = &others.GitWorkspaceFacade{Core: c}
 	c.Head = &others.GitHeadImpl{Core: c}
 	c.Index = &index.GitIndexImpl{Core: c}
 	c.Worktrees = &worktrees.Facade{Core: c}

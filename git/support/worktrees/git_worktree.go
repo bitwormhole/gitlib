@@ -3,6 +3,7 @@ package worktrees
 import (
 	"bitwormhole.com/starter/afs"
 	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git/support/others"
 )
 
 type worktree struct {
@@ -29,8 +30,10 @@ func (inst *worktree) Workspace() store.Workspace {
 	if !dg.IsFile() {
 		return nil
 	}
-	dir := dg.GetParent()
-	return &workspace{dir}
+	builder := others.GitWorkspaceBuilder{}
+	builder.Core = inst.core
+	builder.DotGit = dg
+	return builder.Create()
 }
 
 func (inst *worktree) Exists() bool {

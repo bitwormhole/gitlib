@@ -3,6 +3,7 @@ package submodules
 import (
 	"bitwormhole.com/starter/afs"
 	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git/support/others"
 )
 
 type submodule struct {
@@ -40,8 +41,17 @@ func (inst *submodule) IsActive() bool {
 }
 
 func (inst *submodule) Workspace() store.Workspace {
-	dir := inst.dotgit.GetParent()
-	return &workspace{dir}
+	dg := inst.dotgit
+	if dg == nil {
+		return nil
+	}
+	if !dg.IsFile() {
+		return nil
+	}
+	builder := others.GitWorkspaceBuilder{}
+	builder.Core = inst.core
+	builder.DotGit = dg
+	return builder.Create()
 }
 
 func (inst *submodule) Exists() bool {

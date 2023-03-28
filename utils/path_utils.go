@@ -58,7 +58,7 @@ func isWindowsAbsolutePath(path string) bool {
 	abc := false
 	if 'a' <= r0 && r0 <= 'z' {
 		abc = true
-	} else if 'a' <= r0 && r0 <= 'z' {
+	} else if 'A' <= r0 && r0 <= 'Z' {
 		abc = true
 	}
 	return abc
