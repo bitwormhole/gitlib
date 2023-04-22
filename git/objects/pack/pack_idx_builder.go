@@ -381,7 +381,7 @@ func (inst *v2IdxBuilder) writeToFile(dst afs.Path) error {
 	w2 = nil
 	w = nil
 
-	return tmp.MoveTo(dst)
+	return tmp.MoveTo(dst, nil)
 }
 
 func (inst *v2IdxBuilder) wrapWriter(dst io.Writer) io.Writer {

@@ -178,7 +178,7 @@ func (inst *tempBuffer) SaveToFile(dst afs.Path) error {
 	}
 
 	src := inst.tmpFile
-	return src.MoveTo(dst)
+	return src.MoveTo(dst, nil)
 }
 
 func (inst *tempBuffer) Write(b []byte) (int, error) {

@@ -30,8 +30,8 @@ func (inst *packImporter) Import(p *store.ImportPackParams) (*store.ImportPackRe
 
 	// copy or move
 	if p.MoveFiles {
-		e1 := idxSrc.MoveTo(idxDst)
-		e2 := packSrc.MoveTo(packDst)
+		e1 := idxSrc.MoveTo(idxDst, nil)
+		e2 := packSrc.MoveTo(packDst, nil)
 		errlist = append(errlist, e1)
 		errlist = append(errlist, e2)
 	} else {
