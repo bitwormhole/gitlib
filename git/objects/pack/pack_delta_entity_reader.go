@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"io"
 
-	"bitwormhole.com/starter/vlog"
 	"github.com/bitwormhole/gitlib/git"
+	"github.com/starter-go/vlog"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -314,7 +314,7 @@ func (inst *packEntityInfo) loadParentForDeltaOFS() (*packEntityInfo, error) {
 	parent := &packEntityInfo{
 		context: inst.context,
 		pid:     inst.pid,
-		oid:     nil,
+		oid:     "",
 		pack:    inst.pack,
 		idx:     inst.idx,
 		head:    nil,
@@ -458,8 +458,8 @@ func (inst *packEntityReaderBuilder) makeSourceChain(list []*packEntityInfo) (pa
 
 func (inst *packEntityReaderBuilder) makeMainHeader(list []*packEntityInfo, fianlSize int64) (*git.PackedObjectHeaderEx, error) {
 	result := &git.PackedObjectHeaderEx{
-		OID:    nil,
-		PID:    nil,
+		OID:    "",
+		PID:    "",
 		Offset: 0,
 	}
 	for _, info := range list {

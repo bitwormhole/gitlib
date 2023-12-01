@@ -2,13 +2,12 @@ package clients
 
 import (
 	"fmt"
-
-	"github.com/bitwormhole/starter/markup"
 )
 
 // MainClientImpl ...
 type MainClientImpl struct {
-	markup.Component `id:"git-main-client"`
+
+	//	 markup.Component `id:"git-main-client"`
 
 	ClientRegistryList []ClientRegistry `inject:".git-client-registry"`
 

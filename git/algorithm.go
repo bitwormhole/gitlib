@@ -4,7 +4,7 @@ import (
 	"hash"
 	"io"
 
-	"bitwormhole.com/starter/afs"
+	"github.com/starter-go/afs"
 )
 
 // AlgorithmType 表示算法的类型

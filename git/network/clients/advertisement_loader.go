@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/bitwormhole/gitlib/git/network/pktline"
-	"github.com/bitwormhole/starter/vlog"
+	"github.com/starter-go/vlog"
 )
 
 // AdvertisementLoader ...

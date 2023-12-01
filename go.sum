@@ -16,3 +16,15 @@ bitwormhole.com/starter/vlog v0.0.1 h1:7DCV2jUD1oHEPrfci14IVBK/oXeQ/pHbfbYws1nfu
 bitwormhole.com/starter/vlog v0.0.1/go.mod h1:bb4xDVyOD0+tAhaiscUmuzsFJ+/EL+qE79Je8U0ZqTQ=
 github.com/bitwormhole/starter v0.1.5 h1:WKYzskMDu1kStoREvCviYIk2eOWYXpy2QYuYaX1Db80=
 github.com/bitwormhole/starter v0.1.5/go.mod h1:3/UtKB8VwcmR5xf8mx4V7vgGLaej89LaoT+KuJKWL60=
+github.com/starter-go/afs v0.9.3 h1:2pD7DH7Qv7IlbpQnKDFbhYjc0oaOtamRnp6/rVFaIs0=
+github.com/starter-go/afs v0.9.3/go.mod h1:Kuwz+TntvRVUYJuHWfR9hkEIcBiIC3ScW9IS/gjJulM=
+github.com/starter-go/application v0.9.18 h1:rAjCJvpZjzed7QsUnAh8rBQLFFQegyHKpetsv6i1UKo=
+github.com/starter-go/application v0.9.18/go.mod h1:WXdBRmDnpM6+vAxbuYrOwqxWH1dcGxhXLmwFepRBCeA=
+github.com/starter-go/base v0.9.11 h1:QG5kcShJSV9cs2KEeqZ8UN9icM/0uPZwPFrh0XUOf+Q=
+github.com/starter-go/base v0.9.11/go.mod h1:MMqPMFzwPHjKyfX0cMmkpAAbeJ0tJupFbI8D+x27fJM=
+github.com/starter-go/configen v0.9.3 h1:OJi7A9XncTFhvbKc8ZgSYF+bVDBnnGGhR2u8jS5G5XM=
+github.com/starter-go/configen v0.9.3/go.mod h1:F0Pw1TAmyIiahcuPBqywIM0nxaYGMD9o4FahvcH2AEQ=
+github.com/starter-go/starter v1.0.6 h1:ANymr6lYbF0HVCHMaaakmyU55gLQjo35kRijV9+LnOI=
+github.com/starter-go/starter v1.0.6/go.mod h1:OzXOFPaj73jU/FhXoAW//R1rx+4S3I4qsOSwvXRV14A=
+github.com/starter-go/vlog v0.9.7 h1:ysmWPxsJtgRxL5ht4abtWvJW9E7vLFAtuOOi/XtpSmY=
+github.com/starter-go/vlog v0.9.7/go.mod h1:ywWUCfWNTqXrelvO4/3sQ04SCW4ClR3PiN3qpSlXhH0=

@@ -3,12 +3,12 @@ package instructions
 import (
 	"context"
 
-	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git/repositories"
 )
 
 // Checkout 表示一条git命令
 type Checkout struct {
-	store.Meta
+	repositories.Meta
 
 	Service CheckoutService
 
@@ -21,7 +21,7 @@ func (inst *Checkout) Run() error {
 }
 
 // GetMeta ...
-func (inst *Checkout) GetMeta() *store.Meta {
+func (inst *Checkout) GetMeta() *repositories.Meta {
 	return &inst.Meta
 }
 
@@ -29,7 +29,7 @@ func (inst *Checkout) GetMeta() *store.Meta {
 
 // CheckoutService 。。。
 type CheckoutService interface {
-	store.Service
+	repositories.Service
 	Run(task *Checkout) error
 }
 

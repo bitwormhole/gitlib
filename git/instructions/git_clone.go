@@ -3,12 +3,12 @@ package instructions
 import (
 	"context"
 
-	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git/repositories"
 )
 
 // Clone 表示一条git命令
 type Clone struct {
-	store.Meta
+	repositories.Meta
 
 	Service CloneService
 
@@ -21,7 +21,7 @@ func (inst *Clone) Run() error {
 }
 
 // GetMeta ...
-func (inst *Clone) GetMeta() *store.Meta {
+func (inst *Clone) GetMeta() *repositories.Meta {
 	return &inst.Meta
 }
 
@@ -29,7 +29,7 @@ func (inst *Clone) GetMeta() *store.Meta {
 
 // CloneService 。。。
 type CloneService interface {
-	store.Service
+	repositories.Service
 	Run(task *Clone) error
 }
 

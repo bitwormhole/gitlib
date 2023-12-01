@@ -3,12 +3,12 @@ package instructions
 import (
 	"context"
 
-	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git/repositories"
 )
 
 // Push 表示一条git命令
 type Push struct {
-	store.Meta
+	repositories.Meta
 
 	Service PushService
 
@@ -41,7 +41,7 @@ func (inst *Push) Run() error {
 }
 
 // GetMeta ...
-func (inst *Push) GetMeta() *store.Meta {
+func (inst *Push) GetMeta() *repositories.Meta {
 	return &inst.Meta
 }
 
@@ -49,7 +49,7 @@ func (inst *Push) GetMeta() *store.Meta {
 
 // PushService 。。。
 type PushService interface {
-	store.Service
+	repositories.Service
 	Run(task *Push) error
 }
 

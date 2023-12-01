@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/bitwormhole/gitlib/git"
-	"github.com/bitwormhole/starter/util"
+	"github.com/starter-go/base/lang"
 )
 
 // FormatOperator ...
@@ -38,7 +38,7 @@ func ParseOperator(text string) (*git.Operator, error) {
 	if err != nil {
 		return nil, err
 	}
-	tt := util.NewTimeWithInt64(timeNum1 * 1000).GetTime()
+	tt := lang.Time(timeNum1 * 1000).Time()
 
 	result := &git.Operator{
 		Name:  p1,

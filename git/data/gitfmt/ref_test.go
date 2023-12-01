@@ -8,12 +8,15 @@ import (
 
 func TestRefLS(t *testing.T) {
 
-	ids := git.DefaultIdentityFactory()
+	// ids := git.DefaultIdentityFactory()
 	//               0123456789abcdef0123456789abcdef, 128-bits
-	id := ids.Parse("0123456789abcdef0123456789abcdef")
+	id, err := git.ParseObjectID("0123456789abcdef0123456789abcdef")
+	if err != nil {
+		t.Error(err)
+		return
+	}
 
 	r0 := &git.Ref{ID: id}
-
 	text, err := FormatRef(r0)
 	if err != nil {
 		t.Error(err)
@@ -26,7 +29,9 @@ func TestRefLS(t *testing.T) {
 		return
 	}
 
-	if !git.HashEqual(r1.ID, r0.ID) {
+	if !r1.ID.Equals(r0.ID) {
 		t.Error("want:", r0.ID, " have:", r1.ID)
 	}
+
+	return
 }

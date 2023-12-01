@@ -3,12 +3,12 @@ package instructions
 import (
 	"context"
 
-	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git/repositories"
 )
 
 // Fetch 表示一条git命令
 type Fetch struct {
-	store.Meta
+	repositories.Meta
 
 	Service FetchService
 
@@ -71,7 +71,7 @@ func (inst *Fetch) Run() error {
 }
 
 // GetMeta ...
-func (inst *Fetch) GetMeta() *store.Meta {
+func (inst *Fetch) GetMeta() *repositories.Meta {
 	return &inst.Meta
 }
 
@@ -79,7 +79,7 @@ func (inst *Fetch) GetMeta() *store.Meta {
 
 // FetchService 。。。
 type FetchService interface {
-	store.Service
+	repositories.Service
 	Run(task *Fetch) error
 }
 

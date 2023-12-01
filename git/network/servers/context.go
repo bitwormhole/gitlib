@@ -2,7 +2,7 @@ package servers
 
 import (
 	"github.com/bitwormhole/gitlib/git/network/pktline"
-	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git/repositories"
 )
 
 // Context ...
@@ -14,7 +14,7 @@ type Context struct {
 	Service  string
 
 	Connection pktline.Connection
-	Layout     store.RepositoryLayout
-	Repository store.Repository
-	Session    store.Session
+	Layout     repositories.Layout
+	Repository repositories.Repository
+	Session    repositories.Session
 }

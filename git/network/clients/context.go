@@ -4,17 +4,17 @@ import (
 	"context"
 	"net/http"
 
-	"bitwormhole.com/starter/afs"
 	"github.com/bitwormhole/gitlib/git/gitconfig"
 	"github.com/bitwormhole/gitlib/git/network/pktline"
-	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git/repositories"
+	"github.com/starter-go/afs"
 )
 
 // Context ...
 type Context struct {
-	Lib        store.Lib
-	Repository store.Repository
-	Session    store.Session
+	Lib        repositories.Lib
+	Repository repositories.Repository
+	Session    repositories.Session
 	Path       afs.Path
 	Connection pktline.Connection
 
@@ -37,7 +37,7 @@ type Context struct {
 // Init ...
 func (inst *Context) Init(ctx context.Context, wd afs.Path) error {
 
-	lib, err := store.GetLib(ctx)
+	lib, err := repositories.GetLib(ctx)
 	if err != nil {
 		return err
 	}
@@ -53,22 +53,22 @@ func (inst *Context) Init(ctx context.Context, wd afs.Path) error {
 	return nil
 }
 
-func (inst *Context) loadRepository(wd afs.Path, lib store.Lib) (store.Repository, error) {
+func (inst *Context) loadRepository(wd afs.Path, lib repositories.Lib) (repositories.Repository, error) {
 
 	if wd == nil {
 		return nil, nil
 	}
 
-	layout, err := lib.RepositoryLocator().Locate(wd)
+	layout, err := lib.Locator().Locate(wd)
 	if err != nil {
 		return nil, err
 	}
 
-	return lib.RepositoryLoader().Load(layout)
+	return lib.Loader().Load(layout)
 }
 
 // OpenSession ...
-func (inst *Context) OpenSession() (store.Session, error) {
+func (inst *Context) OpenSession() (repositories.Session, error) {
 	repo := inst.Repository
 	session, err := repo.OpenSession()
 	if err != nil {

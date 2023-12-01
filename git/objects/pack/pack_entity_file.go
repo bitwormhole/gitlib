@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"io"
 
-	"bitwormhole.com/starter/afs"
 	"github.com/bitwormhole/gitlib/git"
-	"github.com/bitwormhole/starter/vlog"
+	"github.com/starter-go/afs"
+	"github.com/starter-go/vlog"
 )
 
 // Pack 表示一个 pack-*.pack 文件
@@ -373,7 +373,7 @@ func (inst *entityReader) Close() error {
 		}
 		err := c.Close()
 		if err != nil {
-			vlog.Warn(err)
+			vlog.Warn(err.Error())
 		}
 	}
 	inst.in1 = nil
@@ -468,8 +468,8 @@ func (inst *entityHeaderReader) readHeaderDeltaRef(hx *git.PackedObjectHeaderEx,
 	if cb1 != cb2 {
 		return fmt.Errorf("read id, with bad size")
 	}
-	xid := pid.GetFactory().Create(buf)
-	hx.DeltaRef = xid.(git.ObjectID)
+	xid, _ := git.CreateObjectID(buf)
+	hx.DeltaRef = xid
 	return nil
 }
 

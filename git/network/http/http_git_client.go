@@ -5,12 +5,11 @@ import (
 	"strings"
 
 	"github.com/bitwormhole/gitlib/git/network/clients"
-	"github.com/bitwormhole/starter/markup"
 )
 
 // GitClient ...
 type GitClient struct {
-	markup.Component `class:"git-client-registry"`
+	// markup.Component `class:"git-client-registry"`
 }
 
 func (inst *GitClient) _Impl() (clients.ClientRegistry, clients.Client) {

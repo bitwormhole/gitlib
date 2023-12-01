@@ -232,7 +232,7 @@ func (inst *idxFileV2) Find(oid git.ObjectID) (*git.PackIndexItem, error) {
 	if e1 != nil {
 		return nil, e1
 	} else if result != nil {
-		if git.HashEqual(oid, result.OID) {
+		if git.HashEqual(oid.HID(), result.OID.HID()) {
 			return result, nil
 		}
 	}
@@ -533,10 +533,10 @@ func (inst *idxFileV2dao) readListID(index int64, limit int) ([]*git.PackIndexIt
 }
 
 func (inst *idxFileV2dao) findRangeInFanout(want git.ObjectID) (int64, int64, error) {
-	if want == nil {
+	if want == "" {
 		return 0, 0, fmt.Errorf("wanted object-id is nil")
 	}
-	b0 := want.GetByte(0)
+	b0 := want.Bytes()[0]
 	i := int(b0) & 0xff
 	cnt1 := uint32(0)
 	cnt9 := uint32(0)
@@ -574,14 +574,14 @@ func (inst *idxFileV2dao) findItemByID(want git.ObjectID) (*git.PackIndexItem, e
 			return nil, err
 		}
 		ids[i5] = have.String()
-		x := git.HashCompare(want, have)
+		x := git.CompareObjectIDs(want, have)
 		if 0 < x {
 			// want <  have
 			i9 = i5
 		} else if x < 0 {
 			// want > have
 			i1 = i5
-		} else /* x==0 */ if git.HashEqual(want, have) {
+		} else /* x==0 */ if want.Equals(have) {
 			result.Index = i5
 			result.OID = want
 			return result, nil
@@ -595,7 +595,7 @@ func (inst *idxFileV2dao) findItemByID(want git.ObjectID) (*git.PackIndexItem, e
 			return nil, err
 		}
 		ids[i] = have.String()
-		if git.HashEqual(want, have) {
+		if want.Equals(have) {
 			result.Index = i
 			result.OID = want
 			return result, nil
@@ -608,7 +608,7 @@ func (inst *idxFileV2dao) findItemByID(want git.ObjectID) (*git.PackIndexItem, e
 func (inst *idxFileV2dao) getOIDByIndex(index int64) (git.ObjectID, error) {
 	err := inst.seekToListID(index)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	cr := commonReader{}
 	return cr.readObjectID(inst.reader, inst.idsize)

@@ -2,7 +2,7 @@ package clients
 
 import (
 	"github.com/bitwormhole/gitlib/git/gitconfig"
-	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git/repositories"
 )
 
 // RemoteConfigLoader ...
@@ -13,7 +13,7 @@ type RemoteConfigLoader struct {
 // Load ...
 func (inst *RemoteConfigLoader) Load() error {
 	cfg := inst.context.Repository.Config()
-	cfg = cfg.FindByScope(store.ConfigScopeMix)
+	cfg = cfg.FindByScope(repositories.ConfigScopeMix)
 
 	err := inst.loadRemotes(cfg)
 	if err != nil {
@@ -28,7 +28,7 @@ func (inst *RemoteConfigLoader) Load() error {
 	return nil
 }
 
-func (inst *RemoteConfigLoader) loadRemotes(cc store.ConfigChain) error {
+func (inst *RemoteConfigLoader) loadRemotes(cc repositories.ConfigChain) error {
 
 	cfg := cc.Config()
 	loader := gitconfig.ConfigLoader{}
@@ -45,7 +45,7 @@ func (inst *RemoteConfigLoader) loadRemotes(cc store.ConfigChain) error {
 	return nil
 }
 
-func (inst *RemoteConfigLoader) loadBranches(cc store.ConfigChain) error {
+func (inst *RemoteConfigLoader) loadBranches(cc repositories.ConfigChain) error {
 
 	cfg := cc.Config()
 	loader := gitconfig.ConfigLoader{}

@@ -72,7 +72,7 @@ func (inst *commonReader) readIdxFanOut(in io.Reader) (*git.PackIdxFanOut, error
 func (inst *commonReader) readPackID(in io.Reader, size git.HashSize) (git.PackID, error) {
 	hex, err := inst.readHexID(in, size)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	return git.CreatePackID(hex)
 }
@@ -80,7 +80,7 @@ func (inst *commonReader) readPackID(in io.Reader, size git.HashSize) (git.PackI
 func (inst *commonReader) readObjectID(in io.Reader, size git.HashSize) (git.ObjectID, error) {
 	hex, err := inst.readHexID(in, size)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	return git.CreateObjectID(hex)
 }
@@ -112,13 +112,13 @@ func (inst *commonReader) readPackFileTail(f *File) (git.PackID, git.PackID, err
 	tailSize := (2 * idSize)
 
 	if fileSize < tailSize {
-		return nil, nil, fmt.Errorf("bad file size")
+		return "", "", fmt.Errorf("bad file size")
 	}
 
 	// open
 	in, err := pool.OpenReader(file, nil)
 	if err != nil {
-		return nil, nil, err
+		return "", "", err
 	}
 	defer func() { in.Close() }()
 
@@ -126,20 +126,20 @@ func (inst *commonReader) readPackFileTail(f *File) (git.PackID, git.PackID, err
 	pos1 := fileSize - tailSize
 	pos2, err := in.Seek(pos1, io.SeekStart)
 	if err != nil {
-		return nil, nil, err
+		return "", "", err
 	}
 	if pos1 != pos2 {
-		return nil, nil, fmt.Errorf("bad seek position")
+		return "", "", fmt.Errorf("bad seek position")
 	}
 
 	// read
 	pid1, err := inst.readPackID(in, idSize1)
 	if err != nil {
-		return nil, nil, err
+		return "", "", err
 	}
 	pid2, err := inst.readPackID(in, idSize1)
 	if err != nil {
-		return nil, nil, err
+		return "", "", err
 	}
 
 	return pid1, pid2, nil

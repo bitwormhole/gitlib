@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"io"
 
-	"bitwormhole.com/starter/afs"
 	"github.com/bitwormhole/gitlib/git/objects"
+	"github.com/starter-go/afs"
 )
 
 // File ...

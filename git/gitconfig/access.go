@@ -3,18 +3,18 @@ package gitconfig
 import (
 	"strings"
 
-	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git/repositories"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // Property ...
 type Property struct {
-	properties store.Config
+	properties repositories.Config
 	key        string
 }
 
-func (inst *Property) init(cfg store.Config, template KeyTemplate, id string) {
+func (inst *Property) init(cfg repositories.Config, template KeyTemplate, id string) {
 	temp := string(template)
 	key := temp
 	const np = NamePlaceholder

@@ -1,11 +1,11 @@
 package instructions
 
 import (
-	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git/repositories"
 )
 
-func findService(meta *store.Meta) store.Service {
-	lib, err := store.GetLib(meta.Context)
+func findService(meta *repositories.Meta) repositories.Service {
+	lib, err := repositories.GetLib(meta.Context)
 	if err != nil {
 		panic(err)
 	}

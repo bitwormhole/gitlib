@@ -4,14 +4,14 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git/repositories"
 )
 
 // ConfigLoader ...
 type ConfigLoader struct {
 }
 
-func (inst *ConfigLoader) getString(cfg store.Config, name string, key1 KeyTemplate) string {
+func (inst *ConfigLoader) getString(cfg repositories.Config, name string, key1 KeyTemplate) string {
 	const namePh = NamePlaceholder
 	key2 := key1.String()
 	temp := key2
@@ -22,7 +22,7 @@ func (inst *ConfigLoader) getString(cfg store.Config, name string, key1 KeyTempl
 	return cfg.GetProperty(key2)
 }
 
-func (inst *ConfigLoader) getInt(cfg store.Config, name string, key KeyTemplate) int {
+func (inst *ConfigLoader) getInt(cfg repositories.Config, name string, key KeyTemplate) int {
 	str := inst.getString(cfg, name, key)
 	if str == "" {
 		return 0
@@ -31,7 +31,7 @@ func (inst *ConfigLoader) getInt(cfg store.Config, name string, key KeyTemplate)
 	return n
 }
 
-func (inst *ConfigLoader) getBool(cfg store.Config, name string, key KeyTemplate) bool {
+func (inst *ConfigLoader) getBool(cfg repositories.Config, name string, key KeyTemplate) bool {
 	str := inst.getString(cfg, name, key)
 	if str == "" {
 		return false
@@ -45,7 +45,7 @@ func (inst *ConfigLoader) exists(value string) bool {
 }
 
 // GetIndex ...
-func (inst *ConfigLoader) GetIndex(cfg store.Config) ConfigIndex {
+func (inst *ConfigLoader) GetIndex(cfg repositories.Config) ConfigIndex {
 	builder := myConfigIndexBuilder{}
 	builder.init(cfg)
 	return builder.create()
@@ -54,7 +54,7 @@ func (inst *ConfigLoader) GetIndex(cfg store.Config) ConfigIndex {
 /////////////////////////////////////////////////////
 
 // LoadCore ...
-func (inst *ConfigLoader) LoadCore(cfg store.Config) *Core {
+func (inst *ConfigLoader) LoadCore(cfg repositories.Config) *Core {
 	const name = ""
 	res := &Core{
 		Bare:                    inst.getBool(cfg, name, CoreBare),
@@ -66,7 +66,7 @@ func (inst *ConfigLoader) LoadCore(cfg store.Config) *Core {
 }
 
 // LoadRemote ...
-func (inst *ConfigLoader) LoadRemote(cfg store.Config, name string) *Remote {
+func (inst *ConfigLoader) LoadRemote(cfg repositories.Config, name string) *Remote {
 	res := &Remote{
 		Name:  name,
 		URL:   inst.getString(cfg, name, RemoteNameURL),
@@ -77,7 +77,7 @@ func (inst *ConfigLoader) LoadRemote(cfg store.Config, name string) *Remote {
 }
 
 // LoadBranch ...
-func (inst *ConfigLoader) LoadBranch(cfg store.Config, name string) *Branch {
+func (inst *ConfigLoader) LoadBranch(cfg repositories.Config, name string) *Branch {
 	res := &Branch{
 		Name:        name,
 		Merge:       inst.getString(cfg, name, BranchNameMerge),

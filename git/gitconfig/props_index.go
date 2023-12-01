@@ -3,12 +3,12 @@ package gitconfig
 import (
 	"strings"
 
-	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git/repositories"
 )
 
 // ConfigIndex ... [aaa.bbb.ccc] is [<class>.<name>.<field>]
 type ConfigIndex interface {
-	GetConfig() store.Config
+	GetConfig() repositories.Config
 
 	ListClasses() []string
 
@@ -21,7 +21,7 @@ type ConfigIndex interface {
 ////////////////////////////////////////////////////////////////////////////////
 
 type myConfigIndex struct {
-	config  store.Config
+	config  repositories.Config
 	classes map[string]*myConfigClass
 }
 
@@ -29,7 +29,7 @@ func (inst *myConfigIndex) _Impl() ConfigIndex {
 	return inst
 }
 
-func (inst *myConfigIndex) GetConfig() store.Config {
+func (inst *myConfigIndex) GetConfig() repositories.Config {
 	return inst.config
 }
 
@@ -127,7 +127,7 @@ type myConfigIndexBuilder struct {
 	index myConfigIndex
 }
 
-func (inst *myConfigIndexBuilder) init(cfg store.Config) {
+func (inst *myConfigIndexBuilder) init(cfg repositories.Config) {
 	inst.index.config = cfg
 	inst.index.classes = make(map[string]*myConfigClass)
 	src := cfg.Export()

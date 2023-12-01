@@ -6,10 +6,11 @@ import (
 	"hash"
 	"io"
 
-	"bitwormhole.com/starter/afs"
 	"github.com/bitwormhole/gitlib/git"
-	"github.com/bitwormhole/starter/util"
-	"github.com/bitwormhole/starter/vlog"
+
+	"github.com/starter-go/afs"
+	"github.com/starter-go/base/lang"
+	"github.com/starter-go/vlog"
 )
 
 type packSumChecker struct {
@@ -172,6 +173,6 @@ func (inst *packSumChecker) finish() error {
 }
 
 func (inst *packSumChecker) log(tag string, data []byte) {
-	str := util.StringifyBytes(data)
+	str := lang.HexFromBytes(data).String()
 	vlog.Warn(tag, ": ", str)
 }

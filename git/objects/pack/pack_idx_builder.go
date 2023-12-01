@@ -8,9 +8,9 @@ import (
 	"io"
 	"sort"
 
-	"bitwormhole.com/starter/afs"
 	"github.com/bitwormhole/gitlib/git"
 	"github.com/bitwormhole/gitlib/git/objects"
+	"github.com/starter-go/afs"
 )
 
 // IdxBuilder ...
@@ -152,17 +152,30 @@ func (inst *v2IdxBuilder) makeObjectHead(item *git.PackedObjectHeaderEx) []byte 
 func (inst *v2IdxBuilder) Len() int {
 	return len(inst.items)
 }
+
 func (inst *v2IdxBuilder) Less(i1, i2 int) bool {
 	o1 := inst.items[i1]
 	o2 := inst.items[i2]
-	n := git.HashCompare(o1.OID, o2.OID)
+	n := git.CompareObjectIDs(o1.OID, o2.OID)
 	return (n > 0)
 }
+
 func (inst *v2IdxBuilder) Swap(i1, i2 int) {
 	o1 := inst.items[i1]
 	o2 := inst.items[i2]
 	inst.items[i1] = o2
 	inst.items[i2] = o1
+}
+
+func (inst *v2IdxBuilder) getByte0FromOID(oid git.ObjectID) byte {
+	data := oid.Bytes()
+	if data == nil {
+		return 0
+	}
+	if len(data) < 1 {
+		return 0
+	}
+	return data[0]
 }
 
 func (inst *v2IdxBuilder) makeFanout() error {
@@ -172,7 +185,7 @@ func (inst *v2IdxBuilder) makeFanout() error {
 	b1 := byte(0)
 	for _, item := range src {
 		oid := item.OID
-		b0 := oid.GetByte(0)
+		b0 := inst.getByte0FromOID(oid) // oid.GetByte(0)
 		if b1 != b0 {
 			i := int(b1)
 			dst.Data[i] = count
@@ -233,7 +246,7 @@ func (inst *v2IdxBuilder) writeFanout(dst io.Writer) error {
 func (inst *v2IdxBuilder) writeIDs(dst io.Writer) error {
 	for _, item := range inst.items {
 		id := item.OID
-		err := inst.writeHashID(id, dst)
+		err := inst.writeHashID(id.HID(), dst)
 		if err != nil {
 			return err
 		}
@@ -283,7 +296,7 @@ func (inst *v2IdxBuilder) writeCRC32(dst io.Writer) error {
 
 func (inst *v2IdxBuilder) writePID(dst io.Writer) error {
 	pid := inst.pack.GetPackID()
-	return inst.writeHashID(pid, dst)
+	return inst.writeHashID(pid.HID(), dst)
 }
 
 func (inst *v2IdxBuilder) writeSum(dst io.Writer) error {
@@ -325,7 +338,7 @@ func (inst *v2IdxBuilder) writeInt64array(list []int64, dst io.Writer) error {
 }
 
 func (inst *v2IdxBuilder) writeHashID(id git.HashID, dst io.Writer) error {
-	if id == nil {
+	if id == "" {
 		return fmt.Errorf("param is nil")
 	}
 	data := id.Bytes()
@@ -357,7 +370,9 @@ func (inst *v2IdxBuilder) writeToFile(dst afs.Path) error {
 	filename := dst.GetName()
 	tmp := dir.GetChild(filename + ".tmp~")
 
-	w, err := tmp.GetIO().OpenWriter(&afs.Options{Create: true, Mkdirs: true})
+	opt := afs.Todo().Create(true).Mkdirs(true)
+	tmp.MakeParents(nil)
+	w, err := tmp.GetIO().OpenWriter(opt)
 	if err != nil {
 		return err
 	}
@@ -381,7 +396,7 @@ func (inst *v2IdxBuilder) writeToFile(dst afs.Path) error {
 	w2 = nil
 	w = nil
 
-	return tmp.MoveTo(dst)
+	return tmp.MoveTo(dst, nil)
 }
 
 func (inst *v2IdxBuilder) wrapWriter(dst io.Writer) io.Writer {

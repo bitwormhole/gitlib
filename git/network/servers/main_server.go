@@ -3,13 +3,11 @@ package servers
 import (
 	"fmt"
 	"strings"
-
-	"github.com/bitwormhole/starter/markup"
 )
 
 // MainServerImpl 实现 MainServer 这个接口
 type MainServerImpl struct {
-	markup.Component `id:"git-main-server"`
+	// markup.Component `id:"git-main-server"`
 
 	ServerRegistryList []ServerRegistry `inject:".git-server-registry"`
 

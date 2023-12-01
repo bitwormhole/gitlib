@@ -5,9 +5,9 @@ import (
 	"io"
 	"net/http"
 
-	"bitwormhole.com/starter/vlog"
 	"github.com/bitwormhole/gitlib/git/network/clients"
 	"github.com/bitwormhole/gitlib/git/network/pktline"
+	"github.com/starter-go/vlog"
 )
 
 type gitUploadPackAdvertisementLoader struct {

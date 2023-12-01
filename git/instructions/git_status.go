@@ -3,12 +3,12 @@ package instructions
 import (
 	"context"
 
-	"github.com/bitwormhole/gitlib/git/store"
+	"github.com/bitwormhole/gitlib/git/repositories"
 )
 
 // Status 表示一条git命令
 type Status struct {
-	store.Meta
+	repositories.Meta
 
 	Service StatusService
 
@@ -21,7 +21,7 @@ func (inst *Status) Run() error {
 }
 
 // GetMeta ...
-func (inst *Status) GetMeta() *store.Meta {
+func (inst *Status) GetMeta() *repositories.Meta {
 	return &inst.Meta
 }
 
@@ -29,7 +29,7 @@ func (inst *Status) GetMeta() *store.Meta {
 
 // StatusService 。。。
 type StatusService interface {
-	store.Service
+	repositories.Service
 	Run(task *Status) error
 }
 

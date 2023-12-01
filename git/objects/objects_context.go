@@ -1,8 +1,8 @@
 package objects
 
 import (
-	"bitwormhole.com/starter/afs"
 	"github.com/bitwormhole/gitlib/git"
+	"github.com/starter-go/afs"
 )
 
 // Context ... 是 objects 的相关组件专用的上下文

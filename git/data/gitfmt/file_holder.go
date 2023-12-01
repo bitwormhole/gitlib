@@ -3,7 +3,7 @@ package gitfmt
 import (
 	"io"
 
-	"bitwormhole.com/starter/afs"
+	"github.com/starter-go/afs"
 )
 
 // FileHolder ...

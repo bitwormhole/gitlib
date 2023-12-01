@@ -1,0 +1,33 @@
+{
+    "configen": {
+        "version": "4",
+        "sources": [
+            {
+                "id": "main",
+                "path": "src/main/golang/code",
+                "r": true
+            },
+            {
+                "id": "test",
+                "path": "src/test/golang/code",
+                "r": true
+            }
+        ],
+        "destinations": [
+            {
+                "id": "main",
+                "path": "gen/main4gitlib",
+                "sources": [
+                    "main"
+                ]
+            },
+            {
+                "id": "test",
+                "path": "gen/test4gitlib",
+                "sources": [
+                    "test"
+                ]
+            }
+        ]
+    }
+}

@@ -4,8 +4,8 @@ import (
 	"os"
 	"strings"
 
-	"bitwormhole.com/starter/afs"
-	"bitwormhole.com/starter/afs/files"
+	"github.com/starter-go/afs"
+	"github.com/starter-go/afs/files"
 )
 
 // ComputeAbsolutePath ... 把 href 解析为完整的绝对路径

@@ -10,9 +10,9 @@ import (
 	"fmt"
 	"io"
 
-	"bitwormhole.com/starter/afs"
 	"github.com/bitwormhole/gitlib/git"
 	"github.com/bitwormhole/gitlib/git/objects"
+	"github.com/starter-go/afs"
 )
 
 type packObjectOffsetScanner struct {
@@ -63,7 +63,7 @@ func (inst *packObjectOffsetScanner) computeComplexObjectSumID(item *git.PackedO
 
 	hx, src, err := p.OpenComplexObjectReader(item, nil)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	defer func() {
 		src.Close()
@@ -87,7 +87,7 @@ func (inst *packObjectOffsetScanner) computeComplexObjectSumID(item *git.PackedO
 	// write body (data)
 	sizeHave, err := io.Copy(dst, src)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	// check type
@@ -96,12 +96,12 @@ func (inst *packObjectOffsetScanner) computeComplexObjectSumID(item *git.PackedO
 	} else if objType == git.ObjectTypeCommit {
 	} else if objType == git.ObjectTypeTag {
 	} else {
-		return nil, fmt.Errorf("bad complex-in-pack-object type: %v", objType.String())
+		return "", fmt.Errorf("bad complex-in-pack-object type: %v", objType.String())
 	}
 
 	// check size
 	if sizeWant != sizeHave {
-		return nil, fmt.Errorf("bad complex-in-pack-object size, want:%v have:%v", sizeWant, sizeHave)
+		return "", fmt.Errorf("bad complex-in-pack-object size, want:%v have:%v", sizeWant, sizeHave)
 	}
 
 	sum := dst.Sum([]byte{})
@@ -182,16 +182,16 @@ func (inst *packObjectOffsetScanner) readPackSumID(r io.ReadSeeker) (git.PackID,
 
 	_, err := r.Seek(int64(0-sizeWant), io.SeekEnd)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	sizeHave, err := r.Read(sum)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	if sizeHave != sizeWant {
-		return nil, fmt.Errorf("bad pack-id size")
+		return "", fmt.Errorf("bad pack-id size")
 	}
 
 	return git.CreatePackID(sum)
