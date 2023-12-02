@@ -6,6 +6,6 @@ import "github.com/starter-go/application"
 
 // ExportComponents ...
 func ExportComponents(cr application.ComponentRegistry) error {
-	// return registerComponents(cr)
-	return nil
+	return registerComponents(cr)
+	// return nil
 }

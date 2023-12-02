@@ -1,9 +1,12 @@
 package repositories
 
 import (
+	"io"
+
 	"github.com/bitwormhole/gitlib/git"
 	"github.com/bitwormhole/gitlib/git/network/pktline"
 	"github.com/starter-go/afs"
+	"github.com/starter-go/base/safe"
 	// "github.com/starter-go/cli"
 )
 
@@ -69,31 +72,62 @@ type ContextConfigurer interface {
 type SystemContext struct {
 	Config      Config
 	ConfigChain ConfigChain
+	Facade      Lib
+	FS          afs.FS
+	SafeMode    safe.Mode
+
+	Closer                    io.Closer
+	ComponentLifecycleManager ComponentLifecycleManager
+
+	// components
+	AllComponents        []ComponentRegistry
+	SystemComponents     []*ComponentRegistration
+	UserComponents       []*ComponentRegistration
+	RepositoryComponents []*ComponentRegistration
+	SessionComponents    []*ComponentRegistration
+	WorktreeComponents   []*ComponentRegistration
+	SubmoduleComponents  []*ComponentRegistration
+
+	// loaders
+	SystemContextLoader     SystemContextLoader
+	UserContextLoader       UserContextLoader
+	RepositoryContextLoader RepositoryContextLoader
+	SessionContextLoader    SessionContextLoader
+	WorktreeContextLoader   WorktreeContextLoader
+	SubmoduleContextLoader  SubmoduleContextLoader
+
+	// for repo
+	RepositoryFinder  Finder
+	RepositoryLocator Locator
+	RepositoryLoader  Loader
 }
 
 // UserContext ...
 type UserContext struct {
-	Parent      *SystemContext
-	Home        afs.Path // 用户的主文件夹
-	Config      Config
-	ConfigChain ConfigChain
+	Parent                    *SystemContext
+	Home                      afs.Path // 用户的主文件夹
+	Config                    Config
+	ConfigChain               ConfigChain
+	ComponentLifecycleManager ComponentLifecycleManager
 }
 
 // RepositoryContext ...
 type RepositoryContext struct {
-	Parent      *UserContext
-	Config      Config
-	ConfigChain ConfigChain
-	Layout      Layout
-	Facade      Repository
-	Submodules  Submodules
-	Worktrees   Worktrees
+	Parent                    *UserContext
+	Config                    Config
+	ConfigChain               ConfigChain
+	Layout                    Layout
+	Facade                    Repository
+	Submodules                Submodules
+	Worktrees                 Worktrees
+	ComponentLifecycleManager ComponentLifecycleManager
 }
 
-// ViewportContext ...
+// ViewportContext 是一个抽象的上下文，具体参考 SubmoduleContext & WorktreeContext
 type ViewportContext struct {
-	Parent *RepositoryContext
-	Layout Layout
+	Parent                    *RepositoryContext
+	Layout                    Layout
+	ComponentLifecycleManager ComponentLifecycleManager
 }
 
 // SubmoduleContext ...
@@ -109,3 +143,12 @@ type WorktreeContext struct {
 
 	Facade Worktree
 }
+
+// SessionContext ...
+type SessionContext struct {
+	Parent                    *RepositoryContext
+	ComponentLifecycleManager ComponentLifecycleManager
+	Session                   Session
+}
+
+////////////////////////////////////////////////////////////////////////////////
