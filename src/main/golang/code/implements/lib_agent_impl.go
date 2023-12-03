@@ -47,7 +47,7 @@ func (inst *LibAgentImpl) GetLib() (repositories.Lib, error) {
 	if err != nil {
 		return nil, err
 	}
-	lib := sc.Facade
+	lib := sc.Lib
 	if lib == nil {
 		return nil, fmt.Errorf("bad repositories.SystemContext, facade is nil")
 	}
@@ -68,5 +68,7 @@ func (inst *LibAgentImpl) getSC() (*repositories.SystemContext, error) {
 }
 
 func (inst *LibAgentImpl) loadSystemContext() (*repositories.SystemContext, error) {
-	return inst.Loader.Load()
+	// use: default params
+	params := &repositories.SystemParams{}
+	return inst.Loader.Load(params)
 }

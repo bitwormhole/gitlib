@@ -14,6 +14,8 @@ type Lib interface {
 
 	// GetCLI(required bool) cli.CLI
 
+	SystemContext() *SystemContext
+
 	Loader() Loader
 
 	Finder() Finder

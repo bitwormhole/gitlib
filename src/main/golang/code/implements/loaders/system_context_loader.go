@@ -1,7 +1,10 @@
-package implements
+package loaders
 
 import (
+	"fmt"
+
 	"github.com/bitwormhole/gitlib/git/repositories"
+	"github.com/starter-go/afs"
 	"github.com/starter-go/base/safe"
 	"github.com/starter-go/base/util"
 )
@@ -10,15 +13,30 @@ import (
 type SystemContextLoaderImpl struct {
 
 	//starter:component
-	_as func(repositories.SystemContextLoader) //starter:as("#")
+	_as func(repositories.SystemContextLoader, repositories.ComponentRegistry) //starter:as("#",".")
 
+	FS            afs.FS                           //starter:inject("#")
 	AllComponents []repositories.ComponentRegistry //starter:inject(".")
 	UseSafeMode   bool                             //starter:inject("${git.threads.use-safe-mode}")
 
 }
 
-func (inst *SystemContextLoaderImpl) _impl() repositories.SystemContextLoader {
-	return inst
+func (inst *SystemContextLoaderImpl) _impl() (repositories.SystemContextLoader, repositories.ComponentRegistry) {
+	return inst, inst
+}
+
+// ListRegistrations ...
+func (inst *SystemContextLoaderImpl) ListRegistrations() []*repositories.ComponentRegistration {
+	r1 := &repositories.ComponentRegistration{
+		Enabled:         true,
+		OnInitForSystem: inst.createComp,
+	}
+	return []*repositories.ComponentRegistration{r1}
+}
+
+func (inst *SystemContextLoaderImpl) createComp(ctx *repositories.SystemContext) (any, error) {
+	ctx.SystemContextLoader = inst // singleton
+	return inst, nil
 }
 
 func (inst *SystemContextLoaderImpl) getSafeMode() safe.Mode {
@@ -29,25 +47,48 @@ func (inst *SystemContextLoaderImpl) getSafeMode() safe.Mode {
 }
 
 // Load ...
-func (inst *SystemContextLoaderImpl) Load() (*repositories.SystemContext, error) {
+func (inst *SystemContextLoaderImpl) Load(params *repositories.SystemParams) (*repositories.SystemContext, error) {
 
-	mode := inst.getSafeMode()
-	ctx := &repositories.SystemContext{}
-
-	ctx.SystemContextLoader = inst
-	ctx.AllComponents = inst.AllComponents
-	ctx.SafeMode = mode
-	ctx.ComponentLifecycleManager.Init(mode)
-
-	err := inst.loadComponents(ctx)
+	err := inst.checkParams(params)
 	if err != nil {
 		return nil, err
 	}
 
+	ctx := &repositories.SystemContext{}
+	ctx.SystemContextLoader = inst
+	ctx.AllComponents = inst.AllComponents
+	ctx.SafeMode = params.Mode
+	ctx.FS = inst.FS
+	ctx.Path = inst.FS.NewPath("/etc/gitconfig")
+
+	steps := make([]func(ctx *repositories.SystemContext) error, 0)
+	steps = append(steps, inst.loadAllComponents)
+	steps = append(steps, inst.loadSystemComponents)
+	steps = append(steps, inst.openNewLife)
+
+	for _, step := range steps {
+		err := step(ctx)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return ctx, nil
 }
 
-func (inst *SystemContextLoaderImpl) loadComponents(ctx *repositories.SystemContext) error {
+func (inst *SystemContextLoaderImpl) checkParams(params *repositories.SystemParams) error {
+
+	if params == nil {
+		return fmt.Errorf("no params")
+	}
+
+	if params.Mode == nil {
+		params.Mode = inst.getSafeMode()
+	}
+
+	return nil
+}
+
+func (inst *SystemContextLoaderImpl) loadAllComponents(ctx *repositories.SystemContext) error {
 
 	// list
 	src := ctx.AllComponents
@@ -77,33 +118,25 @@ func (inst *SystemContextLoaderImpl) loadComponents(ctx *repositories.SystemCont
 		}
 	}
 
-	// load components for system-context
-	return inst.loadSystemComponents(ctx)
+	return nil
 }
 
 func (inst *SystemContextLoaderImpl) loadSystemComponents(ctx *repositories.SystemContext) error {
-
-	src := ctx.SystemComponents
-	dst := ctx.ComponentLifecycleManager.GetComponents()
-	holders := make([]*repositories.ComponentHolder, 0)
-
-	for _, item := range src {
-		h, err := dst.Register(item)
-		if err != nil {
-			return err
+	list := ctx.SystemComponents
+	comlife := ctx.ComLifeManager.Init(list, ctx.SafeMode)
+	comlife.CreateItems(func(h *repositories.ComponentHolder) error {
+		maker := h.Registration.OnInitForSystem
+		com, err := maker(ctx)
+		if err == nil && com != nil {
+			h.Component = com
 		}
-		holders = append(holders, h)
-		onInit := h.Registration.OnInitForSystem
-		com, err := onInit(ctx)
-		if err != nil {
-			return err
-		}
-		h.Component = com
-	}
+		return err
+	})
+	return nil
+}
 
-	// load & open
-	ctx.ComponentLifecycleManager.Load()
-	lifeManager := ctx.ComponentLifecycleManager.GetLifecycles()
+func (inst *SystemContextLoaderImpl) openNewLife(ctx *repositories.SystemContext) error {
+	lifeManager := ctx.ComLifeManager.GetLifecycles()
 	closer, err := lifeManager.Open()
 	if err != nil {
 		return err

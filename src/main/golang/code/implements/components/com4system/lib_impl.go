@@ -32,9 +32,9 @@ func (inst *LibComReg) ListRegistrations() []*repositories.ComponentRegistration
 }
 
 func (inst *LibComReg) create(ctx *repositories.SystemContext) (any, error) {
-	com := &libImpl{context: ctx}
-	ctx.Facade = com
-	return com, nil
+	lib := &libImpl{context: ctx}
+	ctx.Lib = lib
+	return lib, nil
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -59,6 +59,10 @@ func (inst *libImpl) Finder() repositories.Finder {
 
 func (inst *libImpl) Locator() repositories.Locator {
 	return inst.context.RepositoryLocator
+}
+
+func (inst *libImpl) SystemContext() *repositories.SystemContext {
+	return inst.context
 }
 
 func (inst *libImpl) InstructionServiceManager() repositories.ServiceManager {

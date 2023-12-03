@@ -1,33 +1,89 @@
 package repositories
 
-import "github.com/starter-go/afs"
+import (
+	"github.com/starter-go/afs"
+	"github.com/starter-go/base/safe"
+)
+
+////////////////////////////////////////////////////////////////////////////////
+
+// SystemParams ...
+type SystemParams struct {
+	Mode safe.Mode
+}
 
 // SystemContextLoader ...
 type SystemContextLoader interface {
-	Load() (*SystemContext, error)
+	Load(params *SystemParams) (*SystemContext, error)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// UserParams ...
+type UserParams struct {
+	Mode   safe.Mode
+	Home   afs.Path
+	Parent *SystemContext
 }
 
 // UserContextLoader ...
 type UserContextLoader interface {
-	Load(parent *SystemContext, home afs.Path) (*UserContext, error)
+	Load(params *UserParams) (*UserContext, error)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// RepositoryParams ...
+type RepositoryParams struct {
+	Mode   safe.Mode
+	Layout Layout
+	Parent *UserContext
 }
 
 // RepositoryContextLoader ...
 type RepositoryContextLoader interface {
-	Load(parent *UserContext, layout Layout) (*RepositoryContext, error)
+	Load(params *RepositoryParams) (*RepositoryContext, error)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// SessionParams ...
+type SessionParams struct {
+	Mode   safe.Mode
+	Parent *RepositoryContext
 }
 
 // SessionContextLoader ...
 type SessionContextLoader interface {
-	Load(parent *RepositoryContext) (*SessionContext, error)
+	Load(params *SessionParams) (*SessionContext, error)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// WorktreeParams ...
+type WorktreeParams struct {
+	Mode   safe.Mode
+	Layout Layout
+	Parent *RepositoryContext
 }
 
 // WorktreeContextLoader ...
 type WorktreeContextLoader interface {
-	Load(parent *RepositoryContext, layout Layout) (*WorktreeContext, error)
+	Load(params *WorktreeParams) (*WorktreeContext, error)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// SubmoduleParams ...
+type SubmoduleParams struct {
+	Mode   safe.Mode
+	Layout Layout
+	Parent *RepositoryContext
 }
 
 // SubmoduleContextLoader ...
 type SubmoduleContextLoader interface {
-	Load(parent *RepositoryContext, layout Layout) (*SubmoduleContext, error)
+	Load(params *SubmoduleParams) (*SubmoduleContext, error)
 }
+
+////////////////////////////////////////////////////////////////////////////////

@@ -30,6 +30,8 @@ func (inst *autoRegistrar) register(factory comFactory) error {
 func (inst*autoRegistrar) addAll() error {
 
     
+    inst.register(&p4fac42bf2f_cases_ContextLoadersTest{})
+    inst.register(&p4fac42bf2f_cases_RepositoryPathProviderImpl{})
     inst.register(&p4fac42bf2f_cases_SystemContextTest{})
 
 
