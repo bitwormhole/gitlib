@@ -370,7 +370,7 @@ func (inst *v2IdxBuilder) writeToFile(dst afs.Path) error {
 	filename := dst.GetName()
 	tmp := dir.GetChild(filename + ".tmp~")
 
-	opt := afs.Todo().Create(true).Mkdirs(true)
+	opt := afs.Todo().Create(true).Mkdirs(true).Options()
 	tmp.MakeParents(nil)
 	w, err := tmp.GetIO().OpenWriter(opt)
 	if err != nil {

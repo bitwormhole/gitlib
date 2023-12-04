@@ -8,8 +8,8 @@ import (
 
 const (
 	theModuleName     = "github.com/bitwormhole/gitlib"
-	theModuleVersion  = "v0.1.1-snapshot"
-	theModuleRevision = 17
+	theModuleVersion  = "v0.1.2"
+	theModuleRevision = 18
 )
 
 ////////////////////////////////////////////////////////////////////////////////
