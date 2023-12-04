@@ -1,7 +1,7 @@
 package cases
 
 import (
-	"github.com/bitwormhole/gitlib/git/repositories"
+	"github.com/bitwormhole/gitlib"
 	"github.com/starter-go/units"
 )
 
@@ -10,7 +10,7 @@ type SystemContextTest struct {
 
 	//starter:component
 
-	LibAgent repositories.LibAgent //starter:inject("#")
+	LibAgent gitlib.Agent //starter:inject("#")
 
 }
 
@@ -31,10 +31,7 @@ func (inst *SystemContextTest) Units(list []*units.Registration) []*units.Regist
 
 func (inst *SystemContextTest) t() error {
 
-	lib, err := inst.LibAgent.GetLib()
-	if err != nil {
-		return err
-	}
+	lib := inst.LibAgent.GetLib()
 
 	lib.Loader()
 

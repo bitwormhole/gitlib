@@ -44,6 +44,7 @@ func (inst*autoRegistrar) addAll() error {
     inst.register(&pa6edb103eb_com4system_RepositoryLocatorRegistry{})
     inst.register(&pa6edb103eb_com4system_SystemConfigLoaderRegistry{})
     inst.register(&pa6edb103eb_com4system_SystemFacadeRegistry{})
+    inst.register(&peee8217021_implements_GitlibAgentImpl{})
     inst.register(&peee8217021_implements_LibAgentImpl{})
     inst.register(&pf2f602615f_loaders_RepositoryContextLoaderImpl{})
     inst.register(&pf2f602615f_loaders_SessionContextLoaderImpl{})

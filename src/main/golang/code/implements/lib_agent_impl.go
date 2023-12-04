@@ -3,6 +3,7 @@ package implements
 import (
 	"fmt"
 
+	"github.com/bitwormhole/gitlib"
 	"github.com/bitwormhole/gitlib/git/repositories"
 	"github.com/starter-go/application"
 )
@@ -71,4 +72,29 @@ func (inst *LibAgentImpl) loadSystemContext() (*repositories.SystemContext, erro
 	// use: default params
 	params := &repositories.SystemParams{}
 	return inst.Loader.Load(params)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// GitlibAgentImpl ...
+type GitlibAgentImpl struct {
+
+	//starter:component
+	_as func(gitlib.Agent) //starter:as("#")
+
+	Inner repositories.LibAgent //starter:inject("#")
+
+}
+
+func (inst *GitlibAgentImpl) _impl() gitlib.Agent {
+	return inst
+}
+
+// GetLib ...
+func (inst *GitlibAgentImpl) GetLib() repositories.Lib {
+	lib, err := inst.Inner.GetLib()
+	if err != nil {
+		panic(err)
+	}
+	return lib
 }

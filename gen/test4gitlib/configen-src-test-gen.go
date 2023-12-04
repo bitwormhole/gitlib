@@ -1,5 +1,6 @@
 package test4gitlib
 import (
+    paeb460c7d "github.com/bitwormhole/gitlib"
     pa06da1b0f "github.com/bitwormhole/gitlib/git/repositories"
     p4fac42bf2 "github.com/bitwormhole/gitlib/src/test/golang/code/cases"
     p0d2a11d16 "github.com/starter-go/afs"
@@ -145,8 +146,8 @@ func (inst* p4fac42bf2f_cases_SystemContextTest) inject(injext application.Injec
 }
 
 
-func (inst*p4fac42bf2f_cases_SystemContextTest) getLibAgent(ie application.InjectionExt)pa06da1b0f.LibAgent{
-    return ie.GetComponent("#alias-a06da1b0f12870119f837ccacb2eabeb-LibAgent").(pa06da1b0f.LibAgent)
+func (inst*p4fac42bf2f_cases_SystemContextTest) getLibAgent(ie application.InjectionExt)paeb460c7d.Agent{
+    return ie.GetComponent("#alias-aeb460c7d339df24b0b38a0d65e30102-Agent").(paeb460c7d.Agent)
 }
 
 

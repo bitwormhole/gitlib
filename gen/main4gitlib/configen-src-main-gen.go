@@ -58,6 +58,50 @@ func (inst*peee8217021_implements_LibAgentImpl) getLoader(ie application.Injecti
 
 
 
+// type peee821702.GitlibAgentImpl in package:github.com/bitwormhole/gitlib/src/main/golang/code/implements
+//
+// id:com-eee8217021100052-implements-GitlibAgentImpl
+// class:
+// alias:alias-aeb460c7d339df24b0b38a0d65e30102-Agent
+// scope:singleton
+//
+type peee8217021_implements_GitlibAgentImpl struct {
+}
+
+func (inst* peee8217021_implements_GitlibAgentImpl) register(cr application.ComponentRegistry) error {
+	r := cr.NewRegistration()
+	r.ID = "com-eee8217021100052-implements-GitlibAgentImpl"
+	r.Classes = ""
+	r.Aliases = "alias-aeb460c7d339df24b0b38a0d65e30102-Agent"
+	r.Scope = "singleton"
+	r.NewFunc = inst.new
+	r.InjectFunc = inst.inject
+	return r.Commit()
+}
+
+func (inst* peee8217021_implements_GitlibAgentImpl) new() any {
+    return &peee821702.GitlibAgentImpl{}
+}
+
+func (inst* peee8217021_implements_GitlibAgentImpl) inject(injext application.InjectionExt, instance any) error {
+	ie := injext
+	com := instance.(*peee821702.GitlibAgentImpl)
+	nop(ie, com)
+
+	
+    com.Inner = inst.getInner(ie)
+
+
+    return nil
+}
+
+
+func (inst*peee8217021_implements_GitlibAgentImpl) getInner(ie application.InjectionExt)pa06da1b0f.LibAgent{
+    return ie.GetComponent("#alias-a06da1b0f12870119f837ccacb2eabeb-LibAgent").(pa06da1b0f.LibAgent)
+}
+
+
+
 // type p115564418.ExampleComponentRegistry in package:github.com/bitwormhole/gitlib/src/main/golang/code/implements/components
 //
 // id:com-115564418d6dce6c-components-ExampleComponentRegistry
