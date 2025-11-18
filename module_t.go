@@ -8,7 +8,7 @@ import (
 
 const (
 	theModuleName     = "github.com/bitwormhole/gitlib"
-	theModuleVersion  = "v0.1.3"
+	theModuleVersion  = "v1.0.0.alpha-1"
 	theModuleRevision = 19
 )
 
@@ -53,4 +53,4 @@ func NewTestModule() *application.ModuleBuilder {
 	return mb
 }
 
-////////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////////

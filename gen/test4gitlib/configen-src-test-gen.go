@@ -1,76 +1,22 @@
 package test4gitlib
 import (
-    paeb460c7d "github.com/bitwormhole/gitlib"
-    pa06da1b0f "github.com/bitwormhole/gitlib/git/repositories"
-    p4fac42bf2 "github.com/bitwormhole/gitlib/src/test/golang/code/cases"
-    p0d2a11d16 "github.com/starter-go/afs"
-    p0ef6f2938 "github.com/starter-go/application"
+    p4268ba53a "github.com/bitwormhole/gitlib/src/test/golang/u4go"
      "github.com/starter-go/application"
 )
 
-// type p4fac42bf2.RepositoryPathProviderImpl in package:github.com/bitwormhole/gitlib/src/test/golang/code/cases
+// type p4268ba53a.Demo in package:github.com/bitwormhole/gitlib/src/test/golang/u4go
 //
-// id:com-4fac42bf2f307abb-cases-RepositoryPathProviderImpl
-// class:
-// alias:alias-4fac42bf2f307abbe185e1941901afc0-RepositoryPathProvider
-// scope:singleton
-//
-type p4fac42bf2f_cases_RepositoryPathProviderImpl struct {
-}
-
-func (inst* p4fac42bf2f_cases_RepositoryPathProviderImpl) register(cr application.ComponentRegistry) error {
-	r := cr.NewRegistration()
-	r.ID = "com-4fac42bf2f307abb-cases-RepositoryPathProviderImpl"
-	r.Classes = ""
-	r.Aliases = "alias-4fac42bf2f307abbe185e1941901afc0-RepositoryPathProvider"
-	r.Scope = "singleton"
-	r.NewFunc = inst.new
-	r.InjectFunc = inst.inject
-	return r.Commit()
-}
-
-func (inst* p4fac42bf2f_cases_RepositoryPathProviderImpl) new() any {
-    return &p4fac42bf2.RepositoryPathProviderImpl{}
-}
-
-func (inst* p4fac42bf2f_cases_RepositoryPathProviderImpl) inject(injext application.InjectionExt, instance any) error {
-	ie := injext
-	com := instance.(*p4fac42bf2.RepositoryPathProviderImpl)
-	nop(ie, com)
-
-	
-    com.AC = inst.getAC(ie)
-    com.FS = inst.getFS(ie)
-
-
-    return nil
-}
-
-
-func (inst*p4fac42bf2f_cases_RepositoryPathProviderImpl) getAC(ie application.InjectionExt)p0ef6f2938.Context{
-    return ie.GetContext()
-}
-
-
-func (inst*p4fac42bf2f_cases_RepositoryPathProviderImpl) getFS(ie application.InjectionExt)p0d2a11d16.FS{
-    return ie.GetComponent("#alias-0d2a11d163e349503a64168a1cdf48a2-FS").(p0d2a11d16.FS)
-}
-
-
-
-// type p4fac42bf2.ContextLoadersTest in package:github.com/bitwormhole/gitlib/src/test/golang/code/cases
-//
-// id:com-4fac42bf2f307abb-cases-ContextLoadersTest
+// id:com-4268ba53a5adeb35-u4go-Demo
 // class:
 // alias:
 // scope:singleton
 //
-type p4fac42bf2f_cases_ContextLoadersTest struct {
+type p4268ba53a5_u4go_Demo struct {
 }
 
-func (inst* p4fac42bf2f_cases_ContextLoadersTest) register(cr application.ComponentRegistry) error {
+func (inst* p4268ba53a5_u4go_Demo) register(cr application.ComponentRegistry) error {
 	r := cr.NewRegistration()
-	r.ID = "com-4fac42bf2f307abb-cases-ContextLoadersTest"
+	r.ID = "com-4268ba53a5adeb35-u4go-Demo"
 	r.Classes = ""
 	r.Aliases = ""
 	r.Scope = "singleton"
@@ -79,75 +25,19 @@ func (inst* p4fac42bf2f_cases_ContextLoadersTest) register(cr application.Compon
 	return r.Commit()
 }
 
-func (inst* p4fac42bf2f_cases_ContextLoadersTest) new() any {
-    return &p4fac42bf2.ContextLoadersTest{}
+func (inst* p4268ba53a5_u4go_Demo) new() any {
+    return &p4268ba53a.Demo{}
 }
 
-func (inst* p4fac42bf2f_cases_ContextLoadersTest) inject(injext application.InjectionExt, instance any) error {
+func (inst* p4268ba53a5_u4go_Demo) inject(injext application.InjectionExt, instance any) error {
 	ie := injext
-	com := instance.(*p4fac42bf2.ContextLoadersTest)
+	com := instance.(*p4268ba53a.Demo)
 	nop(ie, com)
 
 	
-    com.LibAgent = inst.getLibAgent(ie)
-    com.Paths = inst.getPaths(ie)
 
 
     return nil
-}
-
-
-func (inst*p4fac42bf2f_cases_ContextLoadersTest) getLibAgent(ie application.InjectionExt)pa06da1b0f.LibAgent{
-    return ie.GetComponent("#alias-a06da1b0f12870119f837ccacb2eabeb-LibAgent").(pa06da1b0f.LibAgent)
-}
-
-
-func (inst*p4fac42bf2f_cases_ContextLoadersTest) getPaths(ie application.InjectionExt)p4fac42bf2.RepositoryPathProvider{
-    return ie.GetComponent("#alias-4fac42bf2f307abbe185e1941901afc0-RepositoryPathProvider").(p4fac42bf2.RepositoryPathProvider)
-}
-
-
-
-// type p4fac42bf2.SystemContextTest in package:github.com/bitwormhole/gitlib/src/test/golang/code/cases
-//
-// id:com-4fac42bf2f307abb-cases-SystemContextTest
-// class:
-// alias:
-// scope:singleton
-//
-type p4fac42bf2f_cases_SystemContextTest struct {
-}
-
-func (inst* p4fac42bf2f_cases_SystemContextTest) register(cr application.ComponentRegistry) error {
-	r := cr.NewRegistration()
-	r.ID = "com-4fac42bf2f307abb-cases-SystemContextTest"
-	r.Classes = ""
-	r.Aliases = ""
-	r.Scope = "singleton"
-	r.NewFunc = inst.new
-	r.InjectFunc = inst.inject
-	return r.Commit()
-}
-
-func (inst* p4fac42bf2f_cases_SystemContextTest) new() any {
-    return &p4fac42bf2.SystemContextTest{}
-}
-
-func (inst* p4fac42bf2f_cases_SystemContextTest) inject(injext application.InjectionExt, instance any) error {
-	ie := injext
-	com := instance.(*p4fac42bf2.SystemContextTest)
-	nop(ie, com)
-
-	
-    com.LibAgent = inst.getLibAgent(ie)
-
-
-    return nil
-}
-
-
-func (inst*p4fac42bf2f_cases_SystemContextTest) getLibAgent(ie application.InjectionExt)paeb460c7d.Agent{
-    return ie.GetComponent("#alias-aeb460c7d339df24b0b38a0d65e30102-Agent").(paeb460c7d.Agent)
 }
 
 
