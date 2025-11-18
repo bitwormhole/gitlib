@@ -55,7 +55,41 @@ func (inst *innerLocator) locate(wd afs.Directory) (Layout, error) {
 
 func (inst *innerLocator) tryLocateAsBareRepo(path afs.Directory) (Layout, error) {
 
-	return nil, fmt.Errorf("innerLocator.tryLocateAsBareRepo() : todo: no impl")
+	// 这个方法主要是 通过 查找以下几个文件|文件夹,来达到定位的目的:
+	// dir: objects
+	// dir: refs
+	// file: config
+	// file: HEAD
+
+	if path == nil {
+		return nil, fmt.Errorf("innerLocator.tryLocateAsBareRepo() : param [path] is nil")
+	}
+	ptr := path
+	ttl := ptr.CountParents()
+
+	for ; (ttl >= 0) && (ptr != nil); ttl-- {
+
+		dirRefs := ptr.GetChild("refs")
+		dirObjects := ptr.GetChild("objects")
+		fileConfig := ptr.GetChild("config")
+		fileHead := ptr.GetChild("HEAD")
+
+		b1 := dirRefs.IsDir()
+		b2 := dirObjects.IsDir()
+		b3 := fileConfig.IsFile()
+		b4 := fileHead.IsFile()
+
+		if b1 && b2 && b3 && b4 {
+			repo := fileConfig.GetParent()
+			lb := new(LayoutBuilder)
+			lb.WD = path
+			return inst.makeLayoutWithRepoDir(repo, lb)
+		}
+
+		ptr = ptr.GetParent()
+	}
+
+	return nil, fmt.Errorf("cannot find git-repo at path [%s]", path.String())
 }
 
 func (inst *innerLocator) locateWithDotGitFile(dotgit afs.File, lb *LayoutBuilder) (Layout, error) {
@@ -86,11 +120,16 @@ func (inst *innerLocator) makeLayoutWithRepoDir(repo afs.Directory, lb *LayoutBu
 	fileDescription := repo.GetChild("description")
 	fileHead := repo.GetChild("HEAD")
 	fileIndex := repo.GetChild("index")
+	filePackedRefs := repo.GetChild("packed-refs")
 
 	dirObjects := repo.GetChild("objects")
 	dirRefs := repo.GetChild("refs")
 	dirWorktrees := repo.GetChild("worktrees")
 	dirModules := repo.GetChild("modules")
+	dirLogs := repo.GetChild("logs")
+	dirHooks := repo.GetChild("hooks")
+	dirInfo := repo.GetChild("info")
+	dirBranches := repo.GetChild("branches")
 
 	//files
 
@@ -98,6 +137,7 @@ func (inst *innerLocator) makeLayoutWithRepoDir(repo afs.Directory, lb *LayoutBu
 	lb.Description = fileDescription.(afs.File)
 	lb.HEAD = fileHead.(afs.File)
 	lb.Index = fileIndex.(afs.File)
+	lb.PackedRefs = filePackedRefs.(afs.File)
 
 	//dirs
 
@@ -105,6 +145,10 @@ func (inst *innerLocator) makeLayoutWithRepoDir(repo afs.Directory, lb *LayoutBu
 	lb.Refs = dirRefs.(afs.Directory)
 	lb.Worktrees = dirWorktrees.(afs.Directory)
 	lb.Modules = dirModules.(afs.Directory)
+	lb.Branches = dirBranches.(afs.Directory)
+	lb.Hooks = dirHooks.(afs.Directory)
+	lb.Info = dirInfo.(afs.Directory)
+	lb.Logs = dirLogs.(afs.Directory)
 
 	// complete
 

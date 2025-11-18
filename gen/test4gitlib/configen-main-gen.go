@@ -31,6 +31,7 @@ func (inst*autoRegistrar) addAll() error {
 
     
     inst.register(&p4268ba53a5_u4go_Demo{})
+    inst.register(&p4268ba53a5_u4go_GitRepoLocatorTest{})
 
 
     return nil
